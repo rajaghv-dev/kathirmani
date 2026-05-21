@@ -1,0 +1,377 @@
+{
+  "title": "Kathirmani — Camera Views",
+  "uid": "marlin-cameras",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "15s",
+  "time": { "from": "now-1h", "to": "now" },
+  "tags": ["marlin", "cameras", "surveillance", "kathirmani"],
+  "panels": [
+
+    {
+      "id": 100, "type": "row",
+      "title": "Kathirmani Bill Counter",
+      "collapsed": false,
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 1 },
+      "panels": []
+    },
+    {
+      "id": 101, "type": "stat",
+      "title": "Events Detected — Bill Counter",
+      "gridPos": { "x": 0, "y": 1, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "value": null, "color": "blue" },
+            { "value": 1, "color": "green" }
+          ]}
+        }
+      },
+      "targets": [{ "expr": "marlin_events_detected_total{video=\"Kathirmani Bill Counter\"}", "legendFormat": "Events" }]
+    },
+    {
+      "id": 102, "type": "bargauge",
+      "title": "Find Span Duration per Query — Bill Counter",
+      "gridPos": { "x": 6, "y": 1, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "min": 0,
+          "color": { "mode": "continuous-BlYlRd" },
+          "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "blue" }] }
+        }
+      },
+      "targets": [{ "expr": "marlin_find_span_duration_seconds{video=\"Kathirmani Bill Counter\"}", "legendFormat": "{{query}}" }]
+    },
+    {
+      "id": 103, "type": "stat",
+      "title": "Parse Success Rate — Bill Counter",
+      "gridPos": { "x": 18, "y": 1, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "value": null, "color": "red" },
+            { "value": 0.7, "color": "yellow" },
+            { "value": 0.9, "color": "green" }
+          ]}
+        }
+      },
+      "targets": [{ "expr": "avg(marlin_find_parse_success{video=\"Kathirmani Bill Counter\"})", "legendFormat": "Parse OK" }]
+    },
+
+    {
+      "id": 200, "type": "row",
+      "title": "Kathirmani Center Camera",
+      "collapsed": false,
+      "gridPos": { "x": 0, "y": 9, "w": 24, "h": 1 },
+      "panels": []
+    },
+    {
+      "id": 201, "type": "stat",
+      "title": "Events Detected — Center Camera",
+      "gridPos": { "x": 0, "y": 10, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "value": null, "color": "blue" },
+            { "value": 1, "color": "green" }
+          ]}
+        }
+      },
+      "targets": [{ "expr": "marlin_events_detected_total{video=\"Kathirmani Center Camera\"}", "legendFormat": "Events" }]
+    },
+    {
+      "id": 202, "type": "bargauge",
+      "title": "Find Span Duration per Query — Center Camera",
+      "gridPos": { "x": 6, "y": 10, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "min": 0,
+          "color": { "mode": "continuous-BlYlRd" },
+          "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "blue" }] }
+        }
+      },
+      "targets": [{ "expr": "marlin_find_span_duration_seconds{video=\"Kathirmani Center Camera\"}", "legendFormat": "{{query}}" }]
+    },
+    {
+      "id": 203, "type": "stat",
+      "title": "Parse Success Rate — Center Camera",
+      "gridPos": { "x": 18, "y": 10, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "value": null, "color": "red" },
+            { "value": 0.7, "color": "yellow" },
+            { "value": 0.9, "color": "green" }
+          ]}
+        }
+      },
+      "targets": [{ "expr": "avg(marlin_find_parse_success{video=\"Kathirmani Center Camera\"})", "legendFormat": "Parse OK" }]
+    },
+
+    {
+      "id": 300, "type": "row",
+      "title": "Kathirmani Left Side Camera",
+      "collapsed": false,
+      "gridPos": { "x": 0, "y": 18, "w": 24, "h": 1 },
+      "panels": []
+    },
+    {
+      "id": 301, "type": "stat",
+      "title": "Events Detected — Left Side Camera",
+      "gridPos": { "x": 0, "y": 19, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "value": null, "color": "blue" },
+            { "value": 1, "color": "green" }
+          ]}
+        }
+      },
+      "targets": [{ "expr": "marlin_events_detected_total{video=\"Kathirmani Left Side Camera\"}", "legendFormat": "Events" }]
+    },
+    {
+      "id": 302, "type": "bargauge",
+      "title": "Find Span Duration per Query — Left Side Camera",
+      "gridPos": { "x": 6, "y": 19, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "min": 0,
+          "color": { "mode": "continuous-BlYlRd" },
+          "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "blue" }] }
+        }
+      },
+      "targets": [{ "expr": "marlin_find_span_duration_seconds{video=\"Kathirmani Left Side Camera\"}", "legendFormat": "{{query}}" }]
+    },
+    {
+      "id": 303, "type": "stat",
+      "title": "Parse Success Rate — Left Side Camera",
+      "gridPos": { "x": 18, "y": 19, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "value": null, "color": "red" },
+            { "value": 0.7, "color": "yellow" },
+            { "value": 0.9, "color": "green" }
+          ]}
+        }
+      },
+      "targets": [{ "expr": "avg(marlin_find_parse_success{video=\"Kathirmani Left Side Camera\"})", "legendFormat": "Parse OK" }]
+    },
+
+    {
+      "id": 400, "type": "row",
+      "title": "Kathirmani Near Entry Door Camera",
+      "collapsed": false,
+      "gridPos": { "x": 0, "y": 27, "w": 24, "h": 1 },
+      "panels": []
+    },
+    {
+      "id": 401, "type": "stat",
+      "title": "Events Detected — Near Entry Door Camera",
+      "gridPos": { "x": 0, "y": 28, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "value": null, "color": "blue" },
+            { "value": 1, "color": "green" }
+          ]}
+        }
+      },
+      "targets": [{ "expr": "marlin_events_detected_total{video=\"Kathirmani Near Entry Door Camera\"}", "legendFormat": "Events" }]
+    },
+    {
+      "id": 402, "type": "bargauge",
+      "title": "Find Span Duration per Query — Near Entry Door Camera",
+      "gridPos": { "x": 6, "y": 28, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "min": 0,
+          "color": { "mode": "continuous-BlYlRd" },
+          "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "blue" }] }
+        }
+      },
+      "targets": [{ "expr": "marlin_find_span_duration_seconds{video=\"Kathirmani Near Entry Door Camera\"}", "legendFormat": "{{query}}" }]
+    },
+    {
+      "id": 403, "type": "stat",
+      "title": "Parse Success Rate — Near Entry Door Camera",
+      "gridPos": { "x": 18, "y": 28, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "value": null, "color": "red" },
+            { "value": 0.7, "color": "yellow" },
+            { "value": 0.9, "color": "green" }
+          ]}
+        }
+      },
+      "targets": [{ "expr": "avg(marlin_find_parse_success{video=\"Kathirmani Near Entry Door Camera\"})", "legendFormat": "Parse OK" }]
+    },
+
+    {
+      "id": 500, "type": "row",
+      "title": "Kathirmani Right Side Cam",
+      "collapsed": false,
+      "gridPos": { "x": 0, "y": 36, "w": 24, "h": 1 },
+      "panels": []
+    },
+    {
+      "id": 501, "type": "stat",
+      "title": "Events Detected — Right Side Cam",
+      "gridPos": { "x": 0, "y": 37, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "value": null, "color": "blue" },
+            { "value": 1, "color": "green" }
+          ]}
+        }
+      },
+      "targets": [{ "expr": "marlin_events_detected_total{video=\"Kathirmani Right Side Cam\"}", "legendFormat": "Events" }]
+    },
+    {
+      "id": 502, "type": "bargauge",
+      "title": "Find Span Duration per Query — Right Side Cam",
+      "gridPos": { "x": 6, "y": 37, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "min": 0,
+          "color": { "mode": "continuous-BlYlRd" },
+          "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "blue" }] }
+        }
+      },
+      "targets": [{ "expr": "marlin_find_span_duration_seconds{video=\"Kathirmani Right Side Cam\"}", "legendFormat": "{{query}}" }]
+    },
+    {
+      "id": 503, "type": "stat",
+      "title": "Parse Success Rate — Right Side Cam",
+      "gridPos": { "x": 18, "y": 37, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "value": null, "color": "red" },
+            { "value": 0.7, "color": "yellow" },
+            { "value": 0.9, "color": "green" }
+          ]}
+        }
+      },
+      "targets": [{ "expr": "avg(marlin_find_parse_success{video=\"Kathirmani Right Side Cam\"})", "legendFormat": "Parse OK" }]
+    }
+
+  ]
+}

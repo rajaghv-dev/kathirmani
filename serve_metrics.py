@@ -45,6 +45,13 @@ FIND_TIME   = Gauge("marlin_find_duration_seconds",    "Avg find query time (s)"
 
 MODEL_INFO  = Info("marlin_model", "Model metadata")
 
+# --- fused / store-wide metrics (from results/fused.json) ---
+FUSED_EVENTS    = Gauge("marlin_fused_unique_events",         "Unique events after multi-view dedup")
+FUSED_RAW       = Gauge("marlin_fused_raw_events_total",      "Raw events before dedup across cameras")
+FUSED_FIND_START= Gauge("marlin_fused_find_span_start_seconds","Fused find span start (s)", ["query"])
+FUSED_FIND_END  = Gauge("marlin_fused_find_span_end_seconds",  "Fused find span end (s)",   ["query"])
+FUSED_FIND_DUR  = Gauge("marlin_fused_find_span_duration_seconds","Fused span duration (s)", ["query"])
+
 _loaded: set[str] = set()
 
 
@@ -57,7 +64,7 @@ def load_results():
     total_events = 0
 
     for jf in RESULTS_DIR.glob("*.json"):
-        if jf.name == "summary.json":
+        if jf.name in ("summary.json", "fused.json"):
             continue
         try:
             data = json.loads(jf.read_text())
@@ -70,7 +77,6 @@ def load_results():
         total_events += len(events)
         videos_done += 1
 
-        # Find results
         for query, res in data.get("find_results", {}).items():
             span = res.get("span")
             ok   = 1 if res.get("format_ok") else 0
@@ -87,6 +93,28 @@ def load_results():
 
     PROCESSED.set(videos_done)
     TOTAL_EV.set(total_events)
+    _load_fused()
+
+
+def _load_fused():
+    """Load results/fused.json and update store-wide metrics."""
+    fused_path = RESULTS_DIR / "fused.json"
+    if not fused_path.exists():
+        return
+    try:
+        data = json.loads(fused_path.read_text())
+    except Exception:
+        return
+
+    FUSED_EVENTS.set(data.get("unique_event_count", 0))
+    FUSED_RAW.set(data.get("total_raw_events", 0))
+
+    for query, res in data.get("find_results", {}).items():
+        span = res.get("span")
+        if span and len(span) == 2:
+            FUSED_FIND_START.labels(query=query).set(span[0])
+            FUSED_FIND_END.labels(query=query).set(span[1])
+            FUSED_FIND_DUR.labels(query=query).set(max(0, span[1] - span[0]))
 
 
 def poll_loop(interval: int):

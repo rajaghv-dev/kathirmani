@@ -3,6 +3,7 @@ import json
 import time
 import tempfile
 import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import av
@@ -10,8 +11,11 @@ import torch
 
 from .metrics import (
     INFERENCE_DURATION, EVENTS_DETECTED, VIDEOS_PROCESSED,
-    FIND_SPAN_START, FIND_SPAN_END, FIND_PARSE_OK, poll_gpu_metrics
+    FIND_SPAN_START, FIND_SPAN_END, FIND_PARSE_OK, poll_gpu_metrics,
+    FUSED_EVENTS, FUSED_TOTAL_RAW, FUSED_FIND_START, FUSED_FIND_END, FUSED_FIND_CAM,
 )
+
+_GPU_LOCK = threading.Lock()
 
 # Kathirmani store-specific surveillance queries
 # Each maps to a Prometheus metric label: marlin_find_span_*{query="..."}
@@ -180,6 +184,82 @@ def process_video(model, video_path: Path, results_dir: Path, duration: float | 
     return output
 
 
+def fuse_results(all_results: list[dict]) -> dict:
+    cameras = [r["label"] for r in all_results]
+
+    fused_find: dict = {}
+    for query in FIND_QUERIES:
+        candidates = []
+        for idx, r in enumerate(all_results):
+            fr = r.get("find_results", {}).get(query, {})
+            if fr.get("format_ok") and fr.get("span"):
+                span = fr["span"]
+                length = span[1] - span[0]
+                candidates.append((length, idx, span, r["label"]))
+
+        if candidates:
+            candidates.sort(key=lambda x: x[0], reverse=True)
+            best_len, best_idx, best_span, best_cam = candidates[0]
+            fused_find[query] = {
+                "span": best_span,
+                "camera": best_cam,
+                "format_ok": True,
+            }
+            FUSED_FIND_START.labels(query=query).set(best_span[0])
+            FUSED_FIND_END.labels(query=query).set(best_span[1])
+            FUSED_FIND_CAM.labels(query=query).set(best_idx)
+        else:
+            fused_find[query] = {"span": None, "camera": None, "format_ok": False}
+
+    raw_events: list[dict] = []
+    for r in all_results:
+        raw_events.extend(r.get("events", []))
+
+    total_raw = len(raw_events)
+
+    def _overlap_ratio(a: dict, b: dict) -> float:
+        a0, a1 = float(a.get("start", 0)), float(a.get("end", 0))
+        b0, b1 = float(b.get("start", 0)), float(b.get("end", 0))
+        inter = max(0.0, min(a1, b1) - max(a0, b0))
+        union = max(a1, b1) - min(a0, b0)
+        return inter / union if union > 0 else 0.0
+
+    def _desc_similar(a: dict, b: dict) -> bool:
+        da = (a.get("description") or "").lower().split()
+        db = (b.get("description") or "").lower().split()
+        if not da or not db:
+            return False
+        shared = set(da) & set(db)
+        return len(shared) / max(len(set(da)), len(set(db))) >= 0.5
+
+    deduplicated: list[dict] = []
+    for ev in raw_events:
+        merged = False
+        for i, kept in enumerate(deduplicated):
+            if _desc_similar(ev, kept) and _overlap_ratio(ev, kept) > 0.3:
+                if len(ev.get("description", "")) > len(kept.get("description", "")):
+                    deduplicated[i] = ev
+                merged = True
+                break
+        if not merged:
+            deduplicated.append(ev)
+
+    unique_count = len(deduplicated)
+
+    FUSED_EVENTS.set(unique_count)
+    FUSED_TOTAL_RAW.set(total_raw)
+
+    return {
+        "source": "fused_5_cameras",
+        "cameras": cameras,
+        "find_results": fused_find,
+        "events": deduplicated,
+        "unique_event_count": unique_count,
+        "total_raw_events": total_raw,
+        "dedup_ratio": total_raw / max(unique_count, 1),
+    }
+
+
 def run_all(model, video_dir: Path, results_dir: Path, duration: float | None = None) -> list[dict]:
     videos = [
         v for ext in ("*.mkv", "*.mp4", "*.avi", "*.mov", "*.webm")
@@ -197,11 +277,71 @@ def run_all(model, video_dir: Path, results_dir: Path, duration: float | None = 
     gpu_thread = threading.Thread(target=poll_gpu_metrics, args=(stop_gpu,), daemon=True)
     gpu_thread.start()
 
-    all_results = []
-    for video in videos:
+    total = len(videos)
+    trimmed: dict[Path, Path] = {}
+
+    def _trim(v: Path) -> tuple[Path, Path]:
+        if duration is not None:
+            return v, trim_video(v, duration)
+        return v, v
+
+    with ThreadPoolExecutor(max_workers=min(total, 8)) as pool:
+        futures = {pool.submit(_trim, v): v for v in videos}
+        for fut in as_completed(futures):
+            orig, clipped = fut.result()
+            trimmed[orig] = clipped
+
+    results_by_index: dict[int, dict] = {}
+    completed = 0
+
+    for idx, video in enumerate(videos):
+        infer_path = trimmed[video]
+        label = video.stem
         try:
-            r = process_video(model, video, results_dir, duration=duration)
-            all_results.append(r)
+            with _GPU_LOCK:
+                output = {
+                    "video": video.name,
+                    "label": label,
+                    "duration_tested_sec": duration,
+                    "processed_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                    "caption": None,
+                    "events": [],
+                    "find_results": {},
+                }
+
+                try:
+                    cap_result = _run_caption(model, str(infer_path), label)
+                    output["caption"] = cap_result.get("caption", "")
+                    output["scene"] = cap_result.get("scene", "")
+                    output["events"] = cap_result.get("events", [])
+                    EVENTS_DETECTED.labels(video=label).set(len(output["events"]))
+                except Exception as e:
+                    output["caption_error"] = str(e)
+
+                for query in FIND_QUERIES:
+                    try:
+                        find_result = _run_find(model, str(infer_path), label, query)
+                        span = find_result.get("span")
+                        ok = find_result.get("format_ok", False)
+                        output["find_results"][query] = {
+                            "raw": find_result.get("raw", ""),
+                            "span": list(span) if span else None,
+                            "format_ok": ok,
+                        }
+                        if span:
+                            FIND_SPAN_START.labels(video=label, query=query).set(span[0])
+                            FIND_SPAN_END.labels(video=label, query=query).set(span[1])
+                        FIND_PARSE_OK.labels(video=label, query=query).set(1 if ok else 0)
+                    except Exception as e:
+                        output["find_results"][query] = {"error": str(e)}
+
+                VIDEOS_PROCESSED.labels(status="success").inc()
+
+            out_file = results_dir / f"{label}.json"
+            out_file.write_text(json.dumps(output, indent=2))
+            results_by_index[idx] = output
+            completed += 1
+            print(f"[pipeline] ✓ {label} done ({completed}/{total})")
         except Exception as e:
             print(f"[pipeline] FAILED {video.name}: {e}")
             VIDEOS_PROCESSED.labels(status="error").inc()
@@ -209,8 +349,14 @@ def run_all(model, video_dir: Path, results_dir: Path, duration: float | None = 
     stop_gpu.set()
     cleanup_tmp()
 
+    all_results = [results_by_index[i] for i in sorted(results_by_index)]
+
+    fused = fuse_results(all_results)
+    (results_dir / "fused.json").write_text(json.dumps(fused, indent=2))
+    print(f"[pipeline] Fused result saved → {results_dir / 'fused.json'}")
+
     summary = {
-        "total_videos": len(videos),
+        "total_videos": total,
         "processed": len(all_results),
         "videos": [r["label"] for r in all_results],
         "total_events": sum(len(r.get("events", [])) for r in all_results),

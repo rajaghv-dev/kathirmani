@@ -65,6 +65,35 @@ GPU_TEMPERATURE = Gauge(
 # Model info
 MODEL_INFO = Info("marlin_model", "Model metadata")
 
+# Fused / multi-view metrics
+FUSED_EVENTS = Gauge(
+    "marlin_fused_unique_events",
+    "Unique events after multi-view dedup"
+)
+
+FUSED_TOTAL_RAW = Gauge(
+    "marlin_fused_raw_events_total",
+    "Total raw events before dedup"
+)
+
+FUSED_FIND_START = Gauge(
+    "marlin_fused_find_span_start_seconds",
+    "Fused find span start",
+    ["query"]
+)
+
+FUSED_FIND_END = Gauge(
+    "marlin_fused_find_span_end_seconds",
+    "Fused find span end",
+    ["query"]
+)
+
+FUSED_FIND_CAM = Gauge(
+    "marlin_fused_find_best_camera",
+    "Which camera had the best detection (index 0-4)",
+    ["query"]
+)
+
 
 def poll_gpu_metrics(stop_event: threading.Event, interval: float = 1.0):
     """Background thread to poll GPU metrics via nvidia-smi."""
