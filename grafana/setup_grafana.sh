@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
-# Configure Grafana: add Netdata + Marlin metrics data sources, import dashboard.
-# Run once after Grafana is up: bash grafana/setup_grafana.sh
+# Configure Grafana: add Netdata + Marlin metrics data sources, import dashboards.
+#
+# Run once after Grafana is up:
+#   bash grafana/setup_grafana.sh
+#
+# Then start inference:
+#   source .venv/bin/activate
+#   python run_inference.py --video "Bill Counter" --duration 10 --no-compile
+#
+# Note: run_inference.py self-patches the FFmpeg path via RTLD_GLOBAL preload
+# (no sudo / system FFmpeg required).  Just activate the venv and run.
 
 set -euo pipefail
 
@@ -67,10 +76,19 @@ print('  Dashboard URL:', url)
 echo ""
 echo "===================================================="
 echo "  Setup complete!"
-echo "  Grafana:         http://localhost:3000"
-echo "  Login:           admin / admin"
-echo "  Dashboard path:  Dashboards > Marlin Inference"
+echo "  Grafana:          http://localhost:3000"
+echo "  Login:            admin / admin"
+echo "  Dashboards:       Dashboards > Marlin Inference >"
+echo "    - Marlin-2B — Model & Runtime"
+echo "    - Marlin-2B — Application / Pipeline"
 echo ""
-echo "  Start inference: source .venv/bin/activate && python run_inference.py"
-echo "  Metrics live at: http://localhost:8900/metrics"
+echo "  Run inference (10s test on one camera):"
+echo "    source .venv/bin/activate"
+echo "    python run_inference.py --video 'Bill Counter' --duration 10 --no-compile"
+echo ""
+echo "  Run all cameras (full video):"
+echo "    python run_inference.py"
+echo ""
+echo "  Metrics endpoint: http://localhost:8900/metrics"
+echo "  (metrics server runs while run_inference.py is alive)"
 echo "===================================================="

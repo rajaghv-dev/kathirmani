@@ -1,7 +1,17 @@
-transformers>=5.7.0
+# Core inference
 torch>=2.11.0
-torchcodec
+transformers>=5.7.0
+accelerate
 qwen-vl-utils>=0.0.14
-av
+
+# Video decoding
+# torchcodec is the required backend; it uses PyAV's bundled FFmpeg via RTLD_GLOBAL preload
+# (no system FFmpeg install needed - run_inference.py handles this automatically)
+torchcodec
+av        # provides bundled FFmpeg shared libs used by torchcodec
+
+# Image processing
 pillow
+
+# Metrics
 prometheus_client

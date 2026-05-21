@@ -1,9 +1,11 @@
 """Core Marlin-2B inference pipeline for security camera videos."""
 import json
 import time
+import tempfile
 import threading
 from pathlib import Path
 
+import av
 import torch
 
 from .metrics import (
@@ -28,19 +30,59 @@ FIND_QUERIES = [
 ]
 
 
-def load_model(model_id: str = "NemoStation/Marlin-2B") -> object:
-    print(f"[pipeline] Loading {model_id} ...")
-    model = torch.hub.load if False else None  # placeholder guard
+LOCAL_MODEL_PATH = Path(__file__).parent.parent / "models" / "Marlin-2B"
+
+_tmp_clips: list[Path] = []  # track temp files for cleanup
+
+
+def trim_video(src: Path, duration_sec: float) -> Path:
+    """Decode and re-encode the first `duration_sec` seconds of src to a temp MP4."""
+    tmp = Path(tempfile.mktemp(suffix=".mp4"))
+    _tmp_clips.append(tmp)
+    with av.open(str(src)) as inp:
+        in_vs = inp.streams.video[0]
+        fps = float(in_vs.average_rate or 25)
+        with av.open(str(tmp), "w", format="mp4") as out:
+            from fractions import Fraction
+            out_vs = out.add_stream("libx264", rate=Fraction(fps).limit_denominator(1001))
+            out_vs.width = in_vs.width
+            out_vs.height = in_vs.height
+            out_vs.pix_fmt = "yuv420p"
+            out_vs.options = {"crf": "23", "preset": "ultrafast"}
+            for frame in inp.decode(in_vs):
+                t = float(frame.pts * in_vs.time_base) if frame.pts is not None else 0.0
+                if t > duration_sec:
+                    break
+                frame = frame.reformat(format="yuv420p")
+                for pkt in out_vs.encode(frame):
+                    out.mux(pkt)
+            for pkt in out_vs.encode():
+                out.mux(pkt)
+    return tmp
+
+
+def cleanup_tmp():
+    for p in _tmp_clips:
+        try:
+            p.unlink(missing_ok=True)
+        except Exception:
+            pass
+
+
+def load_model(model_id: str = "NemoStation/Marlin-2B", compile: bool = True) -> object:
+    source = str(LOCAL_MODEL_PATH) if LOCAL_MODEL_PATH.exists() else model_id
+    print(f"[pipeline] Loading from: {source}")
 
     from transformers import AutoModelForCausalLM
     model = AutoModelForCausalLM.from_pretrained(
-        model_id,
+        source,
         trust_remote_code=True,
-        torch_dtype=torch.bfloat16,
+        dtype=torch.bfloat16,
         device_map={"": "cuda"},
     )
-    print("[pipeline] Model loaded. Compiling ...")
-    model.compile()
+    if compile:
+        print("[pipeline] Compiling (first run ~3 min) ...")
+        model.compile()
     print("[pipeline] Ready.")
     return model
 
@@ -57,15 +99,22 @@ def _run_find(model, video_path: str, label: str, query: str) -> dict:
     return result
 
 
-def process_video(model, video_path: Path, results_dir: Path) -> dict:
+def process_video(model, video_path: Path, results_dir: Path, duration: float | None = None) -> dict:
     label = video_path.stem
     print(f"\n{'='*60}")
     print(f"[pipeline] Processing: {label}")
     print(f"{'='*60}")
 
+    # Trim to duration if requested (for testing or short-clip analysis)
+    infer_path = video_path
+    if duration is not None:
+        print(f"[pipeline]   Trimming to {duration}s ...")
+        infer_path = trim_video(video_path, duration)
+
     output = {
         "video": video_path.name,
         "label": label,
+        "duration_tested_sec": duration,
         "processed_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "caption": None,
         "events": [],
@@ -75,7 +124,7 @@ def process_video(model, video_path: Path, results_dir: Path) -> dict:
     # --- Caption mode ---
     try:
         print(f"[pipeline]   Running caption mode ...")
-        cap_result = _run_caption(model, str(video_path), label)
+        cap_result = _run_caption(model, str(infer_path), label)
         output["caption"] = cap_result.get("caption", "")
         output["scene"] = cap_result.get("scene", "")
         output["events"] = cap_result.get("events", [])
@@ -91,7 +140,7 @@ def process_video(model, video_path: Path, results_dir: Path) -> dict:
     print(f"[pipeline]   Running {len(FIND_QUERIES)} find queries ...")
     for query in FIND_QUERIES:
         try:
-            find_result = _run_find(model, str(video_path), label, query)
+            find_result = _run_find(model, str(infer_path), label, query)
             span = find_result.get("span")
             ok = find_result.get("format_ok", False)
             output["find_results"][query] = {
@@ -117,12 +166,11 @@ def process_video(model, video_path: Path, results_dir: Path) -> dict:
     return output
 
 
-def run_all(model, video_dir: Path, results_dir: Path) -> list[dict]:
-    videos = sorted(video_dir.glob("*.mkv")) + \
-             sorted(video_dir.glob("*.mp4")) + \
-             sorted(video_dir.glob("*.avi")) + \
-             sorted(video_dir.glob("*.mov")) + \
-             sorted(video_dir.glob("*.webm"))
+def run_all(model, video_dir: Path, results_dir: Path, duration: float | None = None) -> list[dict]:
+    videos = [
+        v for ext in ("*.mkv", "*.mp4", "*.avi", "*.mov", "*.webm")
+        for v in sorted(video_dir.glob(ext))
+    ]
 
     if not videos:
         print("[pipeline] No video files found in", video_dir)
@@ -131,7 +179,6 @@ def run_all(model, video_dir: Path, results_dir: Path) -> list[dict]:
     print(f"[pipeline] Found {len(videos)} videos: {[v.name for v in videos]}")
     results_dir.mkdir(exist_ok=True)
 
-    # Start GPU polling
     stop_gpu = threading.Event()
     gpu_thread = threading.Thread(target=poll_gpu_metrics, args=(stop_gpu,), daemon=True)
     gpu_thread.start()
@@ -139,15 +186,15 @@ def run_all(model, video_dir: Path, results_dir: Path) -> list[dict]:
     all_results = []
     for video in videos:
         try:
-            r = process_video(model, video, results_dir)
+            r = process_video(model, video, results_dir, duration=duration)
             all_results.append(r)
         except Exception as e:
             print(f"[pipeline] FAILED {video.name}: {e}")
             VIDEOS_PROCESSED.labels(status="error").inc()
 
     stop_gpu.set()
+    cleanup_tmp()
 
-    # Write summary
     summary = {
         "total_videos": len(videos),
         "processed": len(all_results),

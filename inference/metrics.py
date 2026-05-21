@@ -86,7 +86,12 @@ def poll_gpu_metrics(stop_event: threading.Event, interval: float = 1.0):
 
 def start_metrics_server(port: int = 8900):
     """Start Prometheus metrics HTTP server."""
-    start_http_server(port)
+    while True:
+        try:
+            start_http_server(port)
+            break
+        except OSError:
+            port += 1
     MODEL_INFO.info({
         "name": "Marlin-2B",
         "base": "Qwen3.5-2B",

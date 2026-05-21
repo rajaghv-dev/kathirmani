@@ -3,12 +3,52 @@
 Marlin-2B inference on all videos in this directory.
 
 Usage:
-    python run_inference.py                  # process all videos
-    python run_inference.py --no-compile     # skip torch.compile (faster startup)
+    python run_inference.py                        # all videos
+    python run_inference.py --video "Bill Counter" # one video (substring match)
+    python run_inference.py --no-compile           # skip torch.compile (faster startup)
     python run_inference.py --metrics-port 8900
 """
-import argparse
+import os
+import ctypes
+import pathlib
 import sys
+
+# ---------------------------------------------------------------------------
+# Pre-load PyAV's bundled FFmpeg libs with RTLD_GLOBAL so torchcodec can find
+# them without system FFmpeg or a manually set LD_LIBRARY_PATH.
+# Must happen before ANY import of torch / torchcodec / transformers.
+# ---------------------------------------------------------------------------
+def _preload_av_ffmpeg():
+    candidates = [
+        pathlib.Path(sys.prefix) / "lib/python3.12/site-packages/av.libs",
+        pathlib.Path(__file__).parent / ".venv/lib/python3.12/site-packages/av.libs",
+    ]
+    avlibs = next((p for p in candidates if p.exists()), None)
+    if avlibs is None:
+        return
+    # Load in dependency order with RTLD_GLOBAL so subsequent dlopen calls find them
+    for name in [
+        "libavutil.so.60", "libswresample.so.6", "libswscale.so.9",
+        "libavcodec.so.62", "libavformat.so.62", "libavfilter.so.11",
+    ]:
+        so = avlibs / name
+        if so.exists():
+            try:
+                ctypes.CDLL(str(so), mode=ctypes.RTLD_GLOBAL)
+            except OSError:
+                pass
+
+
+_preload_av_ffmpeg()
+
+# These env vars must be set before importing transformers / qwen-vl-utils.
+os.environ.setdefault("FORCE_QWENVL_VIDEO_READER", "torchcodec")
+os.environ.setdefault("VIDEO_MAX_PIXELS", "200704")
+os.environ.setdefault("FPS", "2.0")
+os.environ.setdefault("FPS_MAX_FRAMES", "240")
+os.environ.setdefault("FPS_MIN_FRAMES", "4")
+
+import argparse
 import time
 from pathlib import Path
 
@@ -21,29 +61,39 @@ def main():
     parser.add_argument("--results-dir", default=str(HERE / "results"), help="Output directory")
     parser.add_argument("--metrics-port", type=int, default=8900, help="Prometheus metrics port")
     parser.add_argument("--no-compile", action="store_true", help="Skip torch.compile")
+    parser.add_argument("--video", default=None, help="Run only one video (substring of filename)")
+    parser.add_argument("--duration", type=float, default=None, help="Only analyse first N seconds of each video")
     args = parser.parse_args()
 
     from inference.metrics import start_metrics_server
     start_metrics_server(args.metrics_port)
 
-    from inference.pipeline import load_model, run_all
+    from inference.pipeline import load_model, run_all, process_video
 
     t0 = time.time()
-    model = load_model()
+    model = load_model(compile=not args.no_compile)
 
-    if args.no_compile:
-        pass  # compile already called inside load_model; skip is handled by monkey-patch if needed
+    results_dir = Path(args.results_dir)
+    results_dir.mkdir(exist_ok=True)
 
-    results = run_all(
-        model,
-        video_dir=Path(args.video_dir),
-        results_dir=Path(args.results_dir),
-    )
+    if args.video:
+        video_dir = Path(args.video_dir)
+        matches = [
+            v for ext in ("*.mkv", "*.mp4", "*.avi", "*.mov", "*.webm")
+            for v in video_dir.glob(ext)
+            if args.video.lower() in v.stem.lower()
+        ]
+        if not matches:
+            print(f"[main] No video matching '{args.video}' found in {video_dir}")
+            return
+        results = [process_video(model, matches[0], results_dir, duration=args.duration)]
+    else:
+        results = run_all(model, video_dir=Path(args.video_dir), results_dir=results_dir, duration=args.duration)
 
     elapsed = time.time() - t0
     print(f"\n[main] Total wall time: {elapsed:.1f}s")
     print(f"[main] Results saved to: {args.results_dir}")
-    print(f"[main] Metrics still live at: http://localhost:{args.metrics_port}/metrics")
+    print(f"[main] Metrics live at:  http://localhost:{args.metrics_port}/metrics")
     print("[main] Press Ctrl+C to exit.")
 
     try:
