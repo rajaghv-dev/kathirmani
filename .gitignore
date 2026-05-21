@@ -16,3 +16,14 @@ build/
 *.log
 models/
 grafana-data/
+
+prometheus/data/
+prometheus/prometheus.log
+prometheus/prometheus
+prometheus/prometheus-*.tar.gz
+prometheus/prometheus
+prometheus/promtool
+prometheus/LICENSE
+prometheus/NOTICE
+prometheus/console_libraries/
+prometheus/consoles/
