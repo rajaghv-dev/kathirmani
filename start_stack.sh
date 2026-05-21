@@ -1,53 +1,62 @@
 #!/usr/bin/env bash
-# Start the full observability stack: serve_metrics + Prometheus + (Grafana already running)
+# Start the full observability stack for Kathirmani Marlin inference.
+# All services run as Docker containers on the monitoring_default network.
 # Run from the project root:  bash start_stack.sh
 
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
+NETWORK="monitoring_default"
 
 echo "=== Kathirmani Marlin Observability Stack ==="
 
-# 1. Activate venv
-source "$HERE/.venv/bin/activate"
+# ── 1. serve_metrics ─────────────────────────────────────────────────────────
+echo "[serve_metrics] restarting ..."
+docker rm -f serve_metrics 2>/dev/null || true
+docker run -d \
+    --name serve_metrics \
+    --network "$NETWORK" \
+    -v "$HERE":/app \
+    -w /app \
+    -p 8900:8900 \
+    python:3.12-slim \
+    sh -c "pip install prometheus_client -q && python serve_metrics.py"
+echo "[serve_metrics] started on :8900 (Docker, network=$NETWORK)"
 
-# 2. serve_metrics.py — reads results/ JSONs, exposes :8900/metrics
-if curl -s http://127.0.0.1:8900/metrics >/dev/null 2>&1; then
-    echo "[serve_metrics] already running on :8900"
-else
-    nohup python "$HERE/serve_metrics.py" > /tmp/serve_metrics.log 2>&1 &
-    sleep 2
-    echo "[serve_metrics] started → http://127.0.0.1:8900/metrics"
-fi
+# ── 2. Prometheus ─────────────────────────────────────────────────────────────
+echo "[prometheus]    restarting ..."
+docker rm -f prometheus 2>/dev/null || true
+chmod 777 "$HERE/prometheus/data" 2>/dev/null || true
+docker run -d \
+    --name prometheus \
+    --network "$NETWORK" \
+    --user "$(id -u):$(id -g)" \
+    -v "$HERE/prometheus/prometheus.yml":/etc/prometheus/prometheus.yml:ro \
+    -v "$HERE/prometheus/data":/prometheus \
+    -p 9090:9090 \
+    prom/prometheus:v2.52.0 \
+    --config.file=/etc/prometheus/prometheus.yml \
+    --storage.tsdb.path=/prometheus \
+    --web.cors.origin=".*"
+echo "[prometheus]    started on :9090 (Docker, network=$NETWORK)"
 
-# 3. Prometheus — scrapes :8900 and Netdata :19999
-if curl -s http://127.0.0.1:9090/-/ready >/dev/null 2>&1; then
-    echo "[prometheus]    already running on :9090"
-else
-    nohup "$HERE/prometheus/prometheus" \
-        --config.file="$HERE/prometheus/prometheus.yml" \
-        --storage.tsdb.path="$HERE/prometheus/data" \
-        --web.listen-address=0.0.0.0:9090 \
-        > "$HERE/prometheus/prometheus.log" 2>&1 &
-    sleep 3
-    echo "[prometheus]    started → http://127.0.0.1:9090"
-fi
-
-# 4. Grafana (systemd)
-if curl -s http://localhost:3000/api/health >/dev/null 2>&1; then
+# ── 3. Grafana (already running as Docker container) ─────────────────────────
+if docker ps --format '{{.Names}}' | grep -q "^grafana$"; then
     echo "[grafana]       already running on :3000"
 else
-    echo "[grafana]       start with: sudo systemctl start grafana-server"
+    echo "[grafana]       not running — start your docker-compose stack"
 fi
 
+# ── Summary ───────────────────────────────────────────────────────────────────
 HOST_IP=$(hostname -I | awk '{print $1}')
 echo ""
 echo "Stack ready:"
-echo "  Grafana   →  http://${HOST_IP}:3000   (admin / admin)"
-echo "  Prometheus → http://${HOST_IP}:9090"
-echo "  Metrics    → http://${HOST_IP}:8900/metrics"
+echo "  Grafana    →  http://${HOST_IP}:3000  (admin / admin)"
+echo "  Prometheus →  http://${HOST_IP}:9090"
+echo "  Metrics    →  http://${HOST_IP}:8900/metrics"
 echo ""
-echo "Datasources in Grafana point to Prometheus at http://${HOST_IP}:9090 (browser mode)"
+echo "Datasource: MarlinMetrics → http://prometheus:9090 (proxy, Docker DNS)"
 echo ""
 echo "To run inference:"
+echo "  source .venv/bin/activate"
 echo "  python run_inference.py --video 'Bill Counter' --duration 10 --no-compile"
-echo "  python run_inference.py  # all cameras, full video"
+echo "  python run_inference.py   # all cameras, full video"
