@@ -95,12 +95,45 @@ def main():
         results = run_all(model, video_dir=Path(args.video_dir), results_dir=results_dir, duration=args.duration)
 
     elapsed = time.time() - t0
-    print(f"\n[main] Total wall time: {elapsed:.1f}s")
-    print(f"[main] Results saved to: {args.results_dir}")
-    print(f"[main] Metrics live at:  http://localhost:{args.metrics_port}/metrics")
+    _print_summary(results, elapsed, args)
+
+
+def _grafana_host() -> str:
+    """Best-guess host IP for Grafana URLs (prefers non-loopback)."""
+    import socket
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return "localhost"
+
+
+def _print_summary(results: list, elapsed: float, args) -> None:
+    total_events = sum(len(r.get("events", [])) for r in results)
+    host = _grafana_host()
+
+    sep = "=" * 62
+    print(f"\n{sep}")
+    print("  INFERENCE COMPLETE")
+    print(sep)
+    print(f"  Videos processed : {len(results)}")
+    print(f"  Events detected  : {total_events}")
+    print(f"  Wall time        : {elapsed:.1f}s")
+    print(f"  Results saved to : {args.results_dir}")
+    print()
+    print("  GRAFANA DASHBOARDS")
+    print(f"  {'Model & Runtime':20s}  http://{host}:3000/d/marlin-model-runtime")
+    print(f"  {'Application/Pipeline':20s}  http://{host}:3000/d/marlin-pipeline")
+    print(f"  {'Login':20s}  admin / admin")
+    print()
+    print("  Dashboards auto-refresh every 15s — data visible immediately.")
+    print(sep)
 
     if args.keep_alive:
-        print("[main] --keep-alive: metrics server stays up. Press Ctrl+C to exit.")
+        print("\n[main] --keep-alive: holding metrics server open. Ctrl+C to exit.")
         try:
             while True:
                 time.sleep(10)
