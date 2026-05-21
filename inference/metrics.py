@@ -49,7 +49,7 @@ FIND_PARSE_OK = Gauge(
 # GPU
 GPU_MEMORY_USED_MB = Gauge(
     "marlin_gpu_memory_used_mb",
-    "GPU memory used during inference (MB)"
+    "GPU memory used during inference (MB) — N/A on unified-memory GPUs"
 )
 
 GPU_UTILIZATION = Gauge(
@@ -60,6 +60,11 @@ GPU_UTILIZATION = Gauge(
 GPU_TEMPERATURE = Gauge(
     "marlin_gpu_temperature_celsius",
     "GPU temperature (°C)"
+)
+
+GPU_POWER_WATTS = Gauge(
+    "marlin_gpu_power_watts",
+    "GPU power draw (W)"
 )
 
 # Model info
@@ -95,19 +100,33 @@ FUSED_FIND_CAM = Gauge(
 )
 
 
+def _parse_smi_value(s: str) -> float | None:
+    s = s.strip().replace("[N/A]", "").replace("N/A", "").strip()
+    return float(s) if s else None
+
+
 def poll_gpu_metrics(stop_event: threading.Event, interval: float = 1.0):
-    """Background thread to poll GPU metrics via nvidia-smi."""
+    """Background thread to poll GPU metrics via nvidia-smi.
+    Handles GB10 unified-memory GPUs where memory.used reports [N/A]."""
     while not stop_event.is_set():
         try:
             out = subprocess.check_output(
-                ["nvidia-smi", "--query-gpu=memory.used,utilization.gpu,temperature.gpu",
+                ["nvidia-smi",
+                 "--query-gpu=utilization.gpu,utilization.memory,temperature.gpu,power.draw,memory.used",
                  "--format=csv,noheader,nounits"],
                 text=True
             ).strip()
-            mem, util, temp = [x.strip() for x in out.split(",")]
-            GPU_MEMORY_USED_MB.set(float(mem))
-            GPU_UTILIZATION.set(float(util))
-            GPU_TEMPERATURE.set(float(temp))
+            fields = [x.strip() for x in out.split(",")]
+            util_gpu  = _parse_smi_value(fields[0])
+            util_mem  = _parse_smi_value(fields[1])
+            temp      = _parse_smi_value(fields[2])
+            power     = _parse_smi_value(fields[3])
+            mem_used  = _parse_smi_value(fields[4])
+
+            if util_gpu  is not None: GPU_UTILIZATION.set(util_gpu)
+            if temp      is not None: GPU_TEMPERATURE.set(temp)
+            if power     is not None: GPU_POWER_WATTS.set(power)
+            if mem_used  is not None: GPU_MEMORY_USED_MB.set(mem_used)
         except Exception:
             pass
         time.sleep(interval)

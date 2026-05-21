@@ -8,13 +8,14 @@
   "tags": ["marlin", "gpu", "runtime"],
   "panels": [
     {
-      "id": 1, "type": "stat", "title": "GPU Memory (MB)",
+      "id": 1, "type": "stat", "title": "GPU Power (W)",
+      "description": "GB10 uses unified memory — power draw is the key GPU load indicator",
       "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 },
       "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
       "options": { "colorMode": "background", "reduceOptions": { "calcs": ["lastNotNull"] } },
-      "fieldConfig": { "defaults": { "unit": "none", "color": { "mode": "thresholds" },
-        "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"green"},{"value":40000,"color":"yellow"},{"value":56000,"color":"red"}] } } },
-      "targets": [{ "expr": "marlin_gpu_memory_used_mb", "legendFormat": "GPU Memory MB" }]
+      "fieldConfig": { "defaults": { "unit": "watt", "color": { "mode": "thresholds" },
+        "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"green"},{"value":60,"color":"yellow"},{"value":100,"color":"red"}] } } },
+      "targets": [{ "expr": "marlin_gpu_power_watts", "legendFormat": "Power W" }]
     },
     {
       "id": 2, "type": "gauge", "title": "GPU Utilization %",
