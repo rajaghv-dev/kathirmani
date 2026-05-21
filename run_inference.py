@@ -41,6 +41,11 @@ def _preload_av_ffmpeg():
 
 _preload_av_ffmpeg()
 
+# Prevent transformers / huggingface_hub from phoning home during load.
+# The model is already in models/Marlin-2B/ — no network access needed.
+os.environ.setdefault("HF_HUB_OFFLINE", "1")
+os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+
 # These env vars must be set before importing transformers / qwen-vl-utils.
 os.environ.setdefault("FORCE_QWENVL_VIDEO_READER", "torchcodec")
 os.environ.setdefault("VIDEO_MAX_PIXELS", "200704")

@@ -92,6 +92,7 @@ def load_model(model_path: Path | None = None, compile: bool = True) -> object:
         trust_remote_code=True,
         dtype=torch.bfloat16,
         device_map={"": "cuda"},
+        local_files_only=True,   # never contact HuggingFace Hub
     )
     if compile:
         print("[pipeline] Compiling (first run ~3 min) ...")
