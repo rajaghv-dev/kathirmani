@@ -2,117 +2,103 @@
   "title": "Marlin-2B — Application / Pipeline",
   "uid": "marlin-pipeline",
   "schemaVersion": 39,
-  "version": 1,
-  "refresh": "10s",
+  "version": 2,
+  "refresh": "15s",
   "time": { "from": "now-1h", "to": "now" },
-  "tags": ["marlin", "pipeline", "events", "surveillance"],
+  "tags": ["marlin", "pipeline", "surveillance"],
   "panels": [
     {
-      "id": 1, "type": "stat", "title": "Videos Processed",
+      "id": 1, "type": "stat", "title": "Videos with Results",
       "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 },
       "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
-      "options": { "colorMode": "background", "textMode": "value_and_name", "reduceOptions": { "calcs": ["lastNotNull"] } },
-      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "blue" }] } } },
-      "targets": [{ "expr": "sum(marlin_videos_processed_total{status=\"success\"}) or vector(0)", "legendFormat": "Done" }]
+      "options": { "colorMode": "background", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" },
+        "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"blue"}] } } },
+      "targets": [{ "expr": "marlin_videos_processed_total", "legendFormat": "Videos" }]
     },
     {
       "id": 2, "type": "stat", "title": "Total Events Detected",
       "gridPos": { "x": 4, "y": 0, "w": 4, "h": 4 },
       "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
       "options": { "colorMode": "background", "reduceOptions": { "calcs": ["lastNotNull"] } },
-      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }] } } },
-      "targets": [{ "expr": "sum(marlin_events_detected_total) or vector(0)", "legendFormat": "Events" }]
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" },
+        "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"green"}] } } },
+      "targets": [{ "expr": "marlin_total_events", "legendFormat": "Events" }]
     },
     {
       "id": 3, "type": "stat", "title": "Find Queries Resolved",
       "gridPos": { "x": 8, "y": 0, "w": 4, "h": 4 },
       "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
       "options": { "colorMode": "background", "reduceOptions": { "calcs": ["lastNotNull"] } },
-      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "purple" }] } } },
-      "targets": [{ "expr": "count(marlin_find_parse_success == 1) or vector(0)", "legendFormat": "Resolved" }]
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" },
+        "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"purple"}] } } },
+      "targets": [{ "expr": "count(marlin_find_parse_success == 1)", "legendFormat": "Resolved" }]
     },
     {
-      "id": 4, "type": "stat", "title": "Errors",
+      "id": 4, "type": "stat", "title": "Parse Success Rate",
       "gridPos": { "x": 12, "y": 0, "w": 4, "h": 4 },
       "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
       "options": { "colorMode": "background", "reduceOptions": { "calcs": ["lastNotNull"] } },
-      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 1, "color": "red" }] } } },
-      "targets": [{ "expr": "sum(marlin_videos_processed_total{status=\"error\"}) or vector(0)", "legendFormat": "Errors" }]
+      "fieldConfig": { "defaults": { "unit": "percentunit", "color": { "mode": "thresholds" },
+        "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"red"},{"value":0.7,"color":"yellow"},{"value":0.9,"color":"green"}] } } },
+      "targets": [{ "expr": "avg(marlin_find_parse_success)", "legendFormat": "Parse OK" }]
     },
     {
-      "id": 5, "type": "stat", "title": "Find Parse Success Rate",
+      "id": 5, "type": "stat", "title": "Bill Counter Events",
       "gridPos": { "x": 16, "y": 0, "w": 4, "h": 4 },
       "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
-      "options": { "colorMode": "background", "reduceOptions": { "calcs": ["mean"] } },
-      "fieldConfig": { "defaults": { "unit": "percentunit", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "red" }, { "value": 0.6, "color": "yellow" }, { "value": 0.85, "color": "green" }] } } },
-      "targets": [{ "expr": "avg(marlin_find_parse_success) or vector(0)", "legendFormat": "Parse OK" }]
+      "options": { "colorMode": "background", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" },
+        "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"green"}] } } },
+      "targets": [{ "expr": "marlin_events_detected_total{video=\"Kathirmani Bill Counter\"}", "legendFormat": "Events" }]
     },
     {
-      "id": 6, "type": "stat", "title": "Remaining / Queued",
+      "id": 6, "type": "gauge", "title": "Find Results — Avg Span Duration (s)",
       "gridPos": { "x": 20, "y": 0, "w": 4, "h": 4 },
       "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
-      "options": { "colorMode": "background", "reduceOptions": { "calcs": ["lastNotNull"] } },
-      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "blue" }] } } },
-      "targets": [{ "expr": "5 - sum(marlin_videos_processed_total) or vector(5)", "legendFormat": "Remaining" }]
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "showThresholdMarkers": false },
+      "fieldConfig": { "defaults": { "unit": "s", "min": 0, "max": 10, "color": { "mode": "thresholds" },
+        "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"blue"}] } } },
+      "targets": [{ "expr": "avg(marlin_find_span_duration_seconds)", "legendFormat": "Avg span" }]
     },
     {
-      "id": 10, "type": "bargauge", "title": "Events Detected per Camera",
-      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 9 },
+      "id": 10, "type": "bargauge", "title": "Find Query — Span Duration per Event (Bill Counter)",
+      "description": "How long each detected event lasts in the Bill Counter footage",
+      "gridPos": { "x": 0, "y": 4, "w": 24, "h": 10 },
       "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
-      "options": { "orientation": "horizontal", "displayMode": "gradient", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true },
-      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "continuous-GrYlRd" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }] } } },
-      "targets": [{ "expr": "marlin_events_detected_total", "legendFormat": "{{video}}" }]
+      "options": { "orientation": "horizontal", "displayMode": "gradient", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "s", "min": 0,
+        "color": { "mode": "continuous-BlYlRd" },
+        "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"blue"}] } } },
+      "targets": [{ "expr": "marlin_find_span_duration_seconds{video=\"Kathirmani Bill Counter\"}", "legendFormat": "{{query}}" }]
     },
     {
-      "id": 11, "type": "timeseries", "title": "Videos Processed Over Time",
-      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 9 },
+      "id": 20, "type": "table", "title": "Find Query Results — Bill Counter Camera",
+      "description": "Start/end timestamps for each event queried by the model",
+      "gridPos": { "x": 0, "y": 14, "w": 24, "h": 10 },
       "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
-      "fieldConfig": { "defaults": { "unit": "short", "custom": { "lineWidth": 2, "drawStyle": "bars", "fillOpacity": 60 } } },
-      "targets": [
-        { "expr": "increase(marlin_videos_processed_total{status=\"success\"}[5m])", "legendFormat": "Success" },
-        { "expr": "increase(marlin_videos_processed_total{status=\"error\"}[5m])", "legendFormat": "Error" }
-      ]
-    },
-    {
-      "id": 20, "type": "table", "title": "Find Query Results — All Cameras",
-      "description": "Start/end timestamps for each event found by the model in each camera feed",
-      "gridPos": { "x": 0, "y": 13, "w": 24, "h": 12 },
-      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
-      "options": { "showHeader": true, "sortBy": [{ "displayName": "video", "desc": false }] },
+      "options": { "showHeader": true },
       "fieldConfig": {
-        "defaults": { "unit": "s" },
         "overrides": [
-          { "matcher": { "id": "byName", "options": "Value #marlin_find_parse_success" }, "properties": [{ "id": "displayName", "value": "Parsed OK" }, { "id": "unit", "value": "bool" }] },
-          { "matcher": { "id": "byName", "options": "Value #marlin_find_span_start_seconds" }, "properties": [{ "id": "displayName", "value": "Start (s)" }] },
-          { "matcher": { "id": "byName", "options": "Value #marlin_find_span_end_seconds" }, "properties": [{ "id": "displayName", "value": "End (s)" }] }
+          { "matcher": { "id": "byName", "options": "Value #A" }, "properties": [{"id":"displayName","value":"Start (s)"},{"id":"unit","value":"s"}] },
+          { "matcher": { "id": "byName", "options": "Value #B" }, "properties": [{"id":"displayName","value":"End (s)"},{"id":"unit","value":"s"}] },
+          { "matcher": { "id": "byName", "options": "Value #C" }, "properties": [{"id":"displayName","value":"Duration (s)"},{"id":"unit","value":"s"}] },
+          { "matcher": { "id": "byName", "options": "Value #D" }, "properties": [{"id":"displayName","value":"Parsed OK"},{"id":"custom.width","value":100}] }
         ]
       },
       "targets": [
-        { "expr": "marlin_find_span_start_seconds", "legendFormat": "", "instant": true, "refId": "A" },
-        { "expr": "marlin_find_span_end_seconds", "legendFormat": "", "instant": true, "refId": "B" },
-        { "expr": "marlin_find_parse_success", "legendFormat": "", "instant": true, "refId": "C" }
+        { "expr": "marlin_find_span_start_seconds{video=\"Kathirmani Bill Counter\"}", "legendFormat": "", "instant": true, "refId": "A" },
+        { "expr": "marlin_find_span_end_seconds{video=\"Kathirmani Bill Counter\"}", "legendFormat": "", "instant": true, "refId": "B" },
+        { "expr": "marlin_find_span_duration_seconds{video=\"Kathirmani Bill Counter\"}", "legendFormat": "", "instant": true, "refId": "C" },
+        { "expr": "marlin_find_parse_success{video=\"Kathirmani Bill Counter\"}", "legendFormat": "", "instant": true, "refId": "D" }
       ]
     },
     {
-      "id": 30, "type": "bargauge", "title": "Find Query — Event Span Duration (seconds found)",
-      "description": "Duration = end - start for each resolved query per camera",
-      "gridPos": { "x": 0, "y": 25, "w": 24, "h": 9 },
+      "id": 30, "type": "timeseries", "title": "Find Parse Success — Over Time",
+      "gridPos": { "x": 0, "y": 24, "w": 24, "h": 7 },
       "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
-      "options": { "orientation": "horizontal", "displayMode": "basic", "reduceOptions": { "calcs": ["lastNotNull"] } },
-      "fieldConfig": { "defaults": { "unit": "s", "min": 0, "color": { "mode": "continuous-BlYlRd" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "blue" }] } } },
-      "targets": [
-        { "expr": "marlin_find_span_end_seconds - marlin_find_span_start_seconds", "legendFormat": "{{video}} | {{query}}" }
-      ]
-    },
-    {
-      "id": 40, "type": "timeseries", "title": "Find Span Start Times per Camera (event timeline)",
-      "description": "When each queried event starts in each video — shows temporal distribution of activity",
-      "gridPos": { "x": 0, "y": 34, "w": 24, "h": 9 },
-      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
-      "fieldConfig": { "defaults": { "unit": "s", "custom": { "lineWidth": 0, "pointSize": 8, "drawStyle": "points" } } },
-      "targets": [
-        { "expr": "marlin_find_span_start_seconds", "legendFormat": "{{video}} – {{query}}" }
-      ]
+      "fieldConfig": { "defaults": { "unit": "short", "custom": { "lineWidth": 1, "fillOpacity": 20, "drawStyle": "bars" } } },
+      "targets": [{ "expr": "marlin_find_parse_success{video=\"Kathirmani Bill Counter\"}", "legendFormat": "{{query}}" }]
     }
   ]
 }

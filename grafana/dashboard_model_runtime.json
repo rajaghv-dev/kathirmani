@@ -2,65 +2,70 @@
   "title": "Marlin-2B — Model & Runtime",
   "uid": "marlin-model-runtime",
   "schemaVersion": 39,
-  "version": 1,
-  "refresh": "5s",
-  "time": { "from": "now-30m", "to": "now" },
+  "version": 2,
+  "refresh": "15s",
+  "time": { "from": "now-1h", "to": "now" },
   "tags": ["marlin", "gpu", "runtime"],
   "panels": [
     {
-      "id": 1, "type": "stat", "title": "GPU Memory Used (MB)",
+      "id": 1, "type": "stat", "title": "GPU Memory (MB)",
       "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 },
       "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
-      "options": { "colorMode": "background", "textMode": "value_and_name", "reduceOptions": { "calcs": ["lastNotNull"] } },
-      "fieldConfig": { "defaults": { "unit": "none", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 40000, "color": "yellow" }, { "value": 56000, "color": "red" }] } } },
+      "options": { "colorMode": "background", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "none", "color": { "mode": "thresholds" },
+        "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"green"},{"value":40000,"color":"yellow"},{"value":56000,"color":"red"}] } } },
       "targets": [{ "expr": "marlin_gpu_memory_used_mb", "legendFormat": "GPU Memory MB" }]
     },
     {
-      "id": 2, "type": "gauge", "title": "GPU Utilization",
+      "id": 2, "type": "gauge", "title": "GPU Utilization %",
       "gridPos": { "x": 4, "y": 0, "w": 4, "h": 4 },
       "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "showThresholdMarkers": true },
-      "fieldConfig": { "defaults": { "min": 0, "max": 100, "unit": "percent", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 70, "color": "yellow" }, { "value": 90, "color": "red" }] } } },
-      "targets": [{ "expr": "marlin_gpu_utilization_percent", "legendFormat": "Util %" }]
+      "fieldConfig": { "defaults": { "min": 0, "max": 100, "unit": "percent", "color": { "mode": "thresholds" },
+        "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"green"},{"value":70,"color":"yellow"},{"value":90,"color":"red"}] } } },
+      "targets": [{ "expr": "marlin_gpu_utilization_percent", "legendFormat": "GPU Util %" }]
     },
     {
-      "id": 3, "type": "gauge", "title": "GPU Temperature",
+      "id": 3, "type": "gauge", "title": "GPU Temperature °C",
       "gridPos": { "x": 8, "y": 0, "w": 4, "h": 4 },
       "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "showThresholdMarkers": true },
-      "fieldConfig": { "defaults": { "min": 0, "max": 100, "unit": "celsius", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "green" }, { "value": 70, "color": "yellow" }, { "value": 85, "color": "red" }] } } },
+      "fieldConfig": { "defaults": { "min": 0, "max": 100, "unit": "celsius", "color": { "mode": "thresholds" },
+        "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"green"},{"value":70,"color":"yellow"},{"value":85,"color":"red"}] } } },
       "targets": [{ "expr": "marlin_gpu_temperature_celsius", "legendFormat": "Temp °C" }]
     },
     {
-      "id": 4, "type": "stat", "title": "Avg Inference Time (Caption)",
-      "gridPos": { "x": 12, "y": 0, "w": 4, "h": 4 },
-      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
-      "options": { "colorMode": "background", "reduceOptions": { "calcs": ["mean"] } },
-      "fieldConfig": { "defaults": { "unit": "s", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "blue" }] } } },
-      "targets": [{ "expr": "sum(marlin_inference_duration_seconds_sum{mode=\"caption\"}) / sum(marlin_inference_duration_seconds_count{mode=\"caption\"})", "legendFormat": "Avg caption time" }]
-    },
-    {
-      "id": 5, "type": "stat", "title": "Avg Inference Time (Find)",
-      "gridPos": { "x": 16, "y": 0, "w": 4, "h": 4 },
-      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
-      "options": { "colorMode": "background", "reduceOptions": { "calcs": ["mean"] } },
-      "fieldConfig": { "defaults": { "unit": "s", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "purple" }] } } },
-      "targets": [{ "expr": "sum(marlin_inference_duration_seconds_sum{mode=\"find\"}) / sum(marlin_inference_duration_seconds_count{mode=\"find\"})", "legendFormat": "Avg find time" }]
-    },
-    {
-      "id": 6, "type": "stat", "title": "Total Inference Calls",
-      "gridPos": { "x": 20, "y": 0, "w": 4, "h": 4 },
+      "id": 4, "type": "stat", "title": "Videos Processed",
+      "gridPos": { "x": 12, "y": 0, "w": 3, "h": 4 },
       "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
       "options": { "colorMode": "background", "reduceOptions": { "calcs": ["lastNotNull"] } },
-      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "blue" }] } } },
-      "targets": [{ "expr": "sum(marlin_inference_duration_seconds_count)", "legendFormat": "Total calls" }]
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" },
+        "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"blue"}] } } },
+      "targets": [{ "expr": "marlin_videos_processed_total", "legendFormat": "Processed" }]
+    },
+    {
+      "id": 5, "type": "stat", "title": "Total Events",
+      "gridPos": { "x": 15, "y": 0, "w": 3, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": { "colorMode": "background", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" },
+        "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"green"}] } } },
+      "targets": [{ "expr": "marlin_total_events", "legendFormat": "Events" }]
+    },
+    {
+      "id": 6, "type": "stat", "title": "Events — Bill Counter",
+      "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": { "colorMode": "background", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" },
+        "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"purple"}] } } },
+      "targets": [{ "expr": "marlin_events_detected_total{video=\"Kathirmani Bill Counter\"}", "legendFormat": "Bill Counter events" }]
     },
     {
       "id": 10, "type": "timeseries", "title": "GPU Memory Over Time",
       "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
       "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
-      "fieldConfig": { "defaults": { "unit": "decmbytes", "custom": { "lineWidth": 2, "fillOpacity": 25, "gradientMode": "opacity" } } },
-      "options": { "tooltip": { "mode": "single" } },
+      "fieldConfig": { "defaults": { "unit": "none", "custom": { "lineWidth": 2, "fillOpacity": 20, "gradientMode": "opacity" } } },
       "targets": [{ "expr": "marlin_gpu_memory_used_mb", "legendFormat": "GPU Memory (MB)" }]
     },
     {
@@ -70,8 +75,8 @@
       "fieldConfig": {
         "defaults": { "custom": { "lineWidth": 2, "fillOpacity": 10 } },
         "overrides": [
-          { "matcher": { "id": "byName", "options": "GPU Util %" }, "properties": [{ "id": "unit", "value": "percent" }, { "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
-          { "matcher": { "id": "byName", "options": "GPU Temp °C" }, "properties": [{ "id": "unit", "value": "celsius" }, { "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] }
+          { "matcher": { "id": "byName", "options": "GPU Util %" }, "properties": [{"id":"unit","value":"percent"},{"id":"color","value":{"fixedColor":"green","mode":"fixed"}}] },
+          { "matcher": { "id": "byName", "options": "GPU Temp °C" }, "properties": [{"id":"unit","value":"celsius"},{"id":"color","value":{"fixedColor":"orange","mode":"fixed"}}] }
         ]
       },
       "targets": [
@@ -80,41 +85,15 @@
       ]
     },
     {
-      "id": 20, "type": "timeseries", "title": "Inference Duration per Video (Caption Mode)",
-      "gridPos": { "x": 0, "y": 12, "w": 24, "h": 8 },
-      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
-      "fieldConfig": { "defaults": { "unit": "s", "custom": { "lineWidth": 2 } } },
-      "targets": [
-        { "expr": "marlin_inference_duration_seconds_sum{mode=\"caption\"} / marlin_inference_duration_seconds_count{mode=\"caption\"}", "legendFormat": "{{video}}" }
-      ]
-    },
-    {
-      "id": 21, "type": "timeseries", "title": "Inference Duration per Video (Find Mode)",
-      "gridPos": { "x": 0, "y": 20, "w": 24, "h": 8 },
-      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
-      "fieldConfig": { "defaults": { "unit": "s", "custom": { "lineWidth": 1, "fillOpacity": 5 } } },
-      "targets": [
-        { "expr": "marlin_inference_duration_seconds_sum{mode=\"find\"} / marlin_inference_duration_seconds_count{mode=\"find\"}", "legendFormat": "{{video}}" }
-      ]
-    },
-    {
-      "id": 30, "type": "heatmap", "title": "Inference Duration Distribution (all modes)",
-      "gridPos": { "x": 0, "y": 28, "w": 24, "h": 8 },
-      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
-      "targets": [
-        { "expr": "sum(rate(marlin_inference_duration_seconds_bucket[5m])) by (le)", "format": "heatmap", "legendFormat": "{{le}}" }
-      ]
-    },
-    {
-      "id": 40, "type": "timeseries", "title": "System CPU (Netdata)",
-      "gridPos": { "x": 0, "y": 36, "w": 12, "h": 6 },
+      "id": 20, "type": "timeseries", "title": "System CPU — Netdata",
+      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 7 },
       "datasource": { "type": "prometheus", "uid": "netdata-prom" },
       "fieldConfig": { "defaults": { "unit": "percent", "custom": { "lineWidth": 1, "fillOpacity": 10 } } },
       "targets": [{ "expr": "netdata_system_cpu_percentage_average{dimension=~\"user|system\"}", "legendFormat": "CPU {{dimension}}" }]
     },
     {
-      "id": 41, "type": "timeseries", "title": "System RAM (Netdata)",
-      "gridPos": { "x": 12, "y": 36, "w": 12, "h": 6 },
+      "id": 21, "type": "timeseries", "title": "System RAM — Netdata",
+      "gridPos": { "x": 12, "y": 12, "w": 12, "h": 7 },
       "datasource": { "type": "prometheus", "uid": "netdata-prom" },
       "fieldConfig": { "defaults": { "unit": "decmbytes", "custom": { "lineWidth": 1, "fillOpacity": 10 } } },
       "targets": [{ "expr": "netdata_system_ram_MiB_average{dimension=~\"used|cached\"}", "legendFormat": "RAM {{dimension}}" }]

@@ -71,13 +71,13 @@ def cleanup_tmp():
 
 
 def load_model(model_path: Path | None = None, compile: bool = True) -> object:
-    # Prefer: explicit arg → local models/ dir → HuggingFace download
-    if model_path and model_path.exists():
-        source = str(model_path)
-    elif LOCAL_MODEL_PATH.exists():
-        source = str(LOCAL_MODEL_PATH)
-    else:
-        source = MODEL_ID
+    resolved = model_path or LOCAL_MODEL_PATH
+    if not resolved.exists():
+        raise FileNotFoundError(
+            f"Model not found at {resolved}. "
+            f"Run: python download_model.py"
+        )
+    source = str(resolved)
     print(f"[pipeline] Loading from: {source}")
 
     from transformers import AutoModelForCausalLM

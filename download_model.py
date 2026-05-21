@@ -50,8 +50,18 @@ def main():
         sys.exit(1)
 
     dest.mkdir(parents=True, exist_ok=True)
-    path = snapshot_download(MODEL_ID, local_dir=str(dest), token=token)
-    print(f"[download] Done: {path}")
+    path = snapshot_download(
+        MODEL_ID,
+        local_dir=str(dest),
+        local_dir_use_symlinks=False,  # plain files, no symlinks to HF cache
+        token=token,
+    )
+    # Verify sentinel exists after download
+    if not (dest / SENTINEL).exists():
+        print(f"[download] WARNING: download may be incomplete — {SENTINEL} not found in {dest}")
+        sys.exit(1)
+    size_gb = sum(f.stat().st_size for f in dest.rglob("*.safetensors")) / 1e9
+    print(f"[download] Done: {dest}  ({size_gb:.1f} GB of weights)")
 
 
 if __name__ == "__main__":
