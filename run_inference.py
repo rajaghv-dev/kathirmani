@@ -63,15 +63,19 @@ def main():
     parser.add_argument("--no-compile", action="store_true", help="Skip torch.compile")
     parser.add_argument("--video", default=None, help="Run only one video (substring of filename)")
     parser.add_argument("--duration", type=float, default=None, help="Only analyse first N seconds of each video")
+    parser.add_argument("--model-path", default=None, help="Path to local model dir (default: models/Marlin-2B)")
+    parser.add_argument("--keep-alive", action="store_true", help="Keep metrics server running after inference (default: exit)")
     args = parser.parse_args()
 
     from inference.metrics import start_metrics_server
     start_metrics_server(args.metrics_port)
 
-    from inference.pipeline import load_model, run_all, process_video
+    from inference.pipeline import load_model, run_all, process_video, LOCAL_MODEL_PATH
+
+    model_path = Path(args.model_path) if args.model_path else LOCAL_MODEL_PATH
 
     t0 = time.time()
-    model = load_model(compile=not args.no_compile)
+    model = load_model(model_path=model_path, compile=not args.no_compile)
 
     results_dir = Path(args.results_dir)
     results_dir.mkdir(exist_ok=True)
@@ -94,13 +98,14 @@ def main():
     print(f"\n[main] Total wall time: {elapsed:.1f}s")
     print(f"[main] Results saved to: {args.results_dir}")
     print(f"[main] Metrics live at:  http://localhost:{args.metrics_port}/metrics")
-    print("[main] Press Ctrl+C to exit.")
 
-    try:
-        while True:
-            time.sleep(10)
-    except KeyboardInterrupt:
-        pass
+    if args.keep_alive:
+        print("[main] --keep-alive: metrics server stays up. Press Ctrl+C to exit.")
+        try:
+            while True:
+                time.sleep(10)
+        except KeyboardInterrupt:
+            pass
 
 
 if __name__ == "__main__":

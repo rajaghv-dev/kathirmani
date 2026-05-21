@@ -30,6 +30,7 @@ FIND_QUERIES = [
 ]
 
 
+MODEL_ID = "NemoStation/Marlin-2B"
 LOCAL_MODEL_PATH = Path(__file__).parent.parent / "models" / "Marlin-2B"
 
 _tmp_clips: list[Path] = []  # track temp files for cleanup
@@ -69,8 +70,14 @@ def cleanup_tmp():
             pass
 
 
-def load_model(model_id: str = "NemoStation/Marlin-2B", compile: bool = True) -> object:
-    source = str(LOCAL_MODEL_PATH) if LOCAL_MODEL_PATH.exists() else model_id
+def load_model(model_path: Path | None = None, compile: bool = True) -> object:
+    # Prefer: explicit arg → local models/ dir → HuggingFace download
+    if model_path and model_path.exists():
+        source = str(model_path)
+    elif LOCAL_MODEL_PATH.exists():
+        source = str(LOCAL_MODEL_PATH)
+    else:
+        source = MODEL_ID
     print(f"[pipeline] Loading from: {source}")
 
     from transformers import AutoModelForCausalLM
