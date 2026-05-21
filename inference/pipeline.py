@@ -13,20 +13,26 @@ from .metrics import (
     FIND_SPAN_START, FIND_SPAN_END, FIND_PARSE_OK, poll_gpu_metrics
 )
 
-# Queries tailored for retail store surveillance footage
+# Kathirmani store-specific surveillance queries
+# Each maps to a Prometheus metric label: marlin_find_span_*{query="..."}
 FIND_QUERIES = [
-    "customer enters the store",
-    "customer leaves the store",
-    "cash payment transaction at counter",
-    "person picks up items from shelf",
-    "employee interacts with customer",
-    "person using mobile phone",
-    "group of people gathered",
-    "person walking through aisle",
+    # Entry / Exit
+    "customer enters Kathirmani store",
+    "customer exits Kathirmani store",
+    # Bill counter area
+    "cash payment at bill counter",
+    "billing staff at counter",
+    "customer queue at billing",
+    # Shopping floor
+    "customer browsing shelves",
+    "person picking item from rack",
+    "customer carrying shopping basket",
+    # Security
+    "unattended bag or package",
+    "person loitering near exit",
     "suspicious or unusual behavior",
-    "person standing near entry door",
-    "crowded area with multiple customers",
-    "person carrying a bag",
+    # Crowd & operations
+    "crowded aisle or bottleneck",
 ]
 
 
