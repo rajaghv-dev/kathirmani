@@ -1,0 +1,7 @@
+transformers>=5.7.0
+torch>=2.11.0
+torchcodec
+qwen-vl-utils>=0.0.14
+av
+pillow
+prometheus_client
