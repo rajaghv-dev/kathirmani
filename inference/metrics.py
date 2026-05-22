@@ -293,6 +293,10 @@ def compute_economy(total_events: int, wall_time_sec: float, electricity_rate_in
     }
 
 
+QWEN_QUERIES_DONE = Gauge("marlin_qwen_queries_completed", "Qwen2.5-VL queries completed", ["video"])
+QWEN_ANSWERS_OK   = Gauge("marlin_qwen_answers_ok_total",  "Qwen2.5-VL answers that returned text", ["video"])
+
+
 def start_metrics_server(port: int = 8900):
     """Start Prometheus metrics HTTP server."""
     while True:

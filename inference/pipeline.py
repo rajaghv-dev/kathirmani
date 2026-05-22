@@ -37,6 +37,15 @@ FIND_QUERIES = [
     "suspicious or unusual behavior",
     # Crowd & operations
     "crowded aisle or bottleneck",
+    # Loss prevention — temporal signals (when these behaviors occur)
+    "customer leaving store without approaching billing counter",
+    "person handling merchandise near store exit or boundary",
+    "group of customers gathered around a product display blocking view",
+    "person placing merchandise into personal bag or clothing at shelf",
+    "customer returning to the same shelf section multiple times",
+    "billing staff engaged by customer while another person handles merchandise",
+    "person carrying large bag or backpack near merchandise shelves",
+    "customer switching or swapping product packaging at shelf",
 ]
 
 

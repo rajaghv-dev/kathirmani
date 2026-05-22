@@ -57,6 +57,18 @@ FUSED_FIND_START= Gauge("marlin_fused_find_span_start_seconds","Fused find span 
 FUSED_FIND_END  = Gauge("marlin_fused_find_span_end_seconds",  "Fused find span end (s)",   ["query"])
 FUSED_FIND_DUR  = Gauge("marlin_fused_find_span_duration_seconds","Fused span duration (s)", ["query"])
 
+# --- Qwen2.5-VL visual analysis metrics ---
+QWEN_SECURITY_SIGNALS = Gauge(
+    "marlin_qwen_security_signals_total",
+    "Number of Qwen2.5-VL queries that indicated a security concern",
+    ["video"]
+)
+QWEN_QUERIES_OK = Gauge(
+    "marlin_qwen_queries_ok_total",
+    "Number of Qwen2.5-VL queries that returned a valid answer",
+    ["video"]
+)
+
 # --- token economy / cost metrics (from results/economy.json) ---
 ECONOMY_ENERGY   = Gauge("marlin_energy_consumed_wh",            "Estimated GPU energy used this run (Wh)")
 ECONOMY_COST     = Gauge("marlin_cost_inr",                      "Estimated inference cost in INR (₹)")
@@ -98,6 +110,19 @@ def load_results():
                 FIND_START.labels(video=label, query=query).set(span[0])
                 FIND_END.labels(video=label, query=query).set(span[1])
                 FIND_DUR.labels(video=label, query=query).set(max(0, span[1] - span[0]))
+
+        qwen = data.get("qwen_analysis", {})
+        if qwen and "queries" in qwen:
+            qrs = qwen["queries"]
+            ok_count = sum(1 for r in qrs.values() if r.get("ok"))
+            QWEN_QUERIES_OK.labels(video=label).set(ok_count)
+            # Count security signal queries (loss prevention ones)
+            security_keys = [q for q in qrs if any(
+                kw in q.lower() for kw in
+                ["concealing", "personal bag", "exit without", "commotion", "distraction", "unaccompanied"]
+            )]
+            signals = sum(1 for k in security_keys if qrs[k].get("ok") and len(qrs[k].get("answer", "")) > 20)
+            QWEN_SECURITY_SIGNALS.labels(video=label).set(signals)
 
         if jf.name not in _loaded:
             _loaded.add(jf.name)

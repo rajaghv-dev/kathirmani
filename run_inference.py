@@ -70,6 +70,7 @@ def main():
     parser.add_argument("--duration", type=float, default=None, help="Only analyse first N seconds of each video")
     parser.add_argument("--model-path", default=None, help="Path to local model dir (default: models/Marlin-2B)")
     parser.add_argument("--keep-alive", action="store_true", help="Keep metrics server running after inference (default: exit)")
+    parser.add_argument("--skip-qwen", action="store_true", help="Skip Qwen2.5-VL spatial analysis")
     args = parser.parse_args()
 
     from inference.metrics import start_metrics_server
@@ -115,9 +116,42 @@ def main():
         wall_time_sec=elapsed,
     )
     # Save economy data alongside results
+    import json
     if economy:
-        import json
         (Path(args.results_dir) / "economy.json").write_text(json.dumps(economy, indent=2))
+
+    # --- Qwen2.5-VL spatial analysis (optional, runs after Marlin) ---
+    qwen_path = HERE / "models" / "Qwen2.5-VL-7B-Instruct"
+    if qwen_path.exists() and not args.skip_qwen:
+        from inference.qwen_vl import load_qwen_model, analyze_video, QWEN_QUERIES
+        from inference.pipeline import _GPU_LOCK
+        print("[main] Loading Qwen2.5-VL-7B for spatial analysis ...")
+        qwen_model, qwen_processor = load_qwen_model(qwen_path)
+
+        results_dir = Path(args.results_dir)
+        for result in results:
+            label = result["label"]
+            # Use the trimmed clip if duration was specified; otherwise locate original
+            video_file = next(
+                (v for ext in ("*.mkv", "*.mp4", "*.avi", "*.mov", "*.webm")
+                 for v in Path(args.video_dir).glob(ext)
+                 if v.stem == label), None
+            )
+            if video_file:
+                qwen_result = analyze_video(qwen_model, qwen_processor, video_file, label, _GPU_LOCK)
+                # Log each Qwen answer to Loki
+                from inference.loki import log_qwen_answer
+                for query, res in qwen_result.get("queries", {}).items():
+                    if res.get("ok") and res.get("answer"):
+                        log_qwen_answer(label, query, res["answer"])
+                # Merge into existing result JSON
+                existing = json.loads((results_dir / f"{label}.json").read_text())
+                existing["qwen_analysis"] = qwen_result
+                (results_dir / f"{label}.json").write_text(json.dumps(existing, indent=2))
+                print(f"[main] ✓ Qwen2.5-VL done for {label}: {len(QWEN_QUERIES)} queries")
+    else:
+        if not qwen_path.exists():
+            print("[main] Qwen2.5-VL model not found — run: python download_model.py --model qwen-vl")
 
     _print_summary(results, elapsed, args)
 
@@ -151,6 +185,10 @@ def _print_summary(results: list, elapsed: float, args) -> None:
     print("  GRAFANA DASHBOARDS")
     print(f"  {'Model & Runtime':20s}  http://{host}:3000/d/marlin-model-runtime")
     print(f"  {'Application/Pipeline':20s}  http://{host}:3000/d/marlin-pipeline")
+    print(f"  {'Camera Views':20s}  http://{host}:3000/d/marlin-cameras")
+    print(f"  {'Store View (Fused)':20s}  http://{host}:3000/d/marlin-fused")
+    print(f"  {'Visual Analysis (Qwen)':20s}  http://{host}:3000/d/marlin-qwen")
+    print(f"  {'Inference Logs (Loki)':20s}  http://{host}:3000/d/marlin-loki")
     print(f"  {'Compute Economy':20s}  http://{host}:3000/d/marlin-economy")
     print(f"  {'Login':20s}  admin / admin")
     print()

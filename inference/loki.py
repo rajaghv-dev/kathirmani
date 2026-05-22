@@ -128,6 +128,26 @@ def log_fusion(unique_events: int, raw_events: int, best_cameras: dict[str, str]
     )
 
 
+SECURITY_QUERY_KEYWORDS = {
+    "concealing", "personal bag", "exit without", "commotion",
+    "distraction", "unaccompanied", "group of customers", "returning to"
+}
+
+
+def log_qwen_answer(camera: str, query: str, answer: str) -> None:
+    is_security = any(kw in query.lower() for kw in SECURITY_QUERY_KEYWORDS)
+    log(
+        f"[Qwen] {query[:60]}",
+        camera=camera,
+        event_type="qwen_security" if is_security else "qwen_analysis",
+        extra={
+            "query": query,
+            "answer": answer[:500],
+            "is_security_query": is_security,
+        },
+    )
+
+
 def log_run_complete(videos: int, total_events: int, wall_time_sec: float) -> None:
     log(
         f"Run complete — {videos} cameras, {total_events} events, {wall_time_sec:.0f}s",
