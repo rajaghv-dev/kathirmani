@@ -103,7 +103,7 @@
     {
       "id": 5,
       "type": "stat",
-      "title": "Avg GPU Power (W)",
+      "title": "Avg DGX Power (W)",
       "gridPos": { "x": 16, "y": 0, "w": 4, "h": 4 },
       "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
       "fieldConfig": {
@@ -121,7 +121,7 @@
         }
       },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
-      "targets": [{ "expr": "marlin_avg_gpu_power_during_run_watts", "legendFormat": "Avg Power (W)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "targets": [{ "expr": "marlin_avg_dgx_power_during_run_watts", "legendFormat": "Avg Power (W)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
     },
     {
       "id": 6,
@@ -149,7 +149,7 @@
     {
       "id": 10,
       "type": "timeseries",
-      "title": "GPU Power During Inference",
+      "title": "DGX Power During Inference",
       "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
       "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
       "fieldConfig": {
@@ -159,12 +159,12 @@
         }
       },
       "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
-      "targets": [{ "expr": "marlin_gpu_power_watts", "legendFormat": "GPU Power (W)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "targets": [{ "expr": "marlin_dgx_power_watts", "legendFormat": "DGX Power (W)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
     },
     {
       "id": 11,
       "type": "timeseries",
-      "title": "GPU Temperature During Inference",
+      "title": "System Temperature During Inference",
       "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
       "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
       "fieldConfig": {
@@ -174,7 +174,7 @@
         }
       },
       "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
-      "targets": [{ "expr": "marlin_gpu_temperature_celsius", "legendFormat": "GPU Temp (°C)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "targets": [{ "expr": "marlin_dgx_temperature_celsius", "legendFormat": "System Temp (°C)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
     },
     {
       "id": 20,
@@ -268,7 +268,7 @@
     {
       "id": 33,
       "type": "stat",
-      "title": "GPU Util %",
+      "title": "Compute Util %",
       "gridPos": { "x": 18, "y": 20, "w": 6, "h": 4 },
       "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
       "fieldConfig": {
@@ -286,7 +286,7 @@
         }
       },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
-      "targets": [{ "expr": "marlin_gpu_utilization_percent", "legendFormat": "GPU Util %", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "targets": [{ "expr": "marlin_dgx_compute_utilization_percent", "legendFormat": "Compute Util %", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
     }
   ]
 }

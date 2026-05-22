@@ -5,35 +5,35 @@
   "version": 2,
   "refresh": "15s",
   "time": { "from": "now-1h", "to": "now" },
-  "tags": ["marlin", "gpu", "runtime"],
+  "tags": ["marlin", "dgx", "runtime"],
   "panels": [
     {
-      "id": 1, "type": "stat", "title": "GPU Power (W)",
-      "description": "GB10 uses unified memory — power draw is the key GPU load indicator",
+      "id": 1, "type": "stat", "title": "DGX Power (W)",
+      "description": "DGX Spark GB10 — Grace Blackwell, 119GB unified memory",
       "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 },
       "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
       "options": { "colorMode": "background", "reduceOptions": { "calcs": ["lastNotNull"] } },
       "fieldConfig": { "defaults": { "unit": "watt", "color": { "mode": "thresholds" },
         "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"green"},{"value":60,"color":"yellow"},{"value":100,"color":"red"}] } } },
-      "targets": [{ "expr": "marlin_gpu_power_watts", "legendFormat": "Power W" }]
+      "targets": [{ "expr": "marlin_dgx_power_watts", "legendFormat": "Power W" }]
     },
     {
-      "id": 2, "type": "gauge", "title": "GPU Utilization %",
+      "id": 2, "type": "gauge", "title": "Compute Util %",
       "gridPos": { "x": 4, "y": 0, "w": 4, "h": 4 },
       "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "showThresholdMarkers": true },
       "fieldConfig": { "defaults": { "min": 0, "max": 100, "unit": "percent", "color": { "mode": "thresholds" },
         "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"green"},{"value":70,"color":"yellow"},{"value":90,"color":"red"}] } } },
-      "targets": [{ "expr": "marlin_gpu_utilization_percent", "legendFormat": "GPU Util %" }]
+      "targets": [{ "expr": "marlin_dgx_compute_utilization_percent", "legendFormat": "Compute Util %" }]
     },
     {
-      "id": 3, "type": "gauge", "title": "GPU Temperature °C",
+      "id": 3, "type": "gauge", "title": "System Temp °C",
       "gridPos": { "x": 8, "y": 0, "w": 4, "h": 4 },
       "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "showThresholdMarkers": true },
       "fieldConfig": { "defaults": { "min": 0, "max": 100, "unit": "celsius", "color": { "mode": "thresholds" },
         "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"green"},{"value":70,"color":"yellow"},{"value":85,"color":"red"}] } } },
-      "targets": [{ "expr": "marlin_gpu_temperature_celsius", "legendFormat": "Temp °C" }]
+      "targets": [{ "expr": "marlin_dgx_temperature_celsius", "legendFormat": "Temp °C" }]
     },
     {
       "id": 4, "type": "stat", "title": "Videos Processed",
@@ -63,26 +63,26 @@
       "targets": [{ "expr": "marlin_events_detected_total{video=\"Kathirmani Bill Counter\"}", "legendFormat": "Bill Counter events" }]
     },
     {
-      "id": 10, "type": "timeseries", "title": "GPU Memory Over Time",
+      "id": 10, "type": "timeseries", "title": "Unified Memory Over Time",
       "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
       "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
       "fieldConfig": { "defaults": { "unit": "none", "custom": { "lineWidth": 2, "fillOpacity": 20, "gradientMode": "opacity" } } },
-      "targets": [{ "expr": "marlin_gpu_memory_used_mb", "legendFormat": "GPU Memory (MB)" }]
+      "targets": [{ "expr": "marlin_dgx_unified_mem_used_gb", "legendFormat": "Unified Mem Used (GB)" }]
     },
     {
-      "id": 11, "type": "timeseries", "title": "GPU Utilization & Temperature",
+      "id": 11, "type": "timeseries", "title": "Compute Utilization & Temperature",
       "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
       "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
       "fieldConfig": {
         "defaults": { "custom": { "lineWidth": 2, "fillOpacity": 10 } },
         "overrides": [
-          { "matcher": { "id": "byName", "options": "GPU Util %" }, "properties": [{"id":"unit","value":"percent"},{"id":"color","value":{"fixedColor":"green","mode":"fixed"}}] },
-          { "matcher": { "id": "byName", "options": "GPU Temp °C" }, "properties": [{"id":"unit","value":"celsius"},{"id":"color","value":{"fixedColor":"orange","mode":"fixed"}}] }
+          { "matcher": { "id": "byName", "options": "Compute Util %" }, "properties": [{"id":"unit","value":"percent"},{"id":"color","value":{"fixedColor":"green","mode":"fixed"}}] },
+          { "matcher": { "id": "byName", "options": "System Temp °C" }, "properties": [{"id":"unit","value":"celsius"},{"id":"color","value":{"fixedColor":"orange","mode":"fixed"}}] }
         ]
       },
       "targets": [
-        { "expr": "marlin_gpu_utilization_percent", "legendFormat": "GPU Util %" },
-        { "expr": "marlin_gpu_temperature_celsius", "legendFormat": "GPU Temp °C" }
+        { "expr": "marlin_dgx_compute_utilization_percent", "legendFormat": "Compute Util %" },
+        { "expr": "marlin_dgx_temperature_celsius", "legendFormat": "System Temp °C" }
       ]
     },
     {

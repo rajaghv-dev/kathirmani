@@ -25,10 +25,15 @@ from prometheus_client.registry import Collector
 HERE = Path(__file__).parent
 RESULTS_DIR = HERE / "results"
 
-# --- metrics that update live during inference (from run_inference.py) ---
-GPU_MEM   = Gauge("marlin_gpu_memory_used_mb",   "GPU memory used (MB)")
-GPU_UTIL  = Gauge("marlin_gpu_utilization_percent", "GPU utilisation (%)")
-GPU_TEMP  = Gauge("marlin_gpu_temperature_celsius", "GPU temperature (°C)")
+# --- DGX Spark (Grace Blackwell) hardware metrics — live during inference ---
+# GB10 is integrated GPU with 119GB unified memory; no discrete VRAM
+DGX_COMPUTE = Gauge("marlin_dgx_compute_utilization_percent", "DGX compute utilization (%)")
+DGX_TEMP    = Gauge("marlin_dgx_temperature_celsius",         "DGX system temperature (°C)")
+DGX_POWER   = Gauge("marlin_dgx_power_watts",                 "DGX power draw (W)")
+DGX_CPU_U   = Gauge("marlin_dgx_cpu_utilization_user_percent","ARM CPU user utilization (%)")
+DGX_CPU_S   = Gauge("marlin_dgx_cpu_utilization_system_percent","ARM CPU system utilization (%)")
+DGX_MEM_U   = Gauge("marlin_dgx_unified_mem_used_gb",         "Unified memory used (GB)")
+DGX_MEM_T   = Gauge("marlin_dgx_unified_mem_total_gb",        "Unified memory total (GB)")
 
 # --- static metrics loaded from JSON results ---
 EVENTS    = Gauge("marlin_events_detected_total",   "Events detected per camera", ["video"])
@@ -58,7 +63,7 @@ ECONOMY_COST     = Gauge("marlin_cost_inr",                      "Estimated infe
 ECONOMY_CPE      = Gauge("marlin_cost_per_event_inr",            "INR per event detected")
 ECONOMY_EPW      = Gauge("marlin_events_per_wh",                 "Events detected per watt-hour (efficiency)")
 ECONOMY_WALLTIME = Gauge("marlin_total_inference_seconds",       "Total wall time of last run (s)")
-ECONOMY_AVGPOWER = Gauge("marlin_avg_gpu_power_during_run_watts","Average GPU power during last inference run (W)")
+ECONOMY_AVGPOWER = Gauge("marlin_avg_dgx_power_during_run_watts","Average GPU power during last inference run (W)")
 
 _loaded: set[str] = set()
 

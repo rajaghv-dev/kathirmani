@@ -137,7 +137,7 @@
     },
     {
       "id": 23, "type": "logs", "title": "Errors",
-      "description": "Caption or find failures — check for GPU OOM or video decode issues",
+      "description": "Caption or find failures — check for memory pressure or video decode issues",
       "gridPos": { "x": 12, "y": 41, "w": 12, "h": 8 },
       "datasource": { "type": "loki", "uid": "loki-marlin" },
       "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": true, "showTime": true, "showLabels": true, "wrapLogMessage": true, "sortOrder": "Descending" },

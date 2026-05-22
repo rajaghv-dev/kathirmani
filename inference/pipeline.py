@@ -11,7 +11,7 @@ import torch
 
 from .metrics import (
     INFERENCE_DURATION, EVENTS_DETECTED, VIDEOS_PROCESSED,
-    FIND_SPAN_START, FIND_SPAN_END, FIND_PARSE_OK, poll_gpu_metrics,
+    FIND_SPAN_START, FIND_SPAN_END, FIND_PARSE_OK, poll_dgx_metrics,
     FUSED_EVENTS, FUSED_TOTAL_RAW, FUSED_FIND_START, FUSED_FIND_END, FUSED_FIND_CAM,
 )
 
@@ -285,7 +285,7 @@ def run_all(model, video_dir: Path, results_dir: Path, duration: float | None = 
     results_dir.mkdir(exist_ok=True)
 
     stop_gpu = threading.Event()
-    gpu_thread = threading.Thread(target=poll_gpu_metrics, args=(stop_gpu,), daemon=True)
+    gpu_thread = threading.Thread(target=poll_dgx_metrics, args=(stop_gpu,), daemon=True)
     gpu_thread.start()
 
     total = len(videos)
