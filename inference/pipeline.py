@@ -153,6 +153,8 @@ def process_video(model, video_path: Path, results_dir: Path, duration: float | 
         for ev in output["events"]:
             print(f"            [{ev.get('start',0):.1f}s – {ev.get('end',0):.1f}s] {ev.get('description','')}")
         loki.log_caption(label, output["scene"], output["events"])
+        from . import annotations
+        annotations.annotate_camera_done(label, len(output["events"]))
     except Exception as e:
         print(f"[pipeline]   Caption failed: {e}")
         output["caption_error"] = str(e)
@@ -174,6 +176,8 @@ def process_video(model, video_path: Path, results_dir: Path, duration: float | 
                 FIND_SPAN_START.labels(video=label, query=query).set(span[0])
                 FIND_SPAN_END.labels(video=label, query=query).set(span[1])
                 loki.log_find_hit(label, query, list(span), find_result.get("raw", ""))
+                if query in annotations.SECURITY_QUERIES:
+                    annotations.annotate_security_event(label, query, list(span))
             else:
                 loki.log_find_miss(label, query)
             FIND_PARSE_OK.labels(video=label, query=query).set(1 if ok else 0)

@@ -106,6 +106,19 @@ def main():
 
     elapsed = time.time() - t0
     log_run_complete(len(results), sum(len(r.get("events",[])) for r in results), elapsed)
+    from inference.annotations import annotate_run_complete
+    annotate_run_complete(len(results), sum(len(r.get("events",[])) for r in results), elapsed)
+
+    from inference.metrics import compute_economy
+    economy = compute_economy(
+        total_events=sum(len(r.get("events", [])) for r in results),
+        wall_time_sec=elapsed,
+    )
+    # Save economy data alongside results
+    if economy:
+        import json
+        (Path(args.results_dir) / "economy.json").write_text(json.dumps(economy, indent=2))
+
     _print_summary(results, elapsed, args)
 
 
@@ -138,6 +151,7 @@ def _print_summary(results: list, elapsed: float, args) -> None:
     print("  GRAFANA DASHBOARDS")
     print(f"  {'Model & Runtime':20s}  http://{host}:3000/d/marlin-model-runtime")
     print(f"  {'Application/Pipeline':20s}  http://{host}:3000/d/marlin-pipeline")
+    print(f"  {'Compute Economy':20s}  http://{host}:3000/d/marlin-economy")
     print(f"  {'Login':20s}  admin / admin")
     print()
     print("  Dashboards auto-refresh every 15s — data visible immediately.")

@@ -52,6 +52,14 @@ FUSED_FIND_START= Gauge("marlin_fused_find_span_start_seconds","Fused find span 
 FUSED_FIND_END  = Gauge("marlin_fused_find_span_end_seconds",  "Fused find span end (s)",   ["query"])
 FUSED_FIND_DUR  = Gauge("marlin_fused_find_span_duration_seconds","Fused span duration (s)", ["query"])
 
+# --- token economy / cost metrics (from results/economy.json) ---
+ECONOMY_ENERGY   = Gauge("marlin_energy_consumed_wh",            "Estimated GPU energy used this run (Wh)")
+ECONOMY_COST     = Gauge("marlin_cost_inr",                      "Estimated inference cost in INR (₹)")
+ECONOMY_CPE      = Gauge("marlin_cost_per_event_inr",            "INR per event detected")
+ECONOMY_EPW      = Gauge("marlin_events_per_wh",                 "Events detected per watt-hour (efficiency)")
+ECONOMY_WALLTIME = Gauge("marlin_total_inference_seconds",       "Total wall time of last run (s)")
+ECONOMY_AVGPOWER = Gauge("marlin_avg_gpu_power_during_run_watts","Average GPU power during last inference run (W)")
+
 _loaded: set[str] = set()
 
 
@@ -94,6 +102,31 @@ def load_results():
     PROCESSED.set(videos_done)
     TOTAL_EV.set(total_events)
     _load_fused()
+    _load_economy()
+
+
+def _load_economy():
+    """Load results/economy.json and update token economy gauges."""
+    economy_path = RESULTS_DIR / "economy.json"
+    if not economy_path.exists():
+        return
+    try:
+        data = json.loads(economy_path.read_text())
+    except Exception:
+        return
+
+    if "energy_wh" in data:
+        ECONOMY_ENERGY.set(data["energy_wh"])
+    if "cost_inr" in data:
+        ECONOMY_COST.set(data["cost_inr"])
+    if "cost_per_event_inr" in data:
+        ECONOMY_CPE.set(data["cost_per_event_inr"])
+    if "events_per_wh" in data:
+        ECONOMY_EPW.set(data["events_per_wh"])
+    if "wall_time_sec" in data:
+        ECONOMY_WALLTIME.set(data["wall_time_sec"])
+    if "avg_power_w" in data:
+        ECONOMY_AVGPOWER.set(data["avg_power_w"])
 
 
 def _load_fused():

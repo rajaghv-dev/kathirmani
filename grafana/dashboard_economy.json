@@ -1,0 +1,292 @@
+{
+  "uid": "marlin-economy",
+  "title": "Kathirmani — Compute Economy",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "15s",
+  "time": { "from": "now-1h", "to": "now" },
+  "timezone": "browser",
+  "tags": ["marlin", "economy", "cost"],
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Total Energy (Wh)",
+      "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 },
+      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "watth",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "red", "value": 200 }
+            ]
+          }
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
+      "targets": [{ "expr": "marlin_energy_consumed_wh", "legendFormat": "Energy (Wh)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Est. Cost (₹)",
+      "gridPos": { "x": 4, "y": 0, "w": 4, "h": 4 },
+      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyINR",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.0005 },
+              { "color": "red", "value": 0.002 }
+            ]
+          }
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
+      "targets": [{ "expr": "marlin_cost_inr", "legendFormat": "Cost (INR)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Cost per Event (₹)",
+      "gridPos": { "x": 8, "y": 0, "w": 4, "h": 4 },
+      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyINR",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.0001 },
+              { "color": "red", "value": 0.001 }
+            ]
+          }
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
+      "targets": [{ "expr": "marlin_cost_per_event_inr", "legendFormat": "Cost/Event (INR)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Events per Wh",
+      "gridPos": { "x": 12, "y": 0, "w": 4, "h": 4 },
+      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 10 },
+              { "color": "green", "value": 50 }
+            ]
+          }
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
+      "targets": [{ "expr": "marlin_events_per_wh", "legendFormat": "Events/Wh", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Avg GPU Power (W)",
+      "gridPos": { "x": 16, "y": 0, "w": 4, "h": 4 },
+      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "watt",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "red", "value": 100 }
+            ]
+          }
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
+      "targets": [{ "expr": "marlin_avg_gpu_power_during_run_watts", "legendFormat": "Avg Power (W)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Wall Time (s)",
+      "gridPos": { "x": 20, "y": 0, "w": 4, "h": 4 },
+      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 300 },
+              { "color": "red", "value": 900 }
+            ]
+          }
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
+      "targets": [{ "expr": "marlin_total_inference_seconds", "legendFormat": "Wall Time (s)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "GPU Power During Inference",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "watt",
+          "color": { "mode": "palette-classic" }
+        }
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "targets": [{ "expr": "marlin_gpu_power_watts", "legendFormat": "GPU Power (W)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "GPU Temperature During Inference",
+      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "color": { "mode": "palette-classic" }
+        }
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "targets": [{ "expr": "marlin_gpu_temperature_celsius", "legendFormat": "GPU Temp (°C)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+    },
+    {
+      "id": 20,
+      "type": "bargauge",
+      "title": "Events Detected per Camera",
+      "gridPos": { "x": 0, "y": 12, "w": 24, "h": 8 },
+      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "palette-classic" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 5 },
+              { "color": "red", "value": 15 }
+            ]
+          }
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "displayMode": "gradient",
+        "showUnfilled": true
+      },
+      "targets": [{ "expr": "marlin_events_detected_total", "legendFormat": "{{video}}", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+    },
+    {
+      "id": 30,
+      "type": "stat",
+      "title": "Total Events",
+      "gridPos": { "x": 0, "y": 20, "w": 6, "h": 4 },
+      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "blue", "value": null }]
+          }
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
+      "targets": [{ "expr": "sum(marlin_events_detected_total)", "legendFormat": "Total Events", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+    },
+    {
+      "id": 31,
+      "type": "stat",
+      "title": "Unique Events (fused)",
+      "gridPos": { "x": 6, "y": 20, "w": 6, "h": 4 },
+      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "purple", "value": null }]
+          }
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
+      "targets": [{ "expr": "marlin_fused_unique_events", "legendFormat": "Unique Events", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+    },
+    {
+      "id": 32,
+      "type": "stat",
+      "title": "Find Queries Resolved",
+      "gridPos": { "x": 12, "y": 20, "w": 6, "h": 4 },
+      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 5 },
+              { "color": "green", "value": 10 }
+            ]
+          }
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
+      "targets": [{ "expr": "count(marlin_find_parse_success == 1)", "legendFormat": "Resolved Queries", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+    },
+    {
+      "id": 33,
+      "type": "stat",
+      "title": "GPU Util %",
+      "gridPos": { "x": 18, "y": 20, "w": 6, "h": 4 },
+      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 30 },
+              { "color": "green", "value": 70 }
+            ]
+          }
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
+      "targets": [{ "expr": "marlin_gpu_utilization_percent", "legendFormat": "GPU Util %", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+    }
+  ]
+}

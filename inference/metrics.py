@@ -67,6 +67,17 @@ GPU_POWER_WATTS = Gauge(
     "GPU power draw (W)"
 )
 
+# Token economy / cost metrics
+ENERGY_WH = Gauge("marlin_energy_consumed_wh", "Estimated GPU energy used this run (Wh)")
+COST_INR  = Gauge("marlin_cost_inr", "Estimated inference cost in INR (₹)")
+COST_PER_EVENT = Gauge("marlin_cost_per_event_inr", "INR per event detected")
+EVENTS_PER_WH  = Gauge("marlin_events_per_wh", "Events detected per watt-hour (efficiency)")
+INFERENCE_TOTAL_SEC = Gauge("marlin_total_inference_seconds", "Total wall time of last run (s)")
+AVG_POWER_DURING_RUN = Gauge("marlin_avg_gpu_power_during_run_watts", "Average GPU power during last inference run (W)")
+
+# Power samples accumulated during an inference run
+_power_samples: list[float] = []
+
 # Model info
 MODEL_INFO = Info("marlin_model", "Model metadata")
 
@@ -125,11 +136,42 @@ def poll_gpu_metrics(stop_event: threading.Event, interval: float = 1.0):
 
             if util_gpu  is not None: GPU_UTILIZATION.set(util_gpu)
             if temp      is not None: GPU_TEMPERATURE.set(temp)
-            if power     is not None: GPU_POWER_WATTS.set(power)
+            if power     is not None:
+                GPU_POWER_WATTS.set(power)
+                _power_samples.append(power)
             if mem_used  is not None: GPU_MEMORY_USED_MB.set(mem_used)
         except Exception:
             pass
         time.sleep(interval)
+
+
+def compute_economy(total_events: int, wall_time_sec: float, electricity_rate_inr_per_kwh: float = 10.0) -> dict:
+    """Compute energy and cost from collected power samples."""
+    if not _power_samples:
+        return {}
+    avg_power_w = sum(_power_samples) / len(_power_samples)
+    energy_wh = avg_power_w * (wall_time_sec / 3600)
+    cost_inr = energy_wh / 1000 * electricity_rate_inr_per_kwh
+    events_per_wh = total_events / max(energy_wh, 0.001)
+    cost_per_event = cost_inr / max(total_events, 1)
+
+    ENERGY_WH.set(round(energy_wh, 4))
+    COST_INR.set(round(cost_inr, 6))
+    EVENTS_PER_WH.set(round(events_per_wh, 2))
+    COST_PER_EVENT.set(round(cost_per_event, 6))
+    INFERENCE_TOTAL_SEC.set(round(wall_time_sec, 1))
+    AVG_POWER_DURING_RUN.set(round(avg_power_w, 2))
+
+    _power_samples.clear()
+    return {
+        "avg_power_w": round(avg_power_w, 2),
+        "energy_wh": round(energy_wh, 4),
+        "cost_inr": round(cost_inr, 6),
+        "events_per_wh": round(events_per_wh, 2),
+        "cost_per_event_inr": round(cost_per_event, 6),
+        "wall_time_sec": round(wall_time_sec, 1),
+        "total_events": total_events,
+    }
 
 
 def start_metrics_server(port: int = 8900):
