@@ -1,0 +1,235 @@
+{
+  "video": "Kathirmani Right Side Cam.mkv",
+  "label": "Kathirmani Right Side Cam",
+  "duration_tested_sec": 10.0,
+  "processed_at": "2026-05-22T13:08:54",
+  "caption": "Scene: A large, empty industrial or commercial storage room with a checkered floor pattern. The space is filled with various items including two metal shopping carts in the foreground, one containing bright green plastic bags. A large stack of cardboard boxes, some labeled 'WILDCRAFT', sits in the center. To the right, a massive, empty black metal shelving unit dominates the wall. In the background, there are two white ice cream refrigerators, one with a 'Arun' logo, and a metal rack holding wooden slats. The lighting is bright and even, suggesting an indoor facility. The camera remains stationary throughout the clip, providing a wide-angle view of the cluttered but quiet storage area.\n\nEvents:\n<0.0 - 10.0> The empty storage room remains static with no subject motion.",
+  "events": [
+    {
+      "start": 0.0,
+      "end": 10.0,
+      "description": "The empty storage room remains static with no subject motion."
+    }
+  ],
+  "find_results": {
+    "customer enters Kathirmani store": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer exits Kathirmani store": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "cash payment at bill counter": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "billing staff at counter": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer queue at billing": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer browsing shelves": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "person picking item from rack": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer carrying shopping basket": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "unattended bag or package": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "person loitering near exit": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "suspicious or unusual behavior": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "crowded aisle or bottleneck": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer leaving store without approaching billing counter": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "person handling merchandise near store exit or boundary": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "group of customers gathered around a product display blocking view": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "person placing merchandise into personal bag or clothing at shelf": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer returning to the same shelf section multiple times": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "billing staff engaged by customer while another person handles merchandise": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "person carrying large bag or backpack near merchandise shelves": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer switching or swapping product packaging at shelf": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    }
+  },
+  "scene": "A large, empty industrial or commercial storage room with a checkered floor pattern. The space is filled with various items including two metal shopping carts in the foreground, one containing bright green plastic bags. A large stack of cardboard boxes, some labeled 'WILDCRAFT', sits in the center. To the right, a massive, empty black metal shelving unit dominates the wall. In the background, there are two white ice cream refrigerators, one with a 'Arun' logo, and a metal rack holding wooden slats. The lighting is bright and even, suggesting an indoor facility. The camera remains stationary throughout the clip, providing a wide-angle view of the cluttered but quiet storage area.",
+  "qwen_analysis": {
+    "label": "Kathirmani Right Side Cam",
+    "model": "Qwen2.5-VL-7B-Instruct",
+    "queries": {
+      "Count the customers visible and describe what each person is doing with their hands and any bags they carry.": {
+        "answer": "In the image, there are two customers visible:\n\n1. **Customer on the left**: This person is partially visible and appears to be walking away from the camera. They are not carrying any bags in their hands.\n\n2. **Customer on the right**: This person is closer to the camera and is standing near the shopping cart. They appear to be holding a bag in one hand, possibly a green plastic bag, and have another bag placed on the shopping cart. Their other hand is not visible in the image.\n\nThe shopping cart contains several items, including what looks like a box of diapers or similar products wrapped in green plastic. The cart is positioned next to an empty shelf unit.",
+        "ok": true
+      },
+      "Is any customer placing merchandise into a personal bag, pocket, or clothing while at the shelf \u2014 not into a store basket?": {
+        "answer": "No, there is no visible evidence in the image that any customer is placing merchandise directly into a personal bag, pocket, or clothing while at the shelf. The focus of the image appears to be on the shopping cart and the empty shelves, with no customers actively engaged in such an action.",
+        "ok": true
+      },
+      "Are any customers moving toward the store exit while carrying unpaid merchandise without a billing bag or receipt?": {
+        "answer": "The image shows a shopping cart filled with groceries and boxes, but there is no visible evidence of customers carrying unpaid merchandise without a billing bag or receipt. The focus of the image is on the shopping cart and the empty shelves in the background. There are no people in the immediate foreground who appear to be carrying items that would suggest they have not paid for them. However, it's important to note that this analysis is based solely on the provided image and does not account for any activity outside the frame of the image.",
+        "ok": true
+      },
+      "Is there a group of customers clustered together near merchandise in a way that could obstruct the camera view of the shelf?": {
+        "answer": "No, there is no group of customers clustered together near the merchandise in a way that could obstruct the camera view of the shelf. The image shows an empty shelf with some boxes and shopping carts in front of it, but there are no people obstructing the view. The camera appears to be positioned at a height that captures the entire shelf and the area around it without any obstructions.",
+        "ok": true
+      },
+      "Describe any customer spending an unusually long time handling a single product without placing it in a basket.": {
+        "answer": "The image shows a shopping area with a shopping cart filled with groceries and a stack of boxes on the floor next to the cart. The shelves appear to be mostly empty, indicating that the store might be experiencing a shortage or restocking issues. There is no visible customer spending an unusually long time handling a single product without placing it in a basket. Instead, the focus seems to be on the empty shelves and the items already placed in the cart.",
+        "ok": true
+      },
+      "Is there any commotion, argument, or distraction happening near the billing counter or merchandise display?": {
+        "answer": "The image shows a section of a store with shopping carts and boxes stacked on the floor next to empty shelves. There is no visible commotion, argument, or distraction near the billing counter or merchandise display in this particular image. The scene appears to be calm, with no signs of chaos or conflict. However, it's important to note that this is a still image, and without additional context or video footage, it's not possible to determine if there was any commotion or distraction at a different time.",
+        "ok": true
+      },
+      "Are any customers engaging billing staff in extended conversation while another person is near the merchandise?": {
+        "answer": "The image shows a shopping cart filled with groceries and boxes, and there are empty shelves in the background. There are no visible customers or billing staff in the image, nor can we see anyone engaging in conversation. The scene appears to be a quiet moment in a store, possibly after a busy period or during a less crowded time.",
+        "ok": true
+      },
+      "Are there any empty shelf gaps or sections that appear to need restocking?": {
+        "answer": "Yes, the image shows several empty shelf gaps and sections that appear to need restocking. The shelves on the right side of the image are completely empty, indicating that these areas have not been stocked with products. Additionally, the middle section of the shelves also appears to be empty, suggesting that it too is in need of restocking. The presence of shopping carts filled with items in the foreground further emphasizes the need for restocking as these items are likely out of stock.",
+        "ok": true
+      },
+      "Is there any merchandise on the floor, misplaced, or fallen from shelves?": {
+        "answer": "Yes, there appears to be merchandise on the floor in the image. Specifically, there are boxes and what looks like shopping bags scattered on the floor near the shopping cart. This suggests that some items have fallen from the shelves or been placed there by someone. The boxes are stacked on top of each other, and the shopping cart is also on the floor, which could indicate that it was knocked over or that items were dropped into it.",
+        "ok": true
+      },
+      "How many customers are at or waiting at the billing counter? Estimate queue length.": {
+        "answer": "The image shows a supermarket aisle with empty shelves and a shopping cart filled with boxes and bags. There is one person visible in the background near the entrance, but it is not clear if this person is at the billing counter or just passing by. \n\nTo estimate the queue length at the billing counter, we would need to see more of the store, including the checkout area. Since that information is not provided in the image, it is not possible to accurately estimate the queue length.",
+        "ok": true
+      },
+      "Is any child present in the store without an accompanying adult nearby?": {
+        "answer": "The image shows a shopping cart with boxes and bags, and there is a person partially visible on the left side of the frame. However, it is not possible to determine from this image whether the person is a child or if they are accompanied by an adult. The image does not provide enough detail to make that determination.",
+        "ok": true
+      },
+      "Is any customer appearing distressed, confused, or in need of staff assistance?": {
+        "answer": "The image shows a shopping cart filled with groceries and boxes stacked on the floor next to an empty shelf. There is no visible customer in the image who appears to be distressed, confused, or in need of staff assistance. The person walking by in the background does not seem to be interacting with the situation. It looks like a typical scene where a customer might have been shopping and left some items behind.",
+        "ok": true
+      },
+      "Describe the overall store activity level: how many staff and customers visible, and what is the general level of activity?": {
+        "answer": "The image shows a store with a relatively low level of activity. There are two people visible in the image:\n\n1. A person wearing a red shirt and jeans walking past the shopping cart.\n2. Another person partially visible on the left side of the image, possibly near the entrance or another section of the store.\n\nThe store appears to be mostly empty, with most shelves being empty or nearly empty. There are some boxes stacked on the floor next to the shopping cart, which might indicate recent restocking or an ongoing process. The presence of the shopping cart suggests that at least one customer has been shopping, but there are no other customers visible in the image.\n\nOverall, the store seems to have a calm atmosphere with minimal activity, as evidenced by the lack of other customers and the sparse inventory on the shelves.",
+        "ok": true
+      }
+    }
+  }
+}

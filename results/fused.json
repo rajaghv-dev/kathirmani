@@ -1,0 +1,217 @@
+{
+  "source": "fused_5_cameras",
+  "cameras": [
+    "Kathirmani Bill Counter",
+    "Kathirmani Center Camera",
+    "Kathirmani Left Side Camera",
+    "Kathirmani Near Entry Door Camera",
+    "Kathirmani Right Side Cam"
+  ],
+  "find_results": {
+    "customer enters Kathirmani store": {
+      "span": [
+        0.0,
+        10.0
+      ],
+      "camera": "Kathirmani Bill Counter",
+      "format_ok": true
+    },
+    "customer exits Kathirmani store": {
+      "span": [
+        0.0,
+        10.0
+      ],
+      "camera": "Kathirmani Bill Counter",
+      "format_ok": true
+    },
+    "cash payment at bill counter": {
+      "span": [
+        0.0,
+        10.0
+      ],
+      "camera": "Kathirmani Bill Counter",
+      "format_ok": true
+    },
+    "billing staff at counter": {
+      "span": [
+        0.0,
+        10.0
+      ],
+      "camera": "Kathirmani Bill Counter",
+      "format_ok": true
+    },
+    "customer queue at billing": {
+      "span": [
+        0.0,
+        10.0
+      ],
+      "camera": "Kathirmani Bill Counter",
+      "format_ok": true
+    },
+    "customer browsing shelves": {
+      "span": [
+        0.0,
+        10.0
+      ],
+      "camera": "Kathirmani Bill Counter",
+      "format_ok": true
+    },
+    "person picking item from rack": {
+      "span": [
+        0.0,
+        10.0
+      ],
+      "camera": "Kathirmani Bill Counter",
+      "format_ok": true
+    },
+    "customer carrying shopping basket": {
+      "span": [
+        0.0,
+        10.0
+      ],
+      "camera": "Kathirmani Bill Counter",
+      "format_ok": true
+    },
+    "unattended bag or package": {
+      "span": [
+        0.0,
+        10.0
+      ],
+      "camera": "Kathirmani Bill Counter",
+      "format_ok": true
+    },
+    "person loitering near exit": {
+      "span": [
+        0.0,
+        10.0
+      ],
+      "camera": "Kathirmani Bill Counter",
+      "format_ok": true
+    },
+    "suspicious or unusual behavior": {
+      "span": [
+        0.0,
+        10.0
+      ],
+      "camera": "Kathirmani Bill Counter",
+      "format_ok": true
+    },
+    "crowded aisle or bottleneck": {
+      "span": [
+        0.0,
+        10.0
+      ],
+      "camera": "Kathirmani Bill Counter",
+      "format_ok": true
+    },
+    "customer leaving store without approaching billing counter": {
+      "span": [
+        0.0,
+        10.0
+      ],
+      "camera": "Kathirmani Bill Counter",
+      "format_ok": true
+    },
+    "person handling merchandise near store exit or boundary": {
+      "span": [
+        0.0,
+        10.0
+      ],
+      "camera": "Kathirmani Bill Counter",
+      "format_ok": true
+    },
+    "group of customers gathered around a product display blocking view": {
+      "span": [
+        0.0,
+        10.0
+      ],
+      "camera": "Kathirmani Bill Counter",
+      "format_ok": true
+    },
+    "person placing merchandise into personal bag or clothing at shelf": {
+      "span": [
+        0.0,
+        10.0
+      ],
+      "camera": "Kathirmani Bill Counter",
+      "format_ok": true
+    },
+    "customer returning to the same shelf section multiple times": {
+      "span": [
+        0.0,
+        10.0
+      ],
+      "camera": "Kathirmani Bill Counter",
+      "format_ok": true
+    },
+    "billing staff engaged by customer while another person handles merchandise": {
+      "span": [
+        0.0,
+        10.0
+      ],
+      "camera": "Kathirmani Bill Counter",
+      "format_ok": true
+    },
+    "person carrying large bag or backpack near merchandise shelves": {
+      "span": [
+        0.0,
+        10.0
+      ],
+      "camera": "Kathirmani Bill Counter",
+      "format_ok": true
+    },
+    "customer switching or swapping product packaging at shelf": {
+      "span": [
+        0.0,
+        10.0
+      ],
+      "camera": "Kathirmani Bill Counter",
+      "format_ok": true
+    }
+  },
+  "events": [
+    {
+      "start": 0.0,
+      "end": 5.5,
+      "description": "The person uses a computer mouse on the desk."
+    },
+    {
+      "start": 5.5,
+      "end": 10.0,
+      "description": "The person rests their arms on the counter."
+    },
+    {
+      "start": 0.0,
+      "end": 4.5,
+      "description": "The man talks on a phone while holding a mouse."
+    },
+    {
+      "start": 4.5,
+      "end": 5.5,
+      "description": "The man lowers the phone from his ear."
+    },
+    {
+      "start": 5.5,
+      "end": 10.0,
+      "description": "The man looks down at a small object in his hands."
+    },
+    {
+      "start": 0.0,
+      "end": 10.0,
+      "description": "The camera remains static over the empty store shelves."
+    },
+    {
+      "start": 0.0,
+      "end": 5.5,
+      "description": "The man stands at the counter looking at the computer."
+    },
+    {
+      "start": 0.0,
+      "end": 10.0,
+      "description": "The empty storage room remains static with no subject motion."
+    }
+  ],
+  "unique_event_count": 8,
+  "total_raw_events": 9,
+  "dedup_ratio": 1.125
+}

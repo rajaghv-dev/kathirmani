@@ -1,5 +1,5 @@
 .venv/
-results/
+# results/ intentionally tracked — inference JSONs are part of the repo
 *.mkv
 *.mp4
 *.avi
@@ -27,3 +27,6 @@ prometheus/LICENSE
 prometheus/NOTICE
 prometheus/console_libraries/
 prometheus/consoles/
+
+.claude/
+grafana/results/

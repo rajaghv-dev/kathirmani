@@ -1,0 +1,235 @@
+{
+  "video": "Kathirmani Left Side Camera.mkv",
+  "label": "Kathirmani Left Side Camera",
+  "duration_tested_sec": 10.0,
+  "processed_at": "2026-05-22T13:05:21",
+  "caption": "Scene: A high-angle, wide-shot view of a brightly lit retail store, likely a specialized food or grocery shop. The primary focus is a large, black shelving unit on the left, stocked with various packaged goods, including bags of rice and other dry ingredients. A sign above the shelf reads 'KANDITaman Essential Store RICE & TRADITIONAL RICE'. The floor features a large, circular pattern with alternating light and dark beige or tan tones. In the foreground, a black pedestal fan sits on the floor. To the right, another shelving unit holds blue plastic bins and various packaged items. The background shows a doorway leading to another area and a white wall with a fire extinguisher. The camera remains static throughout the duration, providing a consistent perspective of the empty or lightly stocked shelves.\n\nEvents:\n<0.0 - 10.0> The camera remains static over the empty store shelves.",
+  "events": [
+    {
+      "start": 0.0,
+      "end": 10.0,
+      "description": "The camera remains static over the empty store shelves."
+    }
+  ],
+  "find_results": {
+    "customer enters Kathirmani store": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer exits Kathirmani store": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "cash payment at bill counter": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "billing staff at counter": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer queue at billing": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer browsing shelves": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "person picking item from rack": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer carrying shopping basket": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "unattended bag or package": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "person loitering near exit": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "suspicious or unusual behavior": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "crowded aisle or bottleneck": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer leaving store without approaching billing counter": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "person handling merchandise near store exit or boundary": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "group of customers gathered around a product display blocking view": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "person placing merchandise into personal bag or clothing at shelf": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer returning to the same shelf section multiple times": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "billing staff engaged by customer while another person handles merchandise": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "person carrying large bag or backpack near merchandise shelves": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer switching or swapping product packaging at shelf": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    }
+  },
+  "scene": "A high-angle, wide-shot view of a brightly lit retail store, likely a specialized food or grocery shop. The primary focus is a large, black shelving unit on the left, stocked with various packaged goods, including bags of rice and other dry ingredients. A sign above the shelf reads 'KANDITaman Essential Store RICE & TRADITIONAL RICE'. The floor features a large, circular pattern with alternating light and dark beige or tan tones. In the foreground, a black pedestal fan sits on the floor. To the right, another shelving unit holds blue plastic bins and various packaged items. The background shows a doorway leading to another area and a white wall with a fire extinguisher. The camera remains static throughout the duration, providing a consistent perspective of the empty or lightly stocked shelves.",
+  "qwen_analysis": {
+    "label": "Kathirmani Left Side Camera",
+    "model": "Qwen2.5-VL-7B-Instruct",
+    "queries": {
+      "Count the customers visible and describe what each person is doing with their hands and any bags they carry.": {
+        "answer": "In the image, there are two customers visible:\n\n1. **Customer 1 (Closer to the Camera):**\n   - **Appearance:** Wearing a red top.\n   - **Hand Position:** Both hands appear to be holding a bag or some items, possibly shopping.\n   - **Activity:** Walking towards the shelves, likely browsing or selecting items.\n\n2. **Customer 2 (Further Away):**\n   - **Appearance:** Wearing a dark outfit.\n   - **Hand Position:** One hand appears to be holding a bag or item, while the other hand is not clearly visible.\n   - **Activity:** Walking away from the camera, possibly heading towards another section of the store.\n\nBoth individuals seem to be engaged in typical shopping activities, such as browsing and carrying items.",
+        "ok": true
+      },
+      "Is any customer placing merchandise into a personal bag, pocket, or clothing while at the shelf \u2014 not into a store basket?": {
+        "answer": "No, there is no visible evidence in the image that any customer is placing merchandise into a personal bag, pocket, or clothing while at the shelf. The customers appear to be browsing and selecting items from the shelves, but none of them are seen putting anything into their bags or pockets.",
+        "ok": true
+      },
+      "Are any customers moving toward the store exit while carrying unpaid merchandise without a billing bag or receipt?": {
+        "answer": "Based on the image provided, it is not possible to definitively determine if there are any customers moving toward the store exit while carrying unpaid merchandise without a billing bag or receipt. The image shows a store interior with shelves stocked with various items and a few people walking around, but it does not provide enough detail to confirm the actions of specific individuals or their possession of merchandise. To make such a determination, one would need more information or a clearer view of the individuals in question.",
+        "ok": true
+      },
+      "Is there a group of customers clustered together near merchandise in a way that could obstruct the camera view of the shelf?": {
+        "answer": "No, there is no group of customers clustered together near the merchandise in a way that could obstruct the camera view of the shelf. The image shows two individuals walking past the shelves, but they do not appear to be obstructing the view of the merchandise. The camera angle provides a clear view of the shelves and the products displayed on them.",
+        "ok": true
+      },
+      "Describe any customer spending an unusually long time handling a single product without placing it in a basket.": {
+        "answer": "In the image, there is a customer near the center of the frame who appears to be spending an unusually long time handling a single product from the display case. The individual is standing close to the shelves, which contain various packaged items such as bread and other food products. The person seems to be examining or possibly weighing the item they are holding, as they are not yet placing it into a shopping basket. This behavior could indicate that they are carefully considering their purchase or perhaps checking the weight of the item before deciding to add it to their basket.",
+        "ok": true
+      },
+      "Is there any commotion, argument, or distraction happening near the billing counter or merchandise display?": {
+        "answer": "From the image provided, it appears to be a relatively calm scene in what looks like a bakery or deli. There are no visible signs of commotion, argument, or distraction near the billing counter or merchandise display. The shelves are neatly organized with various baked goods and packaged items, and there are a few people walking around, but they seem to be engaged in normal shopping activities without any apparent disturbance. The timestamp suggests that this is a surveillance video from a security camera, capturing a moment during the day.",
+        "ok": true
+      },
+      "Are any customers engaging billing staff in extended conversation while another person is near the merchandise?": {
+        "answer": "The image shows a store with shelves stocked with various items, likely food products, and a few people walking around. There doesn't appear to be any customer engaging in an extended conversation with a billing staff member or anyone near the merchandise. The individuals seem to be browsing or moving through the store without interacting closely with the staff or the products.",
+        "ok": true
+      },
+      "Are there any empty shelf gaps or sections that appear to need restocking?": {
+        "answer": "From the image, it appears that the shelves in the bakery section are mostly full of various baked goods and packaged items. There do not seem to be any obvious empty shelf gaps or sections that require restocking. The shelves are well-stocked with a variety of products, including what looks like bread, pastries, and other baked items. However, without a closer inspection or more detailed view, it's difficult to determine if there are any specific areas that might need attention.",
+        "ok": true
+      },
+      "Is there any merchandise on the floor, misplaced, or fallen from shelves?": {
+        "answer": "From the image provided, it does not appear that there is any merchandise on the floor that has been misplaced or fallen from the shelves. The shelves seem to be organized and there are no visible items on the floor that could indicate such an occurrence. However, it's important to note that the image is taken from a security camera and may not capture all details of the scene.",
+        "ok": true
+      },
+      "How many customers are at or waiting at the billing counter? Estimate queue length.": {
+        "answer": "In the image, there appear to be two customers at the billing counter. The queue length seems to be minimal, as only these two individuals are visible in the area where customers typically wait for their orders to be processed.",
+        "ok": true
+      },
+      "Is any child present in the store without an accompanying adult nearby?": {
+        "answer": "Based on the image provided, there is no visible child in the store without an accompanying adult nearby. The individuals present appear to be adults and are engaged in typical shopping activities.",
+        "ok": true
+      },
+      "Is any customer appearing distressed, confused, or in need of staff assistance?": {
+        "answer": "From the image provided, it is not possible to determine if any customer appears distressed, confused, or in need of staff assistance. The image shows a store with shelves stocked with various items and two individuals walking through the aisle. There are no clear indicators of distress, confusion, or need for assistance based on their body language or actions. To accurately assess such situations, more context or a closer view would be necessary.",
+        "ok": true
+      },
+      "Describe the overall store activity level: how many staff and customers visible, and what is the general level of activity?": {
+        "answer": "The image shows a store with a moderate level of activity. There are two staff members visible in the background, one near the counter and another further back. There are also a few customers walking around the store, but no specific interactions or transactions appear to be taking place at this moment.\n\nThe general level of activity seems low, as there are not many people present and no one appears to be actively shopping or engaging with the products on display. The store looks clean and organized, with neatly arranged shelves and a well-maintained floor.",
+        "ok": true
+      }
+    }
+  }
+}

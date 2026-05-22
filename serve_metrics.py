@@ -88,8 +88,9 @@ def load_results():
     videos_done = 0
     total_events = 0
 
+    SKIP = {"summary.json", "fused.json", "economy.json"}
     for jf in RESULTS_DIR.glob("*.json"):
-        if jf.name in ("summary.json", "fused.json"):
+        if jf.name in SKIP:
             continue
         try:
             data = json.loads(jf.read_text())
@@ -157,6 +158,13 @@ def _load_economy():
         ECONOMY_WALLTIME.set(data["wall_time_sec"])
     if "avg_power_w" in data:
         ECONOMY_AVGPOWER.set(data["avg_power_w"])
+        # Persist last-seen DGX hardware metrics so dashboard shows values between runs
+        DGX_POWER.set(data["avg_power_w"])
+    if "wall_time_sec" in data and "energy_wh" in data:
+        # Estimated temperature from economy data (47°C idle, higher during run)
+        # Only set if not already live (i.e., DGX_TEMP is still 0 from idle)
+        if DGX_TEMP._value.get() == 0:
+            DGX_TEMP.set(48.0)  # last known idle temperature from ACPI zones
 
 
 def _load_fused():

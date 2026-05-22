@@ -1,0 +1,245 @@
+{
+  "video": "Kathirmani Center Camera.mkv",
+  "label": "Kathirmani Center Camera",
+  "duration_tested_sec": 10.0,
+  "processed_at": "2026-05-22T13:03:44",
+  "caption": "Scene: A high-angle, wide-shot view of a retail store interior, likely a grocery or convenience shop, during the day. The floor features a large circular pattern with yellow and white segments. On the right, a man in a red polo shirt stands behind a white L-shaped counter. The counter is equipped with a computer monitor, keyboard, a small grey computer tower, and a laptop. To the left, a tall silver ladder leans against a black shelving unit stocked with various packaged goods. In the background, there are more shelves, a white ice cream freezer with a logo, and several metal shopping carts. The man is initially seen talking on a mobile phone while holding a mouse over the laptop, then transitions to looking at his phone.\n\nEvents:\n<0.0 - 4.5> The man talks on a phone while holding a mouse.\n<4.5 - 5.5> The man lowers the phone from his ear.\n<5.5 - 10.0> The man looks down at the phone in his hands.",
+  "events": [
+    {
+      "start": 0.0,
+      "end": 4.5,
+      "description": "The man talks on a phone while holding a mouse."
+    },
+    {
+      "start": 4.5,
+      "end": 5.5,
+      "description": "The man lowers the phone from his ear."
+    },
+    {
+      "start": 5.5,
+      "end": 10.0,
+      "description": "The man looks down at the phone in his hands."
+    }
+  ],
+  "find_results": {
+    "customer enters Kathirmani store": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer exits Kathirmani store": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "cash payment at bill counter": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "billing staff at counter": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer queue at billing": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer browsing shelves": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "person picking item from rack": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer carrying shopping basket": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "unattended bag or package": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "person loitering near exit": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "suspicious or unusual behavior": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "crowded aisle or bottleneck": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer leaving store without approaching billing counter": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "person handling merchandise near store exit or boundary": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "group of customers gathered around a product display blocking view": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "person placing merchandise into personal bag or clothing at shelf": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer returning to the same shelf section multiple times": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "billing staff engaged by customer while another person handles merchandise": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "person carrying large bag or backpack near merchandise shelves": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    },
+    "customer switching or swapping product packaging at shelf": {
+      "raw": "From 0.0 to 10.0.",
+      "span": [
+        0.0,
+        10.0
+      ],
+      "format_ok": true
+    }
+  },
+  "scene": "A high-angle, wide-shot view of a retail store interior, likely a grocery or convenience shop, during the day. The floor features a large circular pattern with yellow and white segments. On the right, a man in a red polo shirt stands behind a white L-shaped counter. The counter is equipped with a computer monitor, keyboard, a small grey computer tower, and a laptop. To the left, a tall silver ladder leans against a black shelving unit stocked with various packaged goods. In the background, there are more shelves, a white ice cream freezer with a logo, and several metal shopping carts. The man is initially seen talking on a mobile phone while holding a mouse over the laptop, then transitions to looking at his phone.",
+  "qwen_analysis": {
+    "label": "Kathirmani Center Camera",
+    "model": "Qwen2.5-VL-7B-Instruct",
+    "queries": {
+      "Count the customers visible and describe what each person is doing with their hands and any bags they carry.": {
+        "answer": "In the image, there are several customers visible in the store:\n\n1. **Customer near the entrance**: This person appears to be walking towards the entrance of the store. They are not carrying any bags.\n2. **Customer near the checkout counter**: This person is standing near the checkout counter, possibly waiting for assistance or preparing to check out. They are not carrying any bags.\n3. **Customer in the background**: This person is further back in the store, closer to the center. They appear to be walking away from the camera. They are not carrying any bags.\n\nThe person at the checkout counter seems to be interacting with the cashier, as indicated by their posture and the presence of a shopping cart nearby. The cashier is seated behind the counter, handling items or preparing to scan them. There are no visible bags being carried by the customers in this frame.",
+        "ok": true
+      },
+      "Is any customer placing merchandise into a personal bag, pocket, or clothing while at the shelf \u2014 not into a store basket?": {
+        "answer": "No, there is no visible evidence in this image of a customer placing merchandise directly into a personal bag, pocket, or clothing while at the shelf. The customers appear to be using store baskets and are interacting with the checkout area.",
+        "ok": true
+      },
+      "Are any customers moving toward the store exit while carrying unpaid merchandise without a billing bag or receipt?": {
+        "answer": "Based on the image provided, it appears that there is no clear indication of customers moving toward the store exit while carrying unpaid merchandise without a billing bag or receipt. The individuals in the image seem to be engaged in various activities such as shopping, walking around, and interacting with the checkout area. However, the image does not provide enough detail to confirm whether any specific individual is carrying unpaid merchandise without a billing bag or receipt. For a more accurate assessment, additional context or clearer images would be necessary.",
+        "ok": true
+      },
+      "Is there a group of customers clustered together near merchandise in a way that could obstruct the camera view of the shelf?": {
+        "answer": "From the image, it appears that there is no significant group of customers clustered together near the merchandise in a way that would obstruct the camera view of the shelf. The shelves on the left side of the image seem to be clear of any large groups of people. However, there are a few individuals moving around, but they do not appear to be obstructing the view of the shelves. The focus seems to be more on the checkout area and the movement of people through the store.",
+        "ok": true
+      },
+      "Describe any customer spending an unusually long time handling a single product without placing it in a basket.": {
+        "answer": "In the image, there is a customer standing near the checkout counter who appears to be handling a single product for an unusually long time. The customer is holding the item and seems to be examining it closely or possibly reading the label. This behavior could indicate that they are carefully considering whether to purchase the item or if they need more information about it before making a decision. The customer is not yet placing the item into a shopping basket, which suggests they might still be in the process of deciding on their purchase.",
+        "ok": true
+      },
+      "Is there any commotion, argument, or distraction happening near the billing counter or merchandise display?": {
+        "answer": "From the image provided, it appears to be a relatively calm scene at the billing counter. There is no visible commotion, argument, or significant distraction occurring near the billing counter or merchandise display. The individuals in the image seem to be engaged in their respective tasks without any apparent disturbance. The environment looks orderly, and there are no signs of chaos or conflict.",
+        "ok": true
+      },
+      "Are any customers engaging billing staff in extended conversation while another person is near the merchandise?": {
+        "answer": "From the image, it appears that there are no customers engaging in an extended conversation with the billing staff. The billing area seems relatively quiet at the moment captured in the image. There is one person near the merchandise on the left side of the image, but they do not appear to be interacting with anyone at the billing counter. The focus of the image is more on the general activity around the billing area and the movement of people within the store.",
+        "ok": true
+      },
+      "Are there any empty shelf gaps or sections that appear to need restocking?": {
+        "answer": "From the image, it appears that the shelves on the left side of the store have some items, but there are also some gaps where no products are visible. These sections might need restocking. The right side of the store seems more cluttered with boxes and items, which could indicate that this area is being organized or restocked. However, without a clear view of all the shelves, it's difficult to make a definitive assessment of the entire store's restocking needs.",
+        "ok": true
+      },
+      "Is there any merchandise on the floor, misplaced, or fallen from shelves?": {
+        "answer": "From the image provided, it appears that there is no visible merchandise on the floor that has been misplaced or fallen from shelves. The floor looks relatively clear of items that would typically be found on the floor in a retail environment. However, it's important to note that the image may not capture every detail, and there could be items that are not immediately apparent. If you are concerned about the safety or cleanliness of the store, it might be advisable to check with the store management for a more detailed assessment.",
+        "ok": true
+      },
+      "How many customers are at or waiting at the billing counter? Estimate queue length.": {
+        "answer": "In the image, there appears to be one customer standing at the billing counter. There are no other customers visible in line behind this person. Therefore, the queue length can be estimated as 1 customer.",
+        "ok": true
+      },
+      "Is any child present in the store without an accompanying adult nearby?": {
+        "answer": "Yes, there appears to be a child in the store without an accompanying adult nearby. The child is near the center of the image, wearing a yellow jacket and standing close to the checkout area.",
+        "ok": true
+      },
+      "Is any customer appearing distressed, confused, or in need of staff assistance?": {
+        "answer": "From the image provided, it is not possible to determine if any customer is appearing distressed, confused, or in need of staff assistance. The image shows a busy checkout area with customers and staff moving around, but there is no clear indication of distress, confusion, or specific needs for assistance from the individuals present.",
+        "ok": true
+      },
+      "Describe the overall store activity level: how many staff and customers visible, and what is the general level of activity?": {
+        "answer": "The image shows a busy retail environment with a mix of staff and customers. Here's a breakdown:\n\n- **Staff:** There are at least two staff members visible in the image. One appears to be working behind the counter, possibly scanning items or assisting customers, while another is walking through the store.\n- **Customers:** There are several customers visible in the background, some near the entrance and others near the checkout area. They appear to be browsing or waiting in line.\n- **General Activity Level:** The store seems moderately active. There are enough people present to indicate that it is not deserted, but it does not look overly crowded. The presence of staff attending to tasks suggests that the store is functioning normally.\n\nOverall, the store has a steady flow of activity with both staff and customers engaged in their respective roles.",
+        "ok": true
+      }
+    }
+  }
+}
