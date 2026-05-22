@@ -139,6 +139,8 @@ def process_video(model, video_path: Path, results_dir: Path, duration: float | 
         "find_results": {},
     }
 
+    from . import loki
+
     # --- Caption mode ---
     try:
         print(f"[pipeline]   Running caption mode ...")
@@ -150,9 +152,11 @@ def process_video(model, video_path: Path, results_dir: Path, duration: float | 
         print(f"[pipeline]   Detected {len(output['events'])} events.")
         for ev in output["events"]:
             print(f"            [{ev.get('start',0):.1f}s – {ev.get('end',0):.1f}s] {ev.get('description','')}")
+        loki.log_caption(label, output["scene"], output["events"])
     except Exception as e:
         print(f"[pipeline]   Caption failed: {e}")
         output["caption_error"] = str(e)
+        loki.log_error(label, "caption", str(e))
 
     # --- Find mode ---
     print(f"[pipeline]   Running {len(FIND_QUERIES)} find queries ...")
@@ -169,15 +173,18 @@ def process_video(model, video_path: Path, results_dir: Path, duration: float | 
             if span:
                 FIND_SPAN_START.labels(video=label, query=query).set(span[0])
                 FIND_SPAN_END.labels(video=label, query=query).set(span[1])
+                loki.log_find_hit(label, query, list(span), find_result.get("raw", ""))
+            else:
+                loki.log_find_miss(label, query)
             FIND_PARSE_OK.labels(video=label, query=query).set(1 if ok else 0)
             status = f"[{span[0]:.1f}s–{span[1]:.1f}s]" if span else "not found"
             print(f"            '{query}' → {status}")
         except Exception as e:
             output["find_results"][query] = {"error": str(e)}
+            loki.log_error(label, f"find:{query}", str(e))
 
     VIDEOS_PROCESSED.labels(status="success").inc()
 
-    # Save JSON result
     out_file = results_dir / f"{label}.json"
     out_file.write_text(json.dumps(output, indent=2))
     print(f"[pipeline]   Saved → {out_file}")

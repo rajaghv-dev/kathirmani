@@ -73,6 +73,7 @@ def main():
     args = parser.parse_args()
 
     from inference.metrics import start_metrics_server
+    from inference.loki import log_inference_start, log_run_complete
     start_metrics_server(args.metrics_port)
 
     from inference.pipeline import load_model, run_all, process_video, LOCAL_MODEL_PATH
@@ -95,11 +96,16 @@ def main():
         if not matches:
             print(f"[main] No video matching '{args.video}' found in {video_dir}")
             return
+        log_inference_start([matches[0].stem])
         results = [process_video(model, matches[0], results_dir, duration=args.duration)]
     else:
-        results = run_all(model, video_dir=Path(args.video_dir), results_dir=results_dir, duration=args.duration)
+        video_dir = Path(args.video_dir)
+        all_videos = [v for ext in ("*.mkv","*.mp4","*.avi","*.mov","*.webm") for v in sorted(video_dir.glob(ext))]
+        log_inference_start([v.stem for v in all_videos])
+        results = run_all(model, video_dir=video_dir, results_dir=results_dir, duration=args.duration)
 
     elapsed = time.time() - t0
+    log_run_complete(len(results), sum(len(r.get("events",[])) for r in results), elapsed)
     _print_summary(results, elapsed, args)
 
 

@@ -1,0 +1,149 @@
+{
+  "title": "Kathirmani — Inference Logs (Loki)",
+  "uid": "marlin-loki",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": { "from": "now-3h", "to": "now" },
+  "tags": ["marlin", "loki", "logs", "surveillance"],
+  "panels": [
+    {
+      "id": 1, "type": "stat", "title": "Events Detected (this run)",
+      "gridPos": { "x": 0, "y": 0, "w": 4, "h": 3 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": { "colorMode": "background", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" },
+        "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"blue"}] } } },
+      "targets": [{ "expr": "sum(marlin_events_detected_total)", "legendFormat": "Events" }]
+    },
+    {
+      "id": 2, "type": "stat", "title": "Find Hits",
+      "gridPos": { "x": 4, "y": 0, "w": 4, "h": 3 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": { "colorMode": "background", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" },
+        "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"green"}] } } },
+      "targets": [{ "expr": "count(marlin_find_parse_success == 1)", "legendFormat": "Hits" }]
+    },
+    {
+      "id": 3, "type": "stat", "title": "Find Misses",
+      "gridPos": { "x": 8, "y": 0, "w": 4, "h": 3 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": { "colorMode": "background", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" },
+        "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"yellow"}] } } },
+      "targets": [{ "expr": "count(marlin_find_parse_success == 0)", "legendFormat": "Misses" }]
+    },
+    {
+      "id": 4, "type": "stat", "title": "Cameras Processed",
+      "gridPos": { "x": 12, "y": 0, "w": 4, "h": 3 },
+      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "options": { "colorMode": "background", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" },
+        "thresholds": { "mode": "absolute", "steps": [{"value":null,"color":"purple"}] } } },
+      "targets": [{ "expr": "marlin_videos_processed_total", "legendFormat": "Cameras" }]
+    },
+    {
+      "id": 5, "type": "logs", "title": "All Inference Logs — Live Feed",
+      "description": "All events from the current inference run across all cameras. Filter by label in the top bar.",
+      "gridPos": { "x": 0, "y": 3, "w": 24, "h": 10 },
+      "datasource": { "type": "loki", "uid": "loki-marlin" },
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "sortOrder": "Descending"
+      },
+      "targets": [{
+        "expr": "{app=\"marlin\",store=\"kathirmani\"}",
+        "legendFormat": "",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 10,
+      "type": "row",
+      "title": "Camera Captions — What the Model Saw",
+      "collapsed": false,
+      "gridPos": { "x": 0, "y": 13, "w": 24, "h": 1 }
+    },
+    {
+      "id": 11, "type": "logs", "title": "Bill Counter — Caption & Events",
+      "gridPos": { "x": 0, "y": 14, "w": 12, "h": 8 },
+      "datasource": { "type": "loki", "uid": "loki-marlin" },
+      "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": true, "showTime": true, "showLabels": false, "wrapLogMessage": true, "sortOrder": "Descending" },
+      "targets": [{ "expr": "{app=\"marlin\",camera=\"Kathirmani Bill Counter\",event_type=\"caption_complete\"}", "refId": "A" }]
+    },
+    {
+      "id": 12, "type": "logs", "title": "Center Camera — Caption & Events",
+      "gridPos": { "x": 12, "y": 14, "w": 12, "h": 8 },
+      "datasource": { "type": "loki", "uid": "loki-marlin" },
+      "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": true, "showTime": true, "showLabels": false, "wrapLogMessage": true, "sortOrder": "Descending" },
+      "targets": [{ "expr": "{app=\"marlin\",camera=\"Kathirmani Center Camera\",event_type=\"caption_complete\"}", "refId": "A" }]
+    },
+    {
+      "id": 13, "type": "logs", "title": "Entry Door — Caption & Events",
+      "gridPos": { "x": 0, "y": 22, "w": 12, "h": 8 },
+      "datasource": { "type": "loki", "uid": "loki-marlin" },
+      "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": true, "showTime": true, "showLabels": false, "wrapLogMessage": true, "sortOrder": "Descending" },
+      "targets": [{ "expr": "{app=\"marlin\",camera=\"Kathirmani Near Entry Door Camera\",event_type=\"caption_complete\"}", "refId": "A" }]
+    },
+    {
+      "id": 14, "type": "logs", "title": "Left + Right Side — Caption & Events",
+      "gridPos": { "x": 12, "y": 22, "w": 12, "h": 8 },
+      "datasource": { "type": "loki", "uid": "loki-marlin" },
+      "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": true, "showTime": true, "showLabels": false, "wrapLogMessage": true, "sortOrder": "Descending" },
+      "targets": [{ "expr": "{app=\"marlin\",camera=~\"Kathirmani Left.*|Kathirmani Right.*\",event_type=\"caption_complete\"}", "refId": "A" }]
+    },
+    {
+      "id": 20,
+      "type": "row",
+      "title": "Security Alerts — Find Query Hits",
+      "collapsed": false,
+      "gridPos": { "x": 0, "y": 30, "w": 24, "h": 1 }
+    },
+    {
+      "id": 21, "type": "logs", "title": "Events Found Across All Cameras",
+      "description": "Every successful temporal grounding result — which camera, which query, at what timestamp",
+      "gridPos": { "x": 0, "y": 31, "w": 24, "h": 10 },
+      "datasource": { "type": "loki", "uid": "loki-marlin" },
+      "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": true, "showTime": true, "showLabels": true, "wrapLogMessage": true, "sortOrder": "Descending" },
+      "targets": [{ "expr": "{app=\"marlin\",store=\"kathirmani\",event_type=\"find_hit\"}", "refId": "A" }]
+    },
+    {
+      "id": 22, "type": "logs", "title": "Queries Not Found (Review Coverage)",
+      "description": "Events the model could not locate — may indicate blind spots or rare events",
+      "gridPos": { "x": 0, "y": 41, "w": 12, "h": 8 },
+      "datasource": { "type": "loki", "uid": "loki-marlin" },
+      "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": true, "showTime": true, "showLabels": true, "wrapLogMessage": false, "sortOrder": "Descending" },
+      "targets": [{ "expr": "{app=\"marlin\",store=\"kathirmani\",event_type=\"find_miss\"}", "refId": "A" }]
+    },
+    {
+      "id": 23, "type": "logs", "title": "Errors",
+      "description": "Caption or find failures — check for GPU OOM or video decode issues",
+      "gridPos": { "x": 12, "y": 41, "w": 12, "h": 8 },
+      "datasource": { "type": "loki", "uid": "loki-marlin" },
+      "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": true, "showTime": true, "showLabels": true, "wrapLogMessage": true, "sortOrder": "Descending" },
+      "targets": [{ "expr": "{app=\"marlin\",store=\"kathirmani\",event_type=\"error\"}", "refId": "A" }]
+    },
+    {
+      "id": 30,
+      "type": "row",
+      "title": "Run Summary",
+      "collapsed": false,
+      "gridPos": { "x": 0, "y": 49, "w": 24, "h": 1 }
+    },
+    {
+      "id": 31, "type": "logs", "title": "Run Start / Complete Events",
+      "description": "One entry per inference run — cameras processed, total events, wall time",
+      "gridPos": { "x": 0, "y": 50, "w": 24, "h": 6 },
+      "datasource": { "type": "loki", "uid": "loki-marlin" },
+      "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": true, "showTime": true, "showLabels": false, "wrapLogMessage": false, "sortOrder": "Descending" },
+      "targets": [{ "expr": "{app=\"marlin\",store=\"kathirmani\",event_type=~\"run_start|run_complete|fusion_complete\"}", "refId": "A" }]
+    }
+  ]
+}
