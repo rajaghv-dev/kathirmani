@@ -279,3 +279,48 @@ Qwen2.5-VL vLLM recipe, PureKV (arxiv 2510.25600), VidKV (arxiv 2503.16257).
 - **Decode note:** Locate decodes the video separately from the Marlin/Qwen
   decode (its own sampled-frame pass). Unifying that with the §7 decode-once is a
   listed follow-up (`docs/PLAN-locate-stage.md`).
+
+---
+
+## 10. Running & viewing (current runbook)
+
+Reflects decode-once (§7), parallel cameras (`--max-workers`), the opt-in
+`--locate` YOLOE gate (§9), and the Streamlit Optimizations tab (§8).
+
+### Setup (per shell)
+```bash
+cd <repo>
+source .venv/bin/activate
+docker compose up -d      # Prometheus, Loki, Grafana(:3000), Netdata(:19999)
+```
+
+### Run inference
+```bash
+python run_inference.py                                   # all 5 cameras, Marlin only, parallel
+python run_inference.py --locate                          # + YOLOE Locate gate → Qwen only on routed frames
+python run_inference.py --video "Bill Counter" --duration 12 --no-compile --locate   # fast smoke test
+python run_inference.py --max-workers 3                   # cap parallel camera workers (default: one/video)
+```
+Flags: `--locate` (opt-in, default backend `yoloe`), `--locate-backend`,
+`--skip-qwen`, `--duration N`, `--no-compile` (skip ~3-min compile),
+`--max-workers N`, `--keep-alive`. Single `--video` uses `process_video`
+(sequential); the multi-camera path uses `run_all` (parallel). Locate + Qwen run
+**after** Marlin, looping over results in `main()`.
+
+### Outputs (`results/`)
+- `<camera>.json` — caption, events, `find_results` (+ `locate_analysis` /
+  `qwen_analysis` when those stages ran)
+- `fused.json` — best-camera find spans + deduped store events
+- `summary.json`, `economy.json`
+
+### View — Grafana (`http://<host>:3000`, admin/admin; URLs printed at run end)
+Model & Runtime · Pipeline · Camera Views · Store (Fused) · Visual Analysis
+(Qwen) · Inference Logs (Loki) · Compute Economy.
+
+### View — Streamlit (visualization ONLY; annotation is CVAT/Label Studio)
+```bash
+streamlit run viz_app.py        # http://localhost:8501
+```
+Tabs: Overview · Detections · Timeline · Qwen Q&A · Store (fused) · Backend
+compare · **Optimizations** (decode-once win + Tier 1/2/3 roadmap; renders even
+with no results on disk).
