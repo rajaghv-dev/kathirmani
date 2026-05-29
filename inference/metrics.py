@@ -1,4 +1,5 @@
 """Prometheus metrics server for Marlin inference monitoring."""
+import os
 import socket
 import time
 import threading
@@ -6,6 +7,11 @@ import subprocess
 from prometheus_client import (
     start_http_server, Gauge, Counter, Histogram, Summary, Info
 )
+
+# Netdata REST API — source of truth for CPU / memory / disk runtime.
+# Host-side runs (run_inference.py) reach it on localhost; the Dockerised
+# serve_metrics reaches it as http://netdata:19999 (set NETDATA_URL there).
+NETDATA_URL = os.environ.get("NETDATA_URL", "http://localhost:19999")
 
 # Inference timing
 INFERENCE_DURATION = Histogram(
@@ -87,6 +93,12 @@ DGX_CPU_TEMP_CELSIUS = Gauge(
     "ARM CPU temperature from ACPI (°C)"
 )
 
+# Disk runtime (root filesystem + IO throughput), sourced from Netdata
+DGX_DISK_USED_GB = Gauge("marlin_dgx_disk_used_gb", "Root filesystem used (GB)")
+DGX_DISK_FREE_GB = Gauge("marlin_dgx_disk_free_gb", "Root filesystem available (GB)")
+DGX_DISK_READ_KBS = Gauge("marlin_dgx_disk_read_kbps", "Disk read throughput (KiB/s)")
+DGX_DISK_WRITE_KBS = Gauge("marlin_dgx_disk_write_kbps", "Disk write throughput (KiB/s)")
+
 # Token economy / cost metrics
 ENERGY_WH = Gauge("marlin_energy_consumed_wh", "Estimated energy used this run (Wh)")
 COST_INR  = Gauge("marlin_cost_inr", "Estimated inference cost in INR (₹)")
@@ -94,6 +106,18 @@ COST_PER_EVENT = Gauge("marlin_cost_per_event_inr", "INR per event detected")
 EVENTS_PER_WH  = Gauge("marlin_events_per_wh", "Events detected per watt-hour (efficiency)")
 INFERENCE_TOTAL_SEC = Gauge("marlin_total_inference_seconds", "Total wall time of last run (s)")
 AVG_POWER_DURING_RUN = Gauge("marlin_avg_dgx_power_during_run_watts", "Average power during last inference run (W)")
+
+# Decode-once compute savings (vs the naive 1-decode-per-prompt path).
+# Each camera now decodes ONCE and reuses the frames for all (1 caption + N find)
+# prompts, so we avoid (prompts_per_cam - 1) redundant decodes per camera.
+DECODE_SECONDS_ACTUAL = Gauge("marlin_decode_seconds_actual",
+                              "Video-decode seconds actually spent this run (decode-once)")
+DECODE_SECONDS_SAVED = Gauge("marlin_decode_seconds_saved",
+                             "Video-decode seconds saved this run by reusing frames across prompts")
+DECODES_DONE = Gauge("marlin_video_decodes_done",
+                     "Video decodes actually performed this run (= cameras processed)")
+DECODES_AVOIDED = Gauge("marlin_video_decodes_avoided",
+                        "Redundant video decodes eliminated this run by decode-once")
 
 # Power samples accumulated during an inference run
 _dgx_power_samples: list[float] = []
@@ -191,6 +215,29 @@ def _read_unified_mem_gb() -> tuple[float, float]:
         return 0.0, 0.0
 
 
+def _netdata_dims(chart: str, timeout: float = 1.5) -> dict[str, float]:
+    """Latest per-dimension values for a Netdata chart, or {} if unreachable.
+
+    Netdata returns {"labels": ["time", dim1, ...], "data": [[t, v1, ...], ...]}
+    newest-first. We take the most recent row.
+    """
+    try:
+        import requests
+        r = requests.get(
+            f"{NETDATA_URL}/api/v1/data",
+            params={"chart": chart, "after": -1, "points": 1,
+                    "group": "average", "format": "json"},
+            timeout=timeout,
+        )
+        j = r.json()
+        labels = j["labels"]
+        row = j["data"][0]
+        return {labels[i]: row[i] for i in range(1, len(labels))
+                if isinstance(row[i], (int, float))}
+    except Exception:
+        return {}
+
+
 def _read_thermal_zone_temp(zone: int = 0) -> float | None:
     """Read temperature from /sys/class/thermal/thermal_zone<zone>/temp (divide by 1000)."""
     try:
@@ -207,8 +254,7 @@ def poll_dgx_metrics(stop_event: threading.Event, interval: float = 1.0):
     - Temperature  : /sys/class/thermal/thermal_zone0/temp
     - Power        : nvidia-smi --query-gpu=power.draw
     - Compute util : pynvml.nvmlDeviceGetUtilizationRates (falls back to 0)
-    - CPU util     : /proc/stat
-    - Unified mem  : /proc/meminfo
+    - CPU / mem / disk : Netdata REST API (falls back to /proc if unreachable)
     """
     # Attempt to initialise NVML once; errors are silently swallowed.
     nvml_handle = None
@@ -218,6 +264,13 @@ def poll_dgx_metrics(stop_event: threading.Event, interval: float = 1.0):
         nvml_handle = pynvml.nvmlDeviceGetHandleByIndex(0)
     except Exception:
         pynvml = None  # type: ignore[assignment]
+
+    # Probe Netdata once; if up, it is the source for CPU/mem/disk this run.
+    use_netdata = bool(_netdata_dims("system.cpu"))
+    if use_netdata:
+        print(f"[metrics] CPU/mem/disk runtime from Netdata: {NETDATA_URL}")
+    else:
+        print("[metrics] Netdata unreachable — CPU/mem from /proc, disk skipped.")
 
     while not stop_event.is_set():
         # --- Temperature from sysfs ACPI zone 0 ---
@@ -251,15 +304,35 @@ def poll_dgx_metrics(stop_event: threading.Event, interval: float = 1.0):
         else:
             DGX_COMPUTE_UTIL.set(0)
 
-        # --- CPU utilisation from /proc/stat ---
-        user_pct, sys_pct = _read_proc_stat_cpu()
-        DGX_CPU_UTIL_USER.set(user_pct)
-        DGX_CPU_UTIL_SYS.set(sys_pct)
+        # --- CPU / memory / disk from Netdata (fallback to /proc) ---
+        if use_netdata:
+            cpu = _netdata_dims("system.cpu")          # percent per mode
+            if cpu:
+                DGX_CPU_UTIL_USER.set(round(cpu.get("user", 0.0), 2))
+                DGX_CPU_UTIL_SYS.set(round(cpu.get("system", 0.0), 2))
 
-        # --- Unified memory from /proc/meminfo ---
-        used_gb, total_gb = _read_unified_mem_gb()
-        DGX_UNIFIED_MEM_USED_GB.set(used_gb)
-        DGX_UNIFIED_MEM_TOTAL_GB.set(total_gb)
+            ram = _netdata_dims("system.ram")          # MiB per dimension
+            if ram:
+                total_mib = sum(ram.values())
+                DGX_UNIFIED_MEM_USED_GB.set(round(ram.get("used", 0.0) / 1024, 3))
+                DGX_UNIFIED_MEM_TOTAL_GB.set(round(total_mib / 1024, 3))
+
+            disk = _netdata_dims("disk_space./")       # GiB per dimension
+            if disk:
+                DGX_DISK_USED_GB.set(round(disk.get("used", 0.0), 2))
+                DGX_DISK_FREE_GB.set(round(disk.get("avail", 0.0), 2))
+
+            io = _netdata_dims("system.io")            # KiB/s, reads/writes
+            if io:
+                DGX_DISK_READ_KBS.set(round(abs(io.get("reads", 0.0)), 1))
+                DGX_DISK_WRITE_KBS.set(round(abs(io.get("writes", 0.0)), 1))
+        else:
+            user_pct, sys_pct = _read_proc_stat_cpu()
+            DGX_CPU_UTIL_USER.set(user_pct)
+            DGX_CPU_UTIL_SYS.set(sys_pct)
+            used_gb, total_gb = _read_unified_mem_gb()
+            DGX_UNIFIED_MEM_USED_GB.set(used_gb)
+            DGX_UNIFIED_MEM_TOTAL_GB.set(total_gb)
 
         time.sleep(interval)
 
@@ -295,6 +368,28 @@ def compute_economy(total_events: int, wall_time_sec: float, electricity_rate_in
 
 QWEN_QUERIES_DONE = Gauge("marlin_qwen_queries_completed", "Qwen2.5-VL queries completed", ["video"])
 QWEN_ANSWERS_OK   = Gauge("marlin_qwen_answers_ok_total",  "Qwen2.5-VL answers that returned text", ["video"])
+
+# --- LocateAnything (open-vocabulary localization) stage metrics ---
+LOCATE_OBJECTS = Gauge(
+    "marlin_locate_objects_total",
+    "Open-vocab object instances detected per camera, summed over sampled frames",
+    ["video", "object"],
+)
+LOCATE_MAX_PEOPLE = Gauge(
+    "marlin_locate_max_people",
+    "Peak simultaneous people in any sampled frame (queue / crowd signal)",
+    ["video"],
+)
+LOCATE_FRAMES = Gauge(
+    "marlin_locate_frames_sampled",
+    "Frames sampled and run through the detector",
+    ["video"],
+)
+LOCATE_ROUTED = Gauge(
+    "marlin_locate_frames_routed_to_vlm",
+    "Frames flagged as interesting and routed to the VLM (cascade gate)",
+    ["video"],
+)
 
 
 def start_metrics_server(port: int = 8900):

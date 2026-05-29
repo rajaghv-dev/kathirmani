@@ -287,6 +287,89 @@
       },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
       "targets": [{ "expr": "marlin_dgx_compute_utilization_percent", "legendFormat": "Compute Util %", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+    },
+    {
+      "id": 39,
+      "type": "text",
+      "title": "Compute saved — decode-once",
+      "gridPos": { "x": 0, "y": 24, "w": 24, "h": 3 },
+      "options": {
+        "mode": "markdown",
+        "content": "### Compute saved by decode-once\nEach camera decodes its video **once** and reuses the frames across all `1 caption + 20 find` prompts, instead of re-decoding per prompt. Below: decode-seconds saved this run, and the redundant decodes eliminated (~95% of decodes)."
+      }
+    },
+    {
+      "id": 40,
+      "type": "stat",
+      "title": "Decode Time Saved (s)",
+      "gridPos": { "x": 0, "y": 27, "w": 6, "h": 5 },
+      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "color": "green", "value": null }
+          ]}
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "expr": "marlin_decode_seconds_saved", "legendFormat": "Decode saved (s)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+    },
+    {
+      "id": 41,
+      "type": "stat",
+      "title": "Decode Time Actual (s)",
+      "gridPos": { "x": 6, "y": 27, "w": 6, "h": 5 },
+      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "color": "blue", "value": null }
+          ]}
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "expr": "marlin_decode_seconds_actual", "legendFormat": "Decode actual (s)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+    },
+    {
+      "id": 42,
+      "type": "stat",
+      "title": "Redundant Decodes Avoided",
+      "gridPos": { "x": 12, "y": 27, "w": 6, "h": 5 },
+      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "color": "green", "value": null }
+          ]}
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "expr": "marlin_video_decodes_avoided", "legendFormat": "Decodes avoided", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+    },
+    {
+      "id": 43,
+      "type": "stat",
+      "title": "Decode Reduction %",
+      "gridPos": { "x": 18, "y": 27, "w": 6, "h": 5 },
+      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "color": "yellow", "value": null },
+            { "color": "green", "value": 80 }
+          ]}
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "expr": "100 * marlin_video_decodes_avoided / (marlin_video_decodes_done + marlin_video_decodes_avoided)", "legendFormat": "Reduction %", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
     }
   ]
 }

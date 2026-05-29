@@ -191,6 +191,17 @@ reuse the frames for all 21 prompts (`inference/pipeline.py`):
 Expected win: 21 decodes/camera → 1. The GPU math is unchanged (still 21
 forwards), so this attacks the CPU-decode half of §6, not the serialized-GPU half.
 
+**Progress + savings visibility.** Because the single GPU serializes every
+forward, total work per run is a fixed count (`cameras × (1 + N)` GPU calls), so
+`_Progress` ticks once per completed call and every line reports
+`GPU x/y pct · elapsed · ETA` plus per-call seconds (no more silent parallel
+runs). Decode savings are measured live and exported to Prometheus:
+`marlin_decode_seconds_saved` / `marlin_decode_seconds_actual`,
+`marlin_video_decodes_avoided` / `marlin_video_decodes_done`. Saved decode-seconds
+per camera = (its decode time) × N (the reused find prompts). Surfaced on the
+**Compute Economy** Grafana dashboard ("Compute saved — decode-once" row:
+seconds saved, decodes avoided, reduction %).
+
 ---
 
 ## 8. The optimization roadmap (what's next, ranked for *this* setup)

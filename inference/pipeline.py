@@ -14,9 +14,45 @@ from .metrics import (
     INFERENCE_DURATION, EVENTS_DETECTED, VIDEOS_PROCESSED,
     FIND_SPAN_START, FIND_SPAN_END, FIND_PARSE_OK, poll_dgx_metrics,
     FUSED_EVENTS, FUSED_TOTAL_RAW, FUSED_FIND_START, FUSED_FIND_END, FUSED_FIND_CAM,
+    DECODE_SECONDS_ACTUAL, DECODE_SECONDS_SAVED, DECODES_DONE, DECODES_AVOIDED,
 )
 
 _GPU_LOCK = threading.Lock()
+
+
+class _Progress:
+    """Thread-safe GPU-call progress tracker.
+
+    The single GPU serializes every forward pass, so the total work for a run is
+    a fixed count: cameras × (1 caption + N find queries). Ticking once per
+    completed GPU call gives a true percent-done + ETA across all parallel
+    cameras — without it the parallel run goes silent between camera-done lines.
+    """
+
+    def __init__(self, total_calls: int):
+        self.total = max(total_calls, 1)
+        self.done = 0
+        self.start = time.time()
+        self._lock = threading.Lock()
+
+    def _bump(self, n: int) -> int:
+        with self._lock:
+            self.done += n
+            return self.done
+
+    def tick(self) -> str:
+        """Count one finished GPU call; return a 'GPU x/y pct · elapsed · ETA' string."""
+        done = self._bump(1)
+        elapsed = time.time() - self.start
+        rate = done / elapsed if elapsed > 0 else 0.0
+        eta = (self.total - done) / rate if rate > 0 else 0.0
+        pct = 100.0 * done / self.total
+        return f"GPU {done}/{self.total} {pct:3.0f}% · {elapsed:.0f}s · ETA ~{eta:.0f}s"
+
+    def skip(self, n: int) -> None:
+        """Account for GPU calls that won't run (e.g. a camera whose decode failed)."""
+        self._bump(n)
+
 
 # Kathirmani store-specific surveillance queries
 # Each maps to a Prometheus metric label: marlin_find_span_*{query="..."}
@@ -373,16 +409,18 @@ def fuse_results(all_results: list[dict]) -> dict:
 
 
 def _infer_one_video(model, video: Path, infer_path: Path, results_dir: Path,
-                     duration: float | None) -> dict:
+                     duration: float | None, progress: "_Progress | None" = None) -> dict:
     """Run caption + all find queries for a single camera.
 
     GPU calls are individually guarded by _GPU_LOCK so multiple cameras can run
     concurrently — their video decode / parsing / JSON IO overlap while the
-    actual model forward serializes on the single GPU.
+    actual model forward serializes on the single GPU. `progress` (if given) is
+    ticked once per completed GPU call to report run-wide percent-done + ETA.
     """
     from . import loki, annotations
 
     label = video.stem
+    n_q = len(FIND_QUERIES)
     output = {
         "video": video.name,
         "label": label,
@@ -395,16 +433,31 @@ def _infer_one_video(model, video: Path, infer_path: Path, results_dir: Path,
 
     # Decode ONCE per camera, outside the lock, so decodes of the 5 cameras
     # overlap on CPU while the GPU forward passes serialize on _GPU_LOCK.
+    t_dec = time.time()
     try:
         decoded = _decode_video_once(model, str(infer_path))
     except Exception as e:
         output["caption_error"] = f"decode failed: {e}"
         loki.log_error(label, "decode", str(e))
         VIDEOS_PROCESSED.labels(status="error").inc()
+        if progress:  # these GPU calls will never run — keep the run total honest
+            progress.skip(1 + n_q)
         (results_dir / f"{label}.json").write_text(json.dumps(output, indent=2))
         return output
+    dec_s = time.time() - t_dec
+    metas = decoded[2]
+    nframes = len(metas[0].get("frames_indices", [])) if metas else 0
+    # Decode-once savings: the naive path would decode once per prompt (1 + n_q);
+    # we decode once and reuse, avoiding n_q redundant decodes for this camera.
+    DECODE_SECONDS_ACTUAL.inc(dec_s)
+    DECODE_SECONDS_SAVED.inc(dec_s * n_q)
+    DECODES_DONE.inc(1)
+    DECODES_AVOIDED.inc(n_q)
+    print(f"[{label}] decoded {nframes} frames in {dec_s:.1f}s "
+          f"(reused for {1 + n_q} prompts; saved ~{dec_s * n_q:.0f}s decode)", flush=True)
 
     try:
+        t = time.time()
         with _GPU_LOCK:
             cap_result = _run_caption(model, decoded, label)
         output["caption"] = cap_result.get("caption", "")
@@ -414,12 +467,18 @@ def _infer_one_video(model, video: Path, infer_path: Path, results_dir: Path,
         # Insert to the log DB (Loki) + Grafana annotations as this camera finishes.
         loki.log_caption(label, output["scene"], output["events"])
         annotations.annotate_camera_done(label, len(output["events"]))
+        prog = progress.tick() if progress else ""
+        print(f"[{label}] caption ✓ {len(output['events'])} events · "
+              f"{time.time() - t:.1f}s | {prog}", flush=True)
     except Exception as e:
         output["caption_error"] = str(e)
         loki.log_error(label, "caption", str(e))
+        prog = progress.tick() if progress else ""
+        print(f"[{label}] caption ERROR · {e} | {prog}", flush=True)
 
-    for query in FIND_QUERIES:
+    for i, query in enumerate(FIND_QUERIES, 1):
         try:
+            t = time.time()
             with _GPU_LOCK:
                 find_result = _run_find(model, decoded, label, query)
             span = find_result.get("span")
@@ -438,9 +497,15 @@ def _infer_one_video(model, video: Path, infer_path: Path, results_dir: Path,
             else:
                 loki.log_find_miss(label, query)
             FIND_PARSE_OK.labels(video=label, query=query).set(1 if ok else 0)
+            prog = progress.tick() if progress else ""
+            tag = f"HIT [{span[0]:.0f}-{span[1]:.0f}s]" if span else "miss        "
+            print(f"[{label}] find {i:2d}/{n_q} {tag} · {time.time() - t:.1f}s | {prog}",
+                  flush=True)
         except Exception as e:
             output["find_results"][query] = {"error": str(e)}
             loki.log_error(label, f"find:{query}", str(e))
+            prog = progress.tick() if progress else ""
+            print(f"[{label}] find {i:2d}/{n_q} ERROR · {e} | {prog}", flush=True)
 
     VIDEOS_PROCESSED.labels(status="success").inc()
     out_file = results_dir / f"{label}.json"
@@ -485,11 +550,20 @@ def run_all(model, video_dir: Path, results_dir: Path, duration: float | None = 
     results_by_index: dict[int, dict] = {}
     completed = 0
 
+    prompts_per_cam = 1 + len(FIND_QUERIES)
+    total_gpu_calls = total * prompts_per_cam
+    progress = _Progress(total_gpu_calls)
+    t_run = time.time()
+
     print(f"[pipeline] Processing {total} cameras with {workers} parallel workers "
           f"(GPU forward serialized on the single device).")
+    print(f"[pipeline] Work: {total_gpu_calls} GPU calls "
+          f"({total} cameras × {prompts_per_cam} prompts) · "
+          f"{total} video decodes (decode-once; was {total_gpu_calls}).")
     with ThreadPoolExecutor(max_workers=workers) as pool:
         futures = {
-            pool.submit(_infer_one_video, model, video, trimmed[video], results_dir, duration): idx
+            pool.submit(_infer_one_video, model, video, trimmed[video], results_dir,
+                        duration, progress): idx
             for idx, video in enumerate(videos)
         }
         for fut in as_completed(futures):
@@ -498,10 +572,17 @@ def run_all(model, video_dir: Path, results_dir: Path, duration: float | None = 
             try:
                 results_by_index[idx] = fut.result()
                 completed += 1
-                print(f"[pipeline] ✓ {video.stem} done ({completed}/{total})")
+                print(f"[pipeline] ✓ {video.stem} done — {completed}/{total} cameras · "
+                      f"{progress.done}/{total_gpu_calls} GPU calls · "
+                      f"{time.time() - t_run:.0f}s elapsed", flush=True)
             except Exception as e:
                 print(f"[pipeline] FAILED {video.name}: {e}")
                 VIDEOS_PROCESSED.labels(status="error").inc()
+
+    run_s = time.time() - t_run
+    per_call = run_s / max(progress.done, 1)
+    print(f"[pipeline] All cameras done in {run_s:.0f}s · "
+          f"{progress.done} GPU calls · {per_call:.1f}s/call avg", flush=True)
 
     stop_gpu.set()
     cleanup_tmp()
