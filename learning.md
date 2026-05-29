@@ -247,3 +247,35 @@ work" (Tier 1/3) wins more than "use the hardware harder" (Tier 2).
 
 Refs: vLLM prefix caching (docs.vllm.ai/en/stable/design/prefix_caching),
 Qwen2.5-VL vLLM recipe, PureKV (arxiv 2510.25600), VidKV (arxiv 2503.16257).
+
+---
+
+## 9. "LocateAnything" — it's a stage, not a model (and it's opt-in)
+
+> **Naming trap:** "LocateAnything" is **our localization stage**
+> (`inference/locate.py`), not an off-the-shelf model. The model actually doing
+> the detection is **YOLOE** (the default backend).
+
+- **Role** — the spatial ("where") axis Marlin (when) and Qwen (what) lack.
+  Samples frames (every `SAMPLE_INTERVAL_SEC=2s`), runs an open-vocab detector
+  over `LOCATE_VOCAB` (person, shopping basket, handbag, backpack, product on
+  shelf, shopping cart, mobile phone), and writes `locate_analysis` into each
+  `results/<camera>.json`: per-class `objects` counts, `max_people`, per-frame
+  `frames`, and `route_to_vlm` timestamps.
+- **It is the cascade front-gate.** Frames containing an `INTERACTION_CLASSES`
+  item (handbag/backpack/shopping basket) are flagged into `route_to_vlm`; Qwen
+  then reasons **only** over those frames. Empty route ⇒ Qwen skipped entirely
+  for that camera (the main Qwen compute saving) — see `run_inference.py` Qwen block.
+- **Opt-in.** A plain `python run_inference.py` runs **Marlin only** — no Locate,
+  no Qwen cascade gating. Locate runs only with `--locate` (after Marlin, looping
+  over results in `main()`), backend chosen by `--locate-backend` (default `yoloe`).
+- **Backends — only YOLOE is runnable today.**
+  - `yoloe` (default): weights present — `models/yoloe/yoloe-11s-seg.pt` +
+    `mobileclip_blt.ts` (the text-prompt embedder). Open-vocab embeds `LOCATE_VOCAB`
+    once and reuses across all frames/cameras, so adding prompts is near-free.
+  - `grounding-dino`/`dino`: weights **absent** (`models/grounding-dino-base` missing).
+  - `rf-detr`: experimental, auto-downloads; closed-vocab COCO.
+  - `sam3`: stub — weights not published yet.
+- **Decode note:** Locate decodes the video separately from the Marlin/Qwen
+  decode (its own sampled-frame pass). Unifying that with the §7 decode-once is a
+  listed follow-up (`docs/PLAN-locate-stage.md`).
