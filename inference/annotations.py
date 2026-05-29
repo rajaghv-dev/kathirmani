@@ -10,9 +10,11 @@ GRAFANA_URL = "http://localhost:3000"
 GRAFANA_AUTH = ("admin", "admin")
 
 SECURITY_QUERIES = {
-    "unattended bag or package",
-    "person loitering near exit",
-    "suspicious or unusual behavior",
+    "a person lingers near the exit",
+    "a bag or object is left unattended on the floor",
+    "a person conceals an item with their hand or body",
+    "a person puts a product into their pocket or clothing",
+    "a person walks toward the exit holding an item",
 }
 
 

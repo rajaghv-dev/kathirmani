@@ -208,7 +208,7 @@
         }
       },
       "targets": [{
-        "expr": "marlin_find_span_duration_seconds{query=~\"customer leaving.*|person handling.*|group of.*|person placing.*|customer returning.*|billing staff.*|person carrying.*|customer switching.*\"}",
+        "expr": "marlin_find_span_duration_seconds{query=~\"a person puts a product.*|a person conceals.*|a person carries a large bag.*|a person walks toward the exit.*|a person lingers near the exit.*|a person opens or tears.*|a bag or object is left unattended.*\"}",
         "legendFormat": "{{query}}",
         "refId": "A"
       }]
