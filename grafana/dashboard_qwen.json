@@ -1,239 +1,572 @@
 {
-  "title": "Kathirmani — Visual Analysis (Qwen2.5-VL)",
+  "title": "Kathirmani \u2014 Visual Analysis (Qwen2.5-VL)",
   "uid": "marlin-qwen",
   "schemaVersion": 39,
-  "version": 1,
+  "version": 2,
   "refresh": "30s",
-  "time": { "from": "now-2h", "to": "now" },
-  "tags": ["marlin", "qwen", "visual-analysis", "kathirmani", "loss-prevention"],
+  "time": {
+    "from": "now-2h",
+    "to": "now"
+  },
+  "tags": [
+    "marlin",
+    "qwen",
+    "visual-analysis",
+    "kathirmani",
+    "loss-prevention"
+  ],
   "panels": [
-
     {
-      "id": 1, "type": "stat",
+      "id": 31,
+      "type": "text",
+      "title": "About this dashboard",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 4
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "### Visual Analysis (Qwen2.5-VL) \u2014 \"loss-prevention read\"\nQwen2.5-VL's answers layered on Marlin. A **security signal** = a loss-prevention question (e.g. \"is someone concealing an item?\") that came back non-empty/affirmative \u2014 a *flag to review*, not a confirmed theft. The per-camera bars tell you which camera to look at first."
+      }
+    },
+    {
+      "id": 1,
+      "type": "stat",
       "title": "Qwen Queries OK",
-      "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 },
-      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
       "options": {
         "colorMode": "background",
         "graphMode": "none",
-        "reduceOptions": { "calcs": ["lastNotNull"] }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
       },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [
-            { "value": null, "color": "blue" }
-          ]}
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "blue"
+              }
+            ]
+          }
         }
       },
-      "targets": [{ "expr": "sum(marlin_qwen_queries_ok_total)", "legendFormat": "Queries OK" }]
+      "targets": [
+        {
+          "expr": "sum(marlin_qwen_queries_ok_total)",
+          "legendFormat": "Queries OK"
+        }
+      ]
     },
-
     {
-      "id": 2, "type": "stat",
+      "id": 2,
+      "type": "stat",
       "title": "Security Signals Detected",
-      "gridPos": { "x": 4, "y": 0, "w": 4, "h": 4 },
-      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "gridPos": {
+        "x": 4,
+        "y": 4,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
       "options": {
         "colorMode": "background",
         "graphMode": "none",
-        "reduceOptions": { "calcs": ["lastNotNull"] }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
       },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [
-            { "value": null, "color": "green" },
-            { "value": 1, "color": "yellow" },
-            { "value": 3, "color": "red" }
-          ]}
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "green"
+              },
+              {
+                "value": 1,
+                "color": "yellow"
+              },
+              {
+                "value": 3,
+                "color": "red"
+              }
+            ]
+          }
         }
       },
-      "targets": [{ "expr": "sum(marlin_qwen_security_signals_total)", "legendFormat": "Signals" }]
+      "targets": [
+        {
+          "expr": "sum(marlin_qwen_security_signals_total)",
+          "legendFormat": "Signals"
+        }
+      ]
     },
-
     {
-      "id": 3, "type": "stat",
+      "id": 3,
+      "type": "stat",
       "title": "Total Cameras Analyzed",
-      "gridPos": { "x": 8, "y": 0, "w": 4, "h": 4 },
-      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "gridPos": {
+        "x": 8,
+        "y": 4,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
       "options": {
         "colorMode": "background",
         "graphMode": "none",
-        "reduceOptions": { "calcs": ["lastNotNull"] }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
       },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [
-            { "value": null, "color": "blue" }
-          ]}
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "blue"
+              }
+            ]
+          }
         }
       },
-      "targets": [{ "expr": "count(marlin_qwen_queries_ok_total > 0)", "legendFormat": "Cameras" }]
+      "targets": [
+        {
+          "expr": "count(marlin_qwen_queries_ok_total > 0)",
+          "legendFormat": "Cameras"
+        }
+      ]
     },
-
     {
-      "id": 4, "type": "stat",
+      "id": 4,
+      "type": "stat",
       "title": "Store Events (Marlin)",
-      "gridPos": { "x": 12, "y": 0, "w": 4, "h": 4 },
-      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
       "options": {
         "colorMode": "background",
         "graphMode": "none",
-        "reduceOptions": { "calcs": ["lastNotNull"] }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
       },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [
-            { "value": null, "color": "purple" }
-          ]}
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "purple"
+              }
+            ]
+          }
         }
       },
-      "targets": [{ "expr": "marlin_total_events", "legendFormat": "Events" }]
+      "targets": [
+        {
+          "expr": "marlin_total_events",
+          "legendFormat": "Events"
+        }
+      ]
     },
-
     {
-      "id": 5, "type": "stat",
+      "id": 5,
+      "type": "stat",
       "title": "Unique Store Events (Fused)",
-      "gridPos": { "x": 16, "y": 0, "w": 4, "h": 4 },
-      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "gridPos": {
+        "x": 16,
+        "y": 4,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
       "options": {
         "colorMode": "background",
         "graphMode": "none",
-        "reduceOptions": { "calcs": ["lastNotNull"] }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
       },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [
-            { "value": null, "color": "green" }
-          ]}
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "green"
+              }
+            ]
+          }
         }
       },
-      "targets": [{ "expr": "marlin_fused_unique_events", "legendFormat": "Unique Events" }]
+      "targets": [
+        {
+          "expr": "marlin_fused_unique_events",
+          "legendFormat": "Unique Events"
+        }
+      ]
     },
-
     {
-      "id": 6, "type": "stat",
+      "id": 6,
+      "type": "stat",
       "title": "Inference Wall Time (s)",
-      "gridPos": { "x": 20, "y": 0, "w": 4, "h": 4 },
-      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "gridPos": {
+        "x": 20,
+        "y": 4,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
       "options": {
         "colorMode": "background",
         "graphMode": "none",
-        "reduceOptions": { "calcs": ["lastNotNull"] }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
       },
       "fieldConfig": {
         "defaults": {
           "unit": "s",
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [
-            { "value": null, "color": "blue" }
-          ]}
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "blue"
+              }
+            ]
+          }
         }
       },
-      "targets": [{ "expr": "marlin_total_inference_seconds", "legendFormat": "Wall Time" }]
+      "targets": [
+        {
+          "expr": "marlin_total_inference_seconds",
+          "legendFormat": "Wall Time"
+        }
+      ]
     },
-
     {
-      "id": 10, "type": "bargauge",
+      "id": 10,
+      "type": "bargauge",
       "title": "Qwen2.5-VL Queries OK per Camera",
-      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
-      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
       "options": {
         "orientation": "horizontal",
         "displayMode": "gradient",
-        "reduceOptions": { "calcs": ["lastNotNull"] }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
       },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
           "min": 0,
-          "color": { "mode": "continuous-BlYlRd" },
-          "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "blue" }] }
+          "color": {
+            "mode": "continuous-BlYlRd"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "blue"
+              }
+            ]
+          }
         }
       },
-      "targets": [{ "expr": "marlin_qwen_queries_ok_total", "legendFormat": "{{video}}" }]
+      "targets": [
+        {
+          "expr": "marlin_qwen_queries_ok_total",
+          "legendFormat": "{{video}}"
+        }
+      ]
     },
-
     {
-      "id": 11, "type": "bargauge",
+      "id": 11,
+      "type": "bargauge",
       "title": "Security Signals per Camera",
-      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
-      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
       "options": {
         "orientation": "horizontal",
         "displayMode": "gradient",
-        "reduceOptions": { "calcs": ["lastNotNull"] }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
       },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
           "min": 0,
-          "color": { "mode": "continuous-RdYlGr" },
-          "thresholds": { "mode": "absolute", "steps": [
-            { "value": null, "color": "green" },
-            { "value": 1, "color": "yellow" },
-            { "value": 3, "color": "red" }
-          ]}
+          "color": {
+            "mode": "continuous-RdYlGr"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "green"
+              },
+              {
+                "value": 1,
+                "color": "yellow"
+              },
+              {
+                "value": 3,
+                "color": "red"
+              }
+            ]
+          }
         }
       },
-      "targets": [{ "expr": "marlin_qwen_security_signals_total", "legendFormat": "{{video}}" }]
+      "targets": [
+        {
+          "expr": "marlin_qwen_security_signals_total",
+          "legendFormat": "{{video}}"
+        }
+      ]
     },
-
     {
-      "id": 20, "type": "bargauge",
-      "title": "Loss Prevention — Event Duration (Marlin temporal)",
-      "description": "How long each behavioral pattern was detected — longer = more significant",
-      "gridPos": { "x": 0, "y": 12, "w": 24, "h": 12 },
-      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
+      "id": 20,
+      "type": "bargauge",
+      "title": "Loss Prevention \u2014 Event Duration (Marlin temporal)",
+      "description": "How long each behavioral pattern was detected \u2014 longer = more significant",
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 24,
+        "h": 12
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
       "options": {
         "orientation": "horizontal",
         "displayMode": "gradient",
-        "reduceOptions": { "calcs": ["lastNotNull"] }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
       },
       "fieldConfig": {
         "defaults": {
           "unit": "s",
           "min": 0,
-          "color": { "mode": "continuous-BlYlRd" },
-          "thresholds": { "mode": "absolute", "steps": [{ "value": null, "color": "blue" }] }
+          "color": {
+            "mode": "continuous-BlYlRd"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "blue"
+              }
+            ]
+          }
         }
       },
-      "targets": [{
-        "expr": "marlin_find_span_duration_seconds{query=~\"a person puts a product.*|a person conceals.*|a person carries a large bag.*|a person walks toward the exit.*|a person lingers near the exit.*|a person opens or tears.*|a bag or object is left unattended.*\"}",
-        "legendFormat": "{{query}}",
-        "refId": "A"
-      }]
+      "targets": [
+        {
+          "expr": "marlin_find_span_duration_seconds{query=~\"a person puts a product.*|a person conceals.*|a person carries a large bag.*|a person walks toward the exit.*|a person lingers near the exit.*|a person opens or tears.*|a bag or object is left unattended.*\"}",
+          "legendFormat": "{{query}}",
+          "refId": "A"
+        }
+      ]
     },
-
     {
-      "id": 30, "type": "table",
-      "title": "All Marlin Find Results — Bill Counter",
-      "gridPos": { "x": 0, "y": 24, "w": 24, "h": 10 },
-      "datasource": { "type": "prometheus", "uid": "marlin-metrics" },
-      "options": { "showHeader": true },
+      "id": 30,
+      "type": "table",
+      "title": "All Marlin Find Results \u2014 Bill Counter",
+      "gridPos": {
+        "x": 0,
+        "y": 28,
+        "w": 24,
+        "h": 10
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "options": {
+        "showHeader": true
+      },
       "fieldConfig": {
-        "defaults": { "unit": "short" },
+        "defaults": {
+          "unit": "short"
+        },
         "overrides": [
-          { "matcher": { "id": "byName", "options": "Value #A" }, "properties": [{"id":"displayName","value":"Start (s)"},{"id":"unit","value":"s"}] },
-          { "matcher": { "id": "byName", "options": "Value #B" }, "properties": [{"id":"displayName","value":"End (s)"},{"id":"unit","value":"s"}] },
-          { "matcher": { "id": "byName", "options": "Value #C" }, "properties": [{"id":"displayName","value":"Duration (s)"},{"id":"unit","value":"s"}] }
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Start (s)"
+              },
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "End (s)"
+              },
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #C"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Duration (s)"
+              },
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          }
         ]
       },
       "targets": [
-        { "expr": "marlin_find_span_start_seconds{video=\"Kathirmani Bill Counter\"}", "legendFormat": "", "instant": true, "refId": "A" },
-        { "expr": "marlin_find_span_end_seconds{video=\"Kathirmani Bill Counter\"}", "legendFormat": "", "instant": true, "refId": "B" },
-        { "expr": "marlin_find_span_duration_seconds{video=\"Kathirmani Bill Counter\"}", "legendFormat": "", "instant": true, "refId": "C" }
+        {
+          "expr": "marlin_find_span_start_seconds{video=\"Kathirmani Bill Counter\"}",
+          "legendFormat": "",
+          "instant": true,
+          "refId": "A"
+        },
+        {
+          "expr": "marlin_find_span_end_seconds{video=\"Kathirmani Bill Counter\"}",
+          "legendFormat": "",
+          "instant": true,
+          "refId": "B"
+        },
+        {
+          "expr": "marlin_find_span_duration_seconds{video=\"Kathirmani Bill Counter\"}",
+          "legendFormat": "",
+          "instant": true,
+          "refId": "C"
+        }
       ]
     }
-
   ]
 }

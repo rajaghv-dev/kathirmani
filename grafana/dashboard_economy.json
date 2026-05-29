@@ -1,298 +1,763 @@
 {
   "uid": "marlin-economy",
-  "title": "Kathirmani — Compute Economy",
+  "title": "Kathirmani \u2014 Compute Economy",
   "schemaVersion": 39,
-  "version": 1,
+  "version": 2,
   "refresh": "15s",
-  "time": { "from": "now-1h", "to": "now" },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
   "timezone": "browser",
-  "tags": ["marlin", "economy", "cost"],
+  "tags": [
+    "marlin",
+    "economy",
+    "cost"
+  ],
   "panels": [
+    {
+      "id": 44,
+      "type": "text",
+      "title": "About this dashboard",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 4
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "### Compute Economy \u2014 \"what did this run cost / save?\"\nMoney + efficiency: energy (Wh), est. cost (\u20b9), cost/event, events/Wh, avg power, wall time. The **\"Compute saved \u2014 decode-once\"** row shows decode-seconds saved and redundant decodes avoided (~95%). Note: those decode-savings gauges are emitted only by a live `run_inference.py`; between runs that row is blank."
+      }
+    },
     {
       "id": 1,
       "type": "stat",
       "title": "Total Energy (Wh)",
-      "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 },
-      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "uid": "marlin-metrics",
+        "type": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "watth",
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 50 },
-              { "color": "red", "value": 200 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 200
+              }
             ]
           }
         }
       },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
-      "targets": [{ "expr": "marlin_energy_consumed_wh", "legendFormat": "Energy (Wh)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "colorMode": "background"
+      },
+      "targets": [
+        {
+          "expr": "marlin_energy_consumed_wh",
+          "legendFormat": "Energy (Wh)",
+          "datasource": {
+            "uid": "marlin-metrics",
+            "type": "prometheus"
+          }
+        }
+      ]
     },
     {
       "id": 2,
       "type": "stat",
-      "title": "Est. Cost (₹)",
-      "gridPos": { "x": 4, "y": 0, "w": 4, "h": 4 },
-      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "title": "Est. Cost (\u20b9)",
+      "gridPos": {
+        "x": 4,
+        "y": 4,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "uid": "marlin-metrics",
+        "type": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "currencyINR",
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 0.0005 },
-              { "color": "red", "value": 0.002 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.0005
+              },
+              {
+                "color": "red",
+                "value": 0.002
+              }
             ]
           }
         }
       },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
-      "targets": [{ "expr": "marlin_cost_inr", "legendFormat": "Cost (INR)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "colorMode": "background"
+      },
+      "targets": [
+        {
+          "expr": "marlin_cost_inr",
+          "legendFormat": "Cost (INR)",
+          "datasource": {
+            "uid": "marlin-metrics",
+            "type": "prometheus"
+          }
+        }
+      ]
     },
     {
       "id": 3,
       "type": "stat",
-      "title": "Cost per Event (₹)",
-      "gridPos": { "x": 8, "y": 0, "w": 4, "h": 4 },
-      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "title": "Cost per Event (\u20b9)",
+      "gridPos": {
+        "x": 8,
+        "y": 4,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "uid": "marlin-metrics",
+        "type": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "currencyINR",
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 0.0001 },
-              { "color": "red", "value": 0.001 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.0001
+              },
+              {
+                "color": "red",
+                "value": 0.001
+              }
             ]
           }
         }
       },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
-      "targets": [{ "expr": "marlin_cost_per_event_inr", "legendFormat": "Cost/Event (INR)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "colorMode": "background"
+      },
+      "targets": [
+        {
+          "expr": "marlin_cost_per_event_inr",
+          "legendFormat": "Cost/Event (INR)",
+          "datasource": {
+            "uid": "marlin-metrics",
+            "type": "prometheus"
+          }
+        }
+      ]
     },
     {
       "id": 4,
       "type": "stat",
       "title": "Events per Wh",
-      "gridPos": { "x": 12, "y": 0, "w": 4, "h": 4 },
-      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "uid": "marlin-metrics",
+        "type": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 10 },
-              { "color": "green", "value": 50 }
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 10
+              },
+              {
+                "color": "green",
+                "value": 50
+              }
             ]
           }
         }
       },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
-      "targets": [{ "expr": "marlin_events_per_wh", "legendFormat": "Events/Wh", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "colorMode": "background"
+      },
+      "targets": [
+        {
+          "expr": "marlin_events_per_wh",
+          "legendFormat": "Events/Wh",
+          "datasource": {
+            "uid": "marlin-metrics",
+            "type": "prometheus"
+          }
+        }
+      ]
     },
     {
       "id": 5,
       "type": "stat",
       "title": "Avg DGX Power (W)",
-      "gridPos": { "x": 16, "y": 0, "w": 4, "h": 4 },
-      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "gridPos": {
+        "x": 16,
+        "y": 4,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "uid": "marlin-metrics",
+        "type": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "watt",
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 50 },
-              { "color": "red", "value": 100 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 100
+              }
             ]
           }
         }
       },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
-      "targets": [{ "expr": "marlin_avg_dgx_power_during_run_watts", "legendFormat": "Avg Power (W)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "colorMode": "background"
+      },
+      "targets": [
+        {
+          "expr": "marlin_avg_dgx_power_during_run_watts",
+          "legendFormat": "Avg Power (W)",
+          "datasource": {
+            "uid": "marlin-metrics",
+            "type": "prometheus"
+          }
+        }
+      ]
     },
     {
       "id": 6,
       "type": "stat",
       "title": "Wall Time (s)",
-      "gridPos": { "x": 20, "y": 0, "w": 4, "h": 4 },
-      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "gridPos": {
+        "x": 20,
+        "y": 4,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": {
+        "uid": "marlin-metrics",
+        "type": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "s",
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 300 },
-              { "color": "red", "value": 900 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 300
+              },
+              {
+                "color": "red",
+                "value": 900
+              }
             ]
           }
         }
       },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
-      "targets": [{ "expr": "marlin_total_inference_seconds", "legendFormat": "Wall Time (s)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "colorMode": "background"
+      },
+      "targets": [
+        {
+          "expr": "marlin_total_inference_seconds",
+          "legendFormat": "Wall Time (s)",
+          "datasource": {
+            "uid": "marlin-metrics",
+            "type": "prometheus"
+          }
+        }
+      ]
     },
     {
       "id": 10,
       "type": "timeseries",
       "title": "DGX Power During Inference",
-      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
-      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "uid": "marlin-metrics",
+        "type": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "watt",
-          "color": { "mode": "palette-classic" }
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       },
-      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
-      "targets": [{ "expr": "marlin_dgx_power_watts", "legendFormat": "DGX Power (W)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "expr": "marlin_dgx_power_watts",
+          "legendFormat": "DGX Power (W)",
+          "datasource": {
+            "uid": "marlin-metrics",
+            "type": "prometheus"
+          }
+        }
+      ]
     },
     {
       "id": 11,
       "type": "timeseries",
       "title": "System Temperature During Inference",
-      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
-      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "uid": "marlin-metrics",
+        "type": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "celsius",
-          "color": { "mode": "palette-classic" }
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       },
-      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
-      "targets": [{ "expr": "marlin_dgx_temperature_celsius", "legendFormat": "System Temp (°C)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "expr": "marlin_dgx_temperature_celsius",
+          "legendFormat": "System Temp (\u00b0C)",
+          "datasource": {
+            "uid": "marlin-metrics",
+            "type": "prometheus"
+          }
+        }
+      ]
     },
     {
       "id": 20,
       "type": "bargauge",
       "title": "Events Detected per Camera",
-      "gridPos": { "x": 0, "y": 12, "w": 24, "h": 8 },
-      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "uid": "marlin-metrics",
+        "type": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 5 },
-              { "color": "red", "value": 15 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 5
+              },
+              {
+                "color": "red",
+                "value": 15
+              }
             ]
           }
         }
       },
       "options": {
         "orientation": "horizontal",
-        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
         "displayMode": "gradient",
         "showUnfilled": true
       },
-      "targets": [{ "expr": "marlin_events_detected_total", "legendFormat": "{{video}}", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "targets": [
+        {
+          "expr": "marlin_events_detected_total",
+          "legendFormat": "{{video}}",
+          "datasource": {
+            "uid": "marlin-metrics",
+            "type": "prometheus"
+          }
+        }
+      ]
     },
     {
       "id": 30,
       "type": "stat",
       "title": "Total Events",
-      "gridPos": { "x": 0, "y": 20, "w": 6, "h": 4 },
-      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "uid": "marlin-metrics",
+        "type": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "color": "blue", "value": null }]
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
           }
         }
       },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
-      "targets": [{ "expr": "sum(marlin_events_detected_total)", "legendFormat": "Total Events", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "colorMode": "background"
+      },
+      "targets": [
+        {
+          "expr": "sum(marlin_events_detected_total)",
+          "legendFormat": "Total Events",
+          "datasource": {
+            "uid": "marlin-metrics",
+            "type": "prometheus"
+          }
+        }
+      ]
     },
     {
       "id": 31,
       "type": "stat",
       "title": "Unique Events (fused)",
-      "gridPos": { "x": 6, "y": 20, "w": 6, "h": 4 },
-      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "gridPos": {
+        "x": 6,
+        "y": 24,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "uid": "marlin-metrics",
+        "type": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "color": "purple", "value": null }]
+            "steps": [
+              {
+                "color": "purple",
+                "value": null
+              }
+            ]
           }
         }
       },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
-      "targets": [{ "expr": "marlin_fused_unique_events", "legendFormat": "Unique Events", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "colorMode": "background"
+      },
+      "targets": [
+        {
+          "expr": "marlin_fused_unique_events",
+          "legendFormat": "Unique Events",
+          "datasource": {
+            "uid": "marlin-metrics",
+            "type": "prometheus"
+          }
+        }
+      ]
     },
     {
       "id": 32,
       "type": "stat",
       "title": "Find Queries Resolved",
-      "gridPos": { "x": 12, "y": 20, "w": 6, "h": 4 },
-      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "gridPos": {
+        "x": 12,
+        "y": 24,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "uid": "marlin-metrics",
+        "type": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 5 },
-              { "color": "green", "value": 10 }
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 5
+              },
+              {
+                "color": "green",
+                "value": 10
+              }
             ]
           }
         }
       },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
-      "targets": [{ "expr": "count(marlin_find_parse_success == 1)", "legendFormat": "Resolved Queries", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "colorMode": "background"
+      },
+      "targets": [
+        {
+          "expr": "count(marlin_find_parse_success == 1)",
+          "legendFormat": "Resolved Queries",
+          "datasource": {
+            "uid": "marlin-metrics",
+            "type": "prometheus"
+          }
+        }
+      ]
     },
     {
       "id": 33,
       "type": "stat",
       "title": "Compute Util %",
-      "gridPos": { "x": 18, "y": 20, "w": 6, "h": 4 },
-      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "gridPos": {
+        "x": 18,
+        "y": 24,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "uid": "marlin-metrics",
+        "type": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 30 },
-              { "color": "green", "value": 70 }
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 30
+              },
+              {
+                "color": "green",
+                "value": 70
+              }
             ]
           }
         }
       },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background" },
-      "targets": [{ "expr": "marlin_dgx_compute_utilization_percent", "legendFormat": "Compute Util %", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "colorMode": "background"
+      },
+      "targets": [
+        {
+          "expr": "marlin_dgx_compute_utilization_percent",
+          "legendFormat": "Compute Util %",
+          "datasource": {
+            "uid": "marlin-metrics",
+            "type": "prometheus"
+          }
+        }
+      ]
     },
     {
       "id": 39,
       "type": "text",
-      "title": "Compute saved — decode-once",
-      "gridPos": { "x": 0, "y": 24, "w": 24, "h": 3 },
+      "title": "Compute saved \u2014 decode-once",
+      "gridPos": {
+        "x": 0,
+        "y": 28,
+        "w": 24,
+        "h": 3
+      },
       "options": {
         "mode": "markdown",
         "content": "### Compute saved by decode-once\nEach camera decodes its video **once** and reuses the frames across all `1 caption + 20 find` prompts, instead of re-decoding per prompt. Below: decode-seconds saved this run, and the redundant decodes eliminated (~95% of decodes)."
@@ -302,74 +767,213 @@
       "id": 40,
       "type": "stat",
       "title": "Decode Time Saved (s)",
-      "gridPos": { "x": 0, "y": 27, "w": 6, "h": 5 },
-      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "gridPos": {
+        "x": 0,
+        "y": 31,
+        "w": 6,
+        "h": 5
+      },
+      "datasource": {
+        "uid": "marlin-metrics",
+        "type": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "s",
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [
-            { "color": "green", "value": null }
-          ]}
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
         }
       },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background", "graphMode": "none" },
-      "targets": [{ "expr": "marlin_decode_seconds_saved", "legendFormat": "Decode saved (s)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "expr": "marlin_decode_seconds_saved",
+          "legendFormat": "Decode saved (s)",
+          "datasource": {
+            "uid": "marlin-metrics",
+            "type": "prometheus"
+          }
+        }
+      ]
     },
     {
       "id": 41,
       "type": "stat",
       "title": "Decode Time Actual (s)",
-      "gridPos": { "x": 6, "y": 27, "w": 6, "h": 5 },
-      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "gridPos": {
+        "x": 6,
+        "y": 31,
+        "w": 6,
+        "h": 5
+      },
+      "datasource": {
+        "uid": "marlin-metrics",
+        "type": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "s",
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [
-            { "color": "blue", "value": null }
-          ]}
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
         }
       },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background", "graphMode": "none" },
-      "targets": [{ "expr": "marlin_decode_seconds_actual", "legendFormat": "Decode actual (s)", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "expr": "marlin_decode_seconds_actual",
+          "legendFormat": "Decode actual (s)",
+          "datasource": {
+            "uid": "marlin-metrics",
+            "type": "prometheus"
+          }
+        }
+      ]
     },
     {
       "id": 42,
       "type": "stat",
       "title": "Redundant Decodes Avoided",
-      "gridPos": { "x": 12, "y": 27, "w": 6, "h": 5 },
-      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "gridPos": {
+        "x": 12,
+        "y": 31,
+        "w": 6,
+        "h": 5
+      },
+      "datasource": {
+        "uid": "marlin-metrics",
+        "type": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [
-            { "color": "green", "value": null }
-          ]}
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
         }
       },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background", "graphMode": "none" },
-      "targets": [{ "expr": "marlin_video_decodes_avoided", "legendFormat": "Decodes avoided", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "expr": "marlin_video_decodes_avoided",
+          "legendFormat": "Decodes avoided",
+          "datasource": {
+            "uid": "marlin-metrics",
+            "type": "prometheus"
+          }
+        }
+      ]
     },
     {
       "id": 43,
       "type": "stat",
       "title": "Decode Reduction %",
-      "gridPos": { "x": 18, "y": 27, "w": 6, "h": 5 },
-      "datasource": { "uid": "marlin-metrics", "type": "prometheus" },
+      "gridPos": {
+        "x": 18,
+        "y": 31,
+        "w": 6,
+        "h": 5
+      },
+      "datasource": {
+        "uid": "marlin-metrics",
+        "type": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [
-            { "color": "yellow", "value": null },
-            { "color": "green", "value": 80 }
-          ]}
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "yellow",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 80
+              }
+            ]
+          }
         }
       },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "colorMode": "background", "graphMode": "none" },
-      "targets": [{ "expr": "100 * marlin_video_decodes_avoided / (marlin_video_decodes_done + marlin_video_decodes_avoided)", "legendFormat": "Reduction %", "datasource": { "uid": "marlin-metrics", "type": "prometheus" } }]
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "expr": "100 * marlin_video_decodes_avoided / (marlin_video_decodes_done + marlin_video_decodes_avoided)",
+          "legendFormat": "Reduction %",
+          "datasource": {
+            "uid": "marlin-metrics",
+            "type": "prometheus"
+          }
+        }
+      ]
     }
   ]
 }

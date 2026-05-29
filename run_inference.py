@@ -46,6 +46,17 @@ _preload_av_ffmpeg()
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
 os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
 
+# Persist HF + torch.compile caches INSIDE the repo so repeated runs never
+# re-fetch remote modeling code (trust_remote_code) and never recompile the
+# model from scratch (~3 min). On an ephemeral $HOME these caches otherwise
+# vanish between runs, which looks like "the model is downloading again".
+_CACHE = pathlib.Path(__file__).parent / "models" / ".cache"
+os.environ.setdefault("HF_HOME", str(_CACHE / "hf"))
+os.environ.setdefault("TORCHINDUCTOR_CACHE_DIR", str(_CACHE / "inductor"))
+os.environ.setdefault("TORCHINDUCTOR_FX_GRAPH_CACHE", "1")
+(_CACHE / "hf").mkdir(parents=True, exist_ok=True)
+(_CACHE / "inductor").mkdir(parents=True, exist_ok=True)
+
 # These env vars must be set before importing transformers / qwen-vl-utils.
 os.environ.setdefault("FORCE_QWENVL_VIDEO_READER", "torchcodec")
 os.environ.setdefault("VIDEO_MAX_PIXELS", "200704")
@@ -68,10 +79,19 @@ def main():
     parser.add_argument("--no-compile", action="store_true", help="Skip torch.compile")
     parser.add_argument("--video", default=None, help="Run only one video (substring of filename)")
     parser.add_argument("--duration", type=float, default=None, help="Only analyse first N seconds of each video")
+    parser.add_argument("--max-workers", type=int, default=None,
+                        help="Parallel camera workers (default: one per video). GPU forward is serialized; "
+                             "parallelism overlaps decode/parse/DB inserts across cameras.")
     parser.add_argument("--model-path", default=None, help="Path to local model dir (default: models/Marlin-2B)")
     parser.add_argument("--keep-alive", action="store_true", help="Keep metrics server running after inference (default: exit)")
     parser.add_argument("--skip-qwen", action="store_true", help="Skip Qwen2.5-VL spatial analysis")
+    parser.add_argument("--locate", action="store_true", help="Run open-vocab localization stage (LocateAnything)")
+    parser.add_argument("--locate-backend", default="yoloe",
+                        choices=["yoloe", "grounding-dino", "dino", "rf-detr", "sam3"],
+                        help="Localization backend (yoloe=fast default; grounding-dino/dino, rf-detr, sam3 experimental)")
     args = parser.parse_args()
+
+    _check_telemetry()
 
     from inference.metrics import start_metrics_server
     from inference.loki import log_inference_start, log_run_complete
@@ -103,7 +123,8 @@ def main():
         video_dir = Path(args.video_dir)
         all_videos = [v for ext in ("*.mkv","*.mp4","*.avi","*.mov","*.webm") for v in sorted(video_dir.glob(ext))]
         log_inference_start([v.stem for v in all_videos])
-        results = run_all(model, video_dir=video_dir, results_dir=results_dir, duration=args.duration)
+        results = run_all(model, video_dir=video_dir, results_dir=results_dir,
+                          duration=args.duration, max_workers=args.max_workers)
 
     elapsed = time.time() - t0
     log_run_complete(len(results), sum(len(r.get("events",[])) for r in results), elapsed)
@@ -119,6 +140,32 @@ def main():
     import json
     if economy:
         (Path(args.results_dir) / "economy.json").write_text(json.dumps(economy, indent=2))
+
+    # --- LocateAnything: open-vocab localization (optional, runs after Marlin) ---
+    # Front gate of the cascade: cheap detector counts objects + flags frames
+    # worth sending to the VLM. Results merged into each <camera>.json.
+    if args.locate:
+        try:
+            from inference.locate import load_detector, analyze_video as locate_video
+            from inference.pipeline import _GPU_LOCK
+            detector = load_detector(args.locate_backend)
+            results_dir = Path(args.results_dir)
+            for result in results:
+                label = result["label"]
+                video_file = next(
+                    (v for ext in ("*.mkv", "*.mp4", "*.avi", "*.mov", "*.webm")
+                     for v in Path(args.video_dir).glob(ext)
+                     if v.stem == label), None
+                )
+                if video_file:
+                    loc = locate_video(detector, video_file, label, _GPU_LOCK, duration=args.duration)
+                    existing = json.loads((results_dir / f"{label}.json").read_text())
+                    existing["locate_analysis"] = loc
+                    (results_dir / f"{label}.json").write_text(json.dumps(existing, indent=2))
+                    print(f"[main] ✓ Locate done for {label}: "
+                          f"max_people={loc['max_people']}, routed={len(loc['route_to_vlm'])} frames")
+        except (ImportError, FileNotFoundError) as e:
+            print(f"[main] Locate stage skipped: {e}")
 
     # --- Qwen2.5-VL spatial analysis (optional, runs after Marlin) ---
     qwen_path = HERE / "models" / "Qwen2.5-VL-7B-Instruct"
@@ -138,14 +185,27 @@ def main():
                  if v.stem == label), None
             )
             if video_file:
-                qwen_result = analyze_video(qwen_model, qwen_processor, video_file, label, _GPU_LOCK)
+                # Cascade: if the locate stage ran, reason only over the frames
+                # it flagged. An empty route means nothing interesting → skip the
+                # VLM entirely for this camera (the main compute saving).
+                existing = json.loads((results_dir / f"{label}.json").read_text())
+                loc = existing.get("locate_analysis")
+                frame_times = None
+                if loc is not None:
+                    frame_times = loc.get("route_to_vlm", [])
+                    if not frame_times:
+                        print(f"[main] Cascade: no interesting frames for {label} — skipping Qwen.")
+                        existing["qwen_analysis"] = {"skipped": "no_route_to_vlm", "queries": {}}
+                        (results_dir / f"{label}.json").write_text(json.dumps(existing, indent=2))
+                        continue
+                qwen_result = analyze_video(qwen_model, qwen_processor, video_file, label, _GPU_LOCK,
+                                            frame_times=frame_times)
                 # Log each Qwen answer to Loki
                 from inference.loki import log_qwen_answer
                 for query, res in qwen_result.get("queries", {}).items():
                     if res.get("ok") and res.get("answer"):
                         log_qwen_answer(label, query, res["answer"])
-                # Merge into existing result JSON
-                existing = json.loads((results_dir / f"{label}.json").read_text())
+                # Merge into existing result JSON (already loaded above)
                 existing["qwen_analysis"] = qwen_result
                 (results_dir / f"{label}.json").write_text(json.dumps(existing, indent=2))
                 print(f"[main] ✓ Qwen2.5-VL done for {label}: {len(QWEN_QUERIES)} queries")
@@ -154,6 +214,43 @@ def main():
             print("[main] Qwen2.5-VL model not found — run: python download_model.py --model qwen-vl")
 
     _print_summary(results, elapsed, args)
+
+
+def _check_telemetry() -> None:
+    """Warn up front if the observability stack isn't fully running.
+
+    A run can otherwise finish "successfully" while every Grafana panel shows
+    "No data" — because Prometheus (the datasource) or its scrape targets are
+    down. Probe each service and tell the user how to bring the stack back up.
+    """
+    import urllib.request
+    import urllib.error
+
+    services = [
+        ("Prometheus", "http://localhost:9090/-/healthy"),
+        ("Grafana", "http://localhost:3000/api/health"),
+        ("Loki", "http://localhost:3100/ready"),
+        ("Netdata", "http://localhost:19999/api/v1/info"),
+    ]
+    down = []
+    for name, url in services:
+        try:
+            urllib.request.urlopen(url, timeout=1.5)
+        except urllib.error.HTTPError:
+            pass  # server responded (e.g. Loki 503 while ingester warms) → it's up
+        except Exception:
+            down.append(name)
+
+    if not down:
+        print("[telemetry] stack up: Prometheus, Grafana, Loki, Netdata ✓")
+        return
+
+    sep = "!" * 62
+    print(f"\n{sep}")
+    print(f"  TELEMETRY NOT FULLY RUNNING — down: {', '.join(down)}")
+    print("  This run's metrics/logs may not reach Grafana (panels show 'No data').")
+    print("  Start the stack in another terminal:  bash start_stack.sh")
+    print(f"{sep}\n")
 
 
 def _grafana_host() -> str:
