@@ -96,3 +96,7 @@ Because the single GPU serializes every forward, total work per run is a fixed c
 **Recommended sequence:** decode-once (done) → motion-gate front → vLLM spike (Qwen first, then Marlin) → FP8 → ROI + query gating. On bandwidth-bound GB10, "do less work" (Tier 1/3) wins more than "use the hardware harder" (Tier 2).
 
 **Refs:** vLLM prefix caching (docs.vllm.ai/en/stable/design/prefix_caching), Qwen2.5-VL vLLM recipe, PureKV (arxiv 2510.25600), VidKV (arxiv 2503.16257).
+
+## Related
+
+[02-architecture.md](02-architecture.md) · [04-observability-stack.md](04-observability-stack.md) · [06-hardware-portability.md](06-hardware-portability.md)

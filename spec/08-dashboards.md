@@ -41,3 +41,7 @@ The dashboards are only as alive as the stack behind them. Most "No data" is one
 2. **No run has happened yet** — there are no `results/*.json` for `serve_metrics.py` to expose.
 
 `run_inference.py` now runs a **telemetry preflight** (`_check_telemetry()`) at startup that pings Prometheus/Grafana/Loki/Netdata and prints a warning + `bash start_stack.sh` hint if any are down, so a run no longer silently finishes into empty dashboards.
+
+## Related
+
+[04-observability-stack.md](04-observability-stack.md) · [07-runbook.md](07-runbook.md)

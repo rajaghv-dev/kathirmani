@@ -103,3 +103,7 @@ derived from `sys.version_info` rather than hardcoded to 3.12.
 | `run_inference.py` hardcoded `python3.12` av.libs preload | `marlin.ffmpeg_preload`, version-globbed, Linux-guarded |
 
 See also: [09-repo-structure.md](09-repo-structure.md) for the package layout.
+
+## Related
+
+[04-observability-stack.md](04-observability-stack.md) · [05-performance-and-optimizations.md](05-performance-and-optimizations.md) · [09-repo-structure.md](09-repo-structure.md)

@@ -105,3 +105,7 @@ without an editable install.
   provisioned DGX / Mac Studio venv.
 
 See also: [06-hardware-portability.md](06-hardware-portability.md).
+
+## Related
+
+[06-hardware-portability.md](06-hardware-portability.md) · [07-runbook.md](07-runbook.md)

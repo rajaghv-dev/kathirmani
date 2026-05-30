@@ -34,3 +34,7 @@ There is **no SQL/NoSQL DB**. The datastores are:
 - **`results/*.json`** — the on-disk source of truth.
 
 Each parallel worker inserts to Loki + sets Prometheus gauges + pushes Grafana annotations as it finishes — so "DB inserts" happen concurrently across cameras. (The old sequential `run_all` had silently dropped all Loki logging; this was restored.)
+
+## Related
+
+[01-overview.md](01-overview.md) · [04-observability-stack.md](04-observability-stack.md) · [05-performance-and-optimizations.md](05-performance-and-optimizations.md) · [06-hardware-portability.md](06-hardware-portability.md)

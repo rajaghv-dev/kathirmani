@@ -49,3 +49,7 @@ Results land on disk under `results/`:
 - **Runtime:** PyTorch 2.12 + CUDA 13.0 on NVIDIA GB10
 - **Metrics:** `prometheus_client` → Grafana 12.4.1
 - **System monitoring:** Netdata v2.9.0 (Prometheus endpoint)
+
+## Related
+
+[02-architecture.md](02-architecture.md) · [03-models-and-query-modes.md](03-models-and-query-modes.md) · [07-runbook.md](07-runbook.md)

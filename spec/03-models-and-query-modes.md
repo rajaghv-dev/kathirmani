@@ -51,3 +51,7 @@ The new set is 20 **atomic, visible, present-tense** clauses grouped: entry/exit
 Qwen2.5-VL provides the semantic ("what") reasoning layer. It runs **only** over keyframes the Locate stage flagged into `route_to_vlm` — an empty route means Qwen is skipped entirely for that camera (the main Qwen compute saving).
 
 Its job is the loss-prevention / VQA read: it answers attribute and intent questions ("is someone concealing an item?", "what colour bag?") that Marlin's pure visual grounding cannot. A non-empty/affirmative Qwen answer to a loss-prevention question is a **security signal** — a flag to review, not a confirmed theft. Stock Qwen also runs in vLLM today, which makes it the first candidate for engine-level acceleration (see [05-performance-and-optimizations.md](05-performance-and-optimizations.md)).
+
+## Related
+
+[01-overview.md](01-overview.md) · [05-performance-and-optimizations.md](05-performance-and-optimizations.md)

@@ -58,3 +58,7 @@ streamlit run viz_app.py        # http://localhost:8501
 ```
 
 Tabs: Overview · Detections · Timeline · Qwen Q&A · Store (fused) · Backend compare · **Optimizations** (decode-once win + Tier 1/2/3 roadmap; renders even with no results on disk).
+
+## Related
+
+[01-overview.md](01-overview.md) · [06-hardware-portability.md](06-hardware-portability.md) · [08-dashboards.md](08-dashboards.md) · [09-repo-structure.md](09-repo-structure.md)

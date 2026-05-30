@@ -38,3 +38,7 @@ TORCHINDUCTOR_FX_GRAPH_CACHE=1
 ```
 
 (All gitignored.) First run still compiles once; every run after reuses the cache.
+
+## Related
+
+[02-architecture.md](02-architecture.md) · [06-hardware-portability.md](06-hardware-portability.md) · [08-dashboards.md](08-dashboards.md)
