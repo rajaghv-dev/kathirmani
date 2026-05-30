@@ -47,7 +47,19 @@ else
 fi
 
 # ── Summary ───────────────────────────────────────────────────────────────────
-HOST_IP=$(hostname -I | awk '{print $1}')
+# Portable primary-IP detection: `hostname -I` is Linux-only (fails on macOS /
+# Mac Studio), so fall back to ipconfig (macOS) and finally localhost.
+host_ip() {
+    if hostname -I >/dev/null 2>&1; then
+        hostname -I | awk '{print $1}'
+    elif command -v ipconfig >/dev/null 2>&1; then
+        ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo localhost
+    else
+        echo localhost
+    fi
+}
+HOST_IP=$(host_ip)
+[ -z "$HOST_IP" ] && HOST_IP=localhost
 echo ""
 echo "Stack ready:"
 echo "  Grafana    →  http://${HOST_IP}:3000  (admin / admin)"

@@ -10,6 +10,8 @@ from pathlib import Path
 import av
 import torch
 
+from . import MODELS_DIR
+from .device import detect_device
 from .metrics import (
     INFERENCE_DURATION, EVENTS_DETECTED, VIDEOS_PROCESSED,
     FIND_SPAN_START, FIND_SPAN_END, FIND_PARSE_OK, poll_dgx_metrics,
@@ -86,7 +88,7 @@ FIND_QUERIES = [
 
 
 MODEL_ID = "NemoStation/Marlin-2B"
-LOCAL_MODEL_PATH = Path(__file__).parent.parent / "models" / "Marlin-2B"
+LOCAL_MODEL_PATH = MODELS_DIR / "Marlin-2B"
 
 _tmp_clips: list[Path] = []  # track temp files for cleanup
 
@@ -133,19 +135,30 @@ def load_model(model_path: Path | None = None, compile: bool = True) -> object:
             f"Run: python download_model.py"
         )
     source = str(resolved)
+    cfg = detect_device()
     print(f"[pipeline] Loading from: {source}")
+    print(cfg.describe())
 
-    from transformers import AutoModelForCausalLM
-    model = AutoModelForCausalLM.from_pretrained(
-        source,
+    load_kwargs = dict(
         trust_remote_code=True,
-        dtype=torch.bfloat16,
-        device_map={"": "cuda"},
+        dtype=cfg.dtype,
         local_files_only=True,   # never contact HuggingFace Hub
     )
-    if compile:
+    # device_map (accelerate placement) is CUDA-only here; on MPS/CPU we load
+    # then move the whole model with .to(device).
+    if cfg.device_map is not None:
+        load_kwargs["device_map"] = cfg.device_map
+
+    from transformers import AutoModelForCausalLM
+    model = AutoModelForCausalLM.from_pretrained(source, **load_kwargs)
+    if cfg.device_map is None:
+        model = model.to(cfg.torch_device)
+
+    if compile and cfg.supports_compile:
         print("[pipeline] Compiling (first run ~3 min) ...")
         model.compile()
+    elif compile:
+        print(f"[pipeline] Skipping torch.compile on {cfg.kind}.")
     print("[pipeline] Ready.")
     return model
 

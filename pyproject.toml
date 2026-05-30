@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kathirmani-marlin"
+version = "1.0.0"
+description = "Marlin-2B + Qwen2.5-VL video intelligence over Kathirmani store cameras, portable across NVIDIA DGX (CUDA) and Apple Mac Studio (MPS)."
+requires-python = ">=3.10"
+# Runtime deps are pinned in requirements.txt; torch is installed per-machine by
+# setup.sh (CUDA on DGX, MPS on Mac Studio, CPU elsewhere).
+dependencies = [
+    "transformers>=5.7.0",
+    "accelerate",
+    "qwen-vl-utils>=0.0.14",
+    "torchcodec",
+    "av",
+    "pillow",
+    "prometheus_client",
+    "requests",
+]
+
+[project.scripts]
+marlin-infer = "marlin.cli.run_inference:main"
+marlin-download = "marlin.cli.download_model:main"
+marlin-metrics = "marlin.serve_metrics:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,5 +1,6 @@
 """Prometheus metrics server for Marlin inference monitoring."""
 import os
+import shutil
 import socket
 import time
 import threading
@@ -7,6 +8,12 @@ import subprocess
 from prometheus_client import (
     start_http_server, Gauge, Counter, Histogram, Summary, Info
 )
+
+# nvidia-smi / NVML / sysfs thermal zones only exist on Linux + NVIDIA boxes
+# (the DGX). On an Apple Mac Studio (MPS) or a dev box these are simply absent,
+# so we probe once and skip the NVIDIA-specific polling rather than spawning a
+# failing subprocess every interval. CPU/mem still come from Netdata or /proc.
+_HAS_NVIDIA_SMI = shutil.which("nvidia-smi") is not None
 
 # Netdata REST API — source of truth for CPU / memory / disk runtime.
 # Host-side runs (run_inference.py) reach it on localhost; the Dockerised
@@ -256,14 +263,27 @@ def poll_dgx_metrics(stop_event: threading.Event, interval: float = 1.0):
     - Compute util : pynvml.nvmlDeviceGetUtilizationRates (falls back to 0)
     - CPU / mem / disk : Netdata REST API (falls back to /proc if unreachable)
     """
-    # Attempt to initialise NVML once; errors are silently swallowed.
-    nvml_handle = None
+    # Log which accelerator we detected so dashboards/operators know whether the
+    # NVIDIA-specific gauges (power/util) will carry data on this box.
     try:
-        import pynvml
-        pynvml.nvmlInit()
-        nvml_handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+        from .device import detect_device
+        print(f"[metrics] {detect_device(quiet=True).describe()}")
     except Exception:
-        pynvml = None  # type: ignore[assignment]
+        pass
+
+    # Attempt to initialise NVML once; errors are silently swallowed. Skipped
+    # outright when nvidia-smi is absent (Mac Studio / dev boxes).
+    nvml_handle = None
+    if _HAS_NVIDIA_SMI:
+        try:
+            import pynvml
+            pynvml.nvmlInit()
+            nvml_handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+        except Exception:
+            pynvml = None  # type: ignore[assignment]
+    else:
+        print("[metrics] No nvidia-smi — GPU power/util gauges stay at 0 "
+              "(non-NVIDIA accelerator).")
 
     # Probe Netdata once; if up, it is the source for CPU/mem/disk this run.
     use_netdata = bool(_netdata_dims("system.cpu"))
@@ -279,19 +299,20 @@ def poll_dgx_metrics(stop_event: threading.Event, interval: float = 1.0):
             DGX_TEMPERATURE.set(temp)
             DGX_CPU_TEMP_CELSIUS.set(temp)
 
-        # --- Power from nvidia-smi ---
-        try:
-            smi_out = subprocess.check_output(
-                ["nvidia-smi", "--query-gpu=power.draw",
-                 "--format=csv,noheader,nounits"],
-                text=True, stderr=subprocess.DEVNULL
-            ).strip()
-            power = _parse_smi_value(smi_out)
-            if power is not None:
-                DGX_POWER_WATTS.set(power)
-                _dgx_power_samples.append(power)
-        except Exception:
-            pass
+        # --- Power from nvidia-smi (NVIDIA/Linux only) ---
+        if _HAS_NVIDIA_SMI:
+            try:
+                smi_out = subprocess.check_output(
+                    ["nvidia-smi", "--query-gpu=power.draw",
+                     "--format=csv,noheader,nounits"],
+                    text=True, stderr=subprocess.DEVNULL
+                ).strip()
+                power = _parse_smi_value(smi_out)
+                if power is not None:
+                    DGX_POWER_WATTS.set(power)
+                    _dgx_power_samples.append(power)
+            except Exception:
+                pass
 
         # --- Compute utilisation from NVML ---
         if nvml_handle is not None:

@@ -6,8 +6,11 @@ from pathlib import Path
 
 import torch
 
+from . import MODELS_DIR
+from .device import detect_device
+
 QWEN_MODEL_ID = "Qwen/Qwen2.5-VL-7B-Instruct"
-QWEN_LOCAL_PATH = Path(__file__).parent.parent / "models" / "Qwen2.5-VL-7B-Instruct"
+QWEN_LOCAL_PATH = MODELS_DIR / "Qwen2.5-VL-7B-Instruct"
 
 # Loss prevention and store operations queries for Qwen2.5-VL
 # Professional / neutral language — retail industry standard terms
@@ -41,15 +44,18 @@ def load_qwen_model(model_path: Path | None = None) -> tuple[object, object]:
             f"Qwen2.5-VL model not found at {resolved}. "
             f"Run: python download_model.py --model qwen-vl"
         )
+    cfg = detect_device()
+    load_kwargs = dict(torch_dtype=cfg.dtype, local_files_only=True)
+    if cfg.device_map is not None:
+        load_kwargs["device_map"] = cfg.device_map
+
     from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor
-    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-        str(resolved),
-        torch_dtype=torch.bfloat16,
-        device_map={"": "cuda"},
-        local_files_only=True,
-    )
+    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(str(resolved), **load_kwargs)
+    if cfg.device_map is None:
+        model = model.to(cfg.torch_device)
+
     processor = AutoProcessor.from_pretrained(str(resolved), local_files_only=True)
-    print(f"[qwen_vl] Loaded Qwen2.5-VL-7B from {resolved}")
+    print(f"[qwen_vl] Loaded Qwen2.5-VL-7B from {resolved} ({cfg.machine})")
     return model, processor
 
 
@@ -83,15 +89,21 @@ def run_qwen_query(model, processor, video_path: str, query: str) -> str:
         videos=video_inputs,
         return_tensors="pt",
         **video_kwargs,
-    ).to("cuda")
+    ).to(model.device)
     with torch.inference_mode():
         output_ids = model.generate(**inputs, max_new_tokens=256, do_sample=False)
     trimmed = output_ids[:, inputs["input_ids"].shape[1]:]
     return processor.batch_decode(trimmed, skip_special_tokens=True)[0].strip()
 
 
-def analyze_video(model, processor, video_path: Path, label: str, gpu_lock: threading.Lock) -> dict:
-    """Run all QWEN_QUERIES on a video. Serializes GPU calls via gpu_lock."""
+def analyze_video(model, processor, video_path: Path, label: str, gpu_lock: threading.Lock,
+                  frame_times: list | None = None) -> dict:
+    """Run all QWEN_QUERIES on a video. Serializes GPU calls via gpu_lock.
+
+    ``frame_times`` is the optional list of timestamps the locate cascade flagged
+    as worth reasoning over (see run_inference). It is accepted here so the
+    cascade call site stays valid; the current sampler reads a fixed 8 frames.
+    """
     from .metrics import QWEN_QUERIES_DONE, QWEN_ANSWERS_OK
 
     results = {}
