@@ -1,72 +1,38 @@
-# Project memory
+# Agent memory
 
-Durable, cross-session facts about this project. Read before starting work.
+Terse edit/run context. *What/why* lives in `spec/` — follow the links.
 
-## Project
+**What:** Marlin-2B + Qwen2.5-VL video intelligence over 5 store cameras →
+Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
 
-Marlin-2B (a video VLM) plus Qwen2.5-VL run video intelligence over 5
-Kathirmani store security cameras (Bill Counter, Center, Left Side, Near Entry
-Door, Right Side). The pipeline extracts dense captions, second-precise event
-timestamps, and grounded "find" event spans, then emits metrics and logs to a
-Prometheus / Grafana / Loki / Netdata observability stack. A Streamlit viewer
-provides ad-hoc visualization of the on-disk results.
+## Repo map → `spec/09`
+- Code in `src/marlin/`; root `*.py` are thin shims (don't add logic there).
+- Entry points: `run_inference.py`, `serve_metrics.py`, `download_model.py`,
+  `viz_app.py`, `start_stack.sh`. Commands unchanged post-refactor.
+- Paths anchor on `marlin.PROJECT_ROOT/MODELS_DIR/RESULTS_DIR` (not cwd).
 
-## Target machines
+## Invariants — don't break
+- Device is runtime-detected; load via `marlin.device.detect_device()`, place
+  tensors with `.to(model.device)`. Never hardcode `"cuda"`/dtype. → `spec/06`.
+- Keep root shims + path anchors working; keep `learning.md` as-is.
+- Guard NVIDIA/Linux-only calls (nvidia-smi, NVML, `/sys`,`/proc`, `hostname -I`).
 
-This repo is meant to run on **two** production accelerators:
+## Run / test (dev box = CPU, no model)
+- `bash setup.sh` (picks torch per machine), `bash run.sh`. Override:
+  `MARLIN_DEVICE=cuda|mps|cpu`.
+- `pytest -q tests/` → expect ~18 passed, ~7 skipped (torch/model/server absent).
+  `test_device.py` + `test_structure.py` are torch-free.
 
-- **NVIDIA DGX box** — CUDA, GB10 (Blackwell) with unified LPDDR5X memory (no
-  discrete VRAM).
-- **Apple Mac Studio** — Apple Silicon, Metal / MPS.
+## Pitfalls (detail in spec)
+- "Re-downloading" = `transformers_modules` + compile cache regen, not weights
+  (offline). → `spec/04`.
+- Marlin is Qwen3-VL: pre-decoded frames need `video_metadata` or find spans
+  break. → `spec/05`.
+- One GPU; `_GPU_LOCK` serializes forward passes (only decode/IO overlap). →
+  `spec/02`, `spec/05`.
+- `inference/locate.py` (`--locate`) absent — optional lazy stub (`marlin.locate`).
 
-It must **auto-detect the accelerator at runtime**, preferring
-**CUDA → MPS → CPU** in that order, and pick an appropriate dtype per device.
-Development happens on other boxes where **only CPU may be available and the
-model weights are not present**, so the code must degrade gracefully (no hard
-dependency on a GPU or on the model being downloaded).
-
-## Key entry points
-
-- **`run_inference.py`** — the main pipeline (Marlin caption + find across the 5
-  cameras; opt-in `--locate` YOLOE gate and Qwen cascade).
-- **`serve_metrics.py`** — Prometheus exporter; reads `results/*.json` and
-  exposes them between runs.
-- **`download_model.py`** — fetches the model weights.
-- **`viz_app.py`** — Streamlit viewer for the results.
-- **`start_stack.sh`** — brings up the observability Docker stack
-  (Prometheus, Loki, Grafana, Netdata).
-
-## Datastores
-
-There is **no SQL/NoSQL database**. The datastores are:
-
-- **Prometheus** (TSDB) — metric gauges/histograms set inline per camera and
-  scraped from `serve_metrics.py` and Netdata.
-- **Loki** — log lines pushed directly by the pipeline.
-- **`results/*.json`** — the on-disk **source of truth**, intentionally
-  git-tracked.
-
-## Gotchas worth remembering
-
-- **The model is not "re-downloading."** Weights load with
-  `local_files_only=True` / `HF_HUB_OFFLINE=1` and are never re-fetched. What
-  regenerates each run is the `trust_remote_code` module cache
-  (`transformers_modules`) and the `torch.compile` artifacts. These are pinned
-  into the repo via `HF_HOME` and `TORCHINDUCTOR_CACHE_DIR` (gitignored cache
-  dirs) so they persist across runs.
-- **Marlin is Qwen3-VL based, not Qwen2.5-VL.** The processor is a Qwen3-VL
-  processor that builds prompts from **frame timestamps**, so cached/pre-decoded
-  frames must be passed with `video_metadata` — otherwise it defaults to
-  fps=24 and the find spans come out wrong (captions still look fine).
-- **Single GPU serializes all forward passes via `_GPU_LOCK`.** Cameras run in a
-  `ThreadPoolExecutor`, but only decode/parse/IO/metric inserts overlap; the GPU
-  math is serialized. Expect a modest wall-time win, not 5x.
-- **Decode-once optimization is already implemented.** The video is decoded once
-  per camera and the frames are reused across all 21 prompts (1 caption + 20
-  finds), eliminating ~95% of redundant video decode. Decode runs outside
-  `_GPU_LOCK`.
-
-## See also
-
-`learning.md` (repo root) and `spec/` are the human-facing documentation —
-consult them for the detailed reasoning, dataflow, and roadmap.
+## Spec index
+`01` overview · `02` architecture · `03` models/queries · `04` observability ·
+`05` performance · `06` hardware-portability · `07` runbook · `08` dashboards ·
+`09` repo-structure.
