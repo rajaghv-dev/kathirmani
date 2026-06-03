@@ -81,9 +81,14 @@ implementation.
   → evidence → Grafana + review UI.
 - **Parallel once 0–2 land:** Phase 3 (observability) ∥ Phase 4 (CV worker); Phase 8
   (search) and Phase 10 (twin) are independent after Phase 5 events exist.
-- **Gated on external availability:** real DeepStream install (Phase 4 accelerated
-  path), NVIDIA Nemotron/Cosmos weights (6/8/9/13), live RTSP (Phase 1 second half).
-  Build the wiring with the runnable baseline; flip when available.
+- **Acquirable now (free/OSS on HF):** the NVIDIA VLM/LLM/embedding/Cosmos models
+  (Nemotron-Nano-VL, Nemotron-3-Nano, C-RADIO, Cosmos-Reason2) — the HF token works,
+  so the production-default profile is real, not stubbed
+  ([11-model-plugin-policy.md](11-model-plugin-policy.md)).
+- **Still gated on external access:** DeepStream/NIM/TAO CV (need an **NGC key**,
+  `nvcr.io` is 401) → YOLOE/RT-DETR is the free CV path meanwhile; the Docker NVIDIA
+  runtime needs registering (Phase 0); live RTSP cameras (Phase 1 second half).
+  Build the wiring with what's free; add NGC assets when a key exists.
 - **Always-on from Phase 1:** Grafana (master plan §20.5 "do not delay observability").
 
 ## Anti-goals (master plan §20 — do not violate)
@@ -97,6 +102,29 @@ implementation.
 5. Don't delay observability — Grafana from Phase 1.
 6. Don't make a non-NVIDIA model the production/benchmark default — Qwen is
    comparison-only ([11-model-plugin-policy.md](11-model-plugin-policy.md)).
+
+## Security & trust (cross-cutting — utmost priority, not just Phase 12)
+
+This is a **platform**, so security and trust are first-class and built into **every
+phase**, not deferred to the Phase 12 hardening bucket. It handles retail CCTV
+(faces/people = **PII/biometric data**), produces loss/theft **evidence** that must
+be tamper-evident and admissible, and is **multi-store** (tenant isolation). Trust in
+the data, the models, and the verdicts *is* the product.
+
+| Concern | Control | Lands in |
+|---------|---------|----------|
+| **Secrets** | RTSP creds / HF tokens / DB passwords never in logs or git; `.env` + secret store; `validate-config` rejects inline secrets | Phase 0 |
+| **AuthN/AuthZ** | every API call authenticated; RBAC least-privilege; object-storage (MinIO) scoped perms; no anonymous footage access | Phase 2 |
+| **Encryption** | TLS in transit; encryption at rest for clips (MinIO) + DB (Postgres) | Phase 1–2 |
+| **PII & retention** | minimize/redact where possible; enforce `configs/retention.yaml` limits; privacy-by-design on footage | Phase 1, 12 |
+| **Tenant isolation** | all data store-scoped; one store cannot read another's clips/incidents | Phase 2, 10 |
+| **Evidence integrity** | `video_segments.checksum`; immutable/locked evidence; full chain-of-custody audit (reviewer + timestamp + **model version**) | Phase 7 |
+| **Model trust** | pin provenance (`model_registry.source_url`/`license_notes`); NVIDIA-only policy; safety/guard models + output validation (A1.1) | Phase 0, 6 |
+| **Auditability** | `model_runs` + incident audit logs make every decision traceable — trust through legibility | Phase 3, 6, 12 |
+
+**Gate:** no phase is "done" until its relevant security/trust control above is in
+place. Auditability + legibility (already a core principle —
+[02-architecture.md](02-architecture.md), `04`/`08`) is how trust is *demonstrated*.
 
 ## Acceptance (whole platform)
 

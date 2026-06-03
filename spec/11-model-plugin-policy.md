@@ -32,13 +32,20 @@ vss_allowed_as_reference: true}`.
 - **Disallowed as default (A1.2):** Qwen, InternVL, LLaVA, Gemma, Phi, DeepSeek,
   OpenAI, Gemini, Claude.
 
+The policy is also a **trust/supply-chain** decision: a single, vetted vendor scope
+narrows model provenance, licensing, and safety review (pin
+`model_registry.source_url` + `license_notes`; pair with NVIDIA safety/guard models
+for output validation). Model trust is part of the platform's cross-cutting security
+posture — see [10-platform-roadmap.md](10-platform-roadmap.md) "Security & trust".
+
 **The repo's current models are all disallowed-as-default** — Marlin (Qwen3-VL
 based), Qwen2.5-VL ([03-models-and-query-modes.md](03-models-and-query-modes.md)),
 YOLOE. So they become the `research_qwen_baseline` profile: **runnable,
 comparison-only, `non_default: true`**. It is the fallback that keeps the platform
-end-to-end testable *today* while NVIDIA weights are unavailable. The production +
-benchmark default declares NVIDIA models, which may be **config-declared and
-plugin-stubbed until weights land**. `make validate-model-config` enforces A5.2:
+end-to-end testable *today* and as the comparison arm of the bake-off. The
+production + benchmark default declares **real, free NVIDIA models** that are
+**acquirable now** from HuggingFace (see the selected-models table below); only
+NGC-hosted assets (DeepStream/NIM/TAO) remain stubbed until an NGC key exists. `make validate-model-config` enforces A5.2:
 vendor scope nvidia_only; no non-NVIDIA default `model_id`; every task → a known
 plugin; every plugin → declared runtimes + endpoint; output schema declared; metrics
 enabled. This is the single highest-stakes decision in the whole platform — building
@@ -71,10 +78,41 @@ seeds `model-plugins/base/metrics.py`.
   `nvidia_dgx_retail_high_throughput` (TensorRT-LLM/NIM, batch 32, concurrency 16/32),
   plus `research_qwen_baseline`.
 - **Catalog** (`configs/model_catalog/nvidia_models.yaml`, A3) — versioned; each
-  model declares modality/tasks/precision/runtimes/default_metrics. Seed entries:
-  `nemotron-nano-v2-vl` (clip reasoning/verification), `nemotron-omni` (multimodal),
-  `cosmos-3` (digital-twin simulation), `radio-clip-or-compatible` (embedding/search),
-  `deepstream-detector-tao-compatible` (detection), `deepstream-reid-compatible` (ReID).
+  model declares modality/tasks/precision/runtimes/default_metrics + provenance.
+
+### Selected free/OSS NVIDIA models (real IDs, verified on HF 2026-06-03)
+
+The master plan's `…-or-compatible` placeholders are resolved to **actual,
+free, open** NVIDIA models on HuggingFace — all readable with the repo's HF token
+(`gated=False`, Cosmos `gated=auto` auto-grants). Per the directive "use free/OSS
+NVIDIA, check HF equivalents":
+
+| Task | NVIDIA model (free, HF) | Runtime on this box | HF equivalent / quant |
+|------|-------------------------|---------------------|------------------------|
+| VLM clip-reasoning | `nvidia/Llama-3.1-Nemotron-Nano-VL-8B-V1` | Ollama/llama.cpp (GGUF) or transformers | `forkjoin-ai/…-vl-8b-v1-gguf`; bigger: `nvidia/NVIDIA-Nemotron-Nano-12B-v2-VL-{BF16,FP8,NVFP4-QAD}` |
+| Summary / search-critic (LLM) | `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16` (MoE, ~3B active) or `…-Nano-4B` | Ollama/llama.cpp (GGUF) | `unsloth/Nemotron-3-Nano-30B-A3B-GGUF`, `lmstudio-community/…-4B-GGUF` |
+| Visual embedding / search | `nvidia/C-RADIOv4-H` | transformers/PyTorch (Triton later) | `nvidia/RADIO-L`, `nvidia/C-RADIOv3-H` |
+| Digital-twin reasoning | `nvidia/Cosmos-Reason2-2B` (gated=auto) | transformers/PyTorch | `nvidia/Cosmos-Reason2-8B`, `nvidia/Cosmos-Embed1-448p-anomaly-detection` |
+| CV detection (free, **no NGC**) | YOLOE (already local) or `PekingU/rtdetr_v2_r50vd` (Apache-2.0) | existing locate stage | TAO PeopleNet/ReID later — **needs NGC key** |
+
+### Acquisition & runtime on this box (GB10 aarch64, Blackwell, CUDA 13)
+
+- **HF token works** → the VLM/LLM/embedding/Cosmos models above download **now**;
+  they are **not stubbed**. Only NGC-hosted assets (DeepStream SDK, NIM, TAO CV
+  models, NGC Triton images) need an **NGC API key** (`nvcr.io` returns 401 without
+  one) — those stay deferred; YOLOE/RT-DETR is the free CV path meanwhile.
+- **Default runtime = Ollama / llama.cpp (GGUF)** for the generative plugins, not
+  vLLM: prebuilt vLLM on aarch64 + Blackwell + CUDA 13 is unproven and may need a
+  source build, while Ollama/llama.cpp run GGUF portably here. vLLM/TensorRT-LLM
+  stay the throughput target to attempt in the Phase-13 bake-off. RADIO + Cosmos run
+  directly under transformers/PyTorch (the cascade's existing CUDA path).
+- **Docker GPU containers** (NIM/Triton/DeepStream) need the NVIDIA runtime
+  registered first: `nvidia-ctk runtime configure --runtime=docker` + daemon restart
+  (installed but not yet wired — a Phase-0 host step).
+- **Supply-chain trust** (the cross-cutting security posture,
+  [10-platform-roadmap.md](10-platform-roadmap.md)): pin each model to an exact
+  **revision (commit sha)**, record `source_url` + `license` + checksum in
+  `model_registry`, and accept licenses deliberately (esp. Cosmos `gated=auto`).
 
 ## The model-run audit trail (A6) — DB + dashboards
 

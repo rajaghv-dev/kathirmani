@@ -36,6 +36,20 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
 - Target: OSS-ingestion-first, NVIDIA-model-first, plugin platform (master plan
   `oss_ingestion_nvidia_model_plugin_master_plan_v2.md` at root). Current
   `src/marlin` cascade = the AI-worker seed. 14 phases; start at Phase 0.
+- **Invariant — security & trust are utmost (it's a platform).** PII CCTV +
+  tamper-evident loss/theft evidence + multi-store isolation. Treat security
+  **cross-cutting every phase**, not just Phase 12: API auth/RBAC, secrets never
+  in logs/repo, encrypt at rest+transit, evidence integrity (checksum + immutable
+  + audit: reviewer/ts/model_version), model provenance. → `spec/10` Security.
+- **Models = free/OSS NVIDIA, HF-hosted (verified 2026-06-03).** VLM
+  `nvidia/Llama-3.1-Nemotron-Nano-VL-8B-V1`; LLM `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B`
+  (or `-4B`); embed `nvidia/C-RADIOv4-H`; twin `nvidia/Cosmos-Reason2-2B`; CV =
+  YOLOE/RT-DETR (TAO needs NGC). HF token works → acquirable now. → `spec/11` table.
+- **Box/env (GB10 aarch64, CUDA13, 1.1T free).** HF token present+working; **no NGC
+  key** (`nvcr.io` 401 → DeepStream/NIM/TAO blocked). Docker + nvidia-ctk installed
+  but **nvidia runtime not registered** (`nvidia-ctk runtime configure --runtime=docker`
+  + restart). Default generative runtime = **Ollama/llama.cpp (GGUF)**, not vLLM
+  (unproven on aarch64+Blackwell); RADIO/Cosmos via transformers.
 - **Invariant — NVIDIA-only default models.** Qwen/Marlin/YOLOE are disallowed as
   defaults → kept as comparison-only `research_qwen_baseline` behind the plugin
   layer; NVIDIA models (maybe stubbed) are production default. Swap = config, not
