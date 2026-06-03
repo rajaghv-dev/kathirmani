@@ -36,20 +36,32 @@ interim CV path; generative runtime = Ollama/transformers (vLLM later).
   `models/PROVENANCE.json` (force-tracked; `models/` weights gitignored).
 - **Security:** added `.env` to `.gitignore` (secrets never in repo).
 
+## Update (later same day) — merged to main + operationalized
+
+- **Merged `phase-0-skeleton` → main, pushed** (ff). All 3 models now fetched + pinned
+  in `models/PROVENANCE.json`: Nemotron-Nano-VL-8B `@437f4e28`, C-RADIOv4-H `@0057b339`,
+  **Cosmos-Reason2-2B `@9ce19a19`** (user accepted the HF license → 403 resolved).
+- **Base services up:** `docker compose -f docker-compose.yml up -d` (postgres/redis/
+  minio) — clean, no port clash with the running start_stack.sh observability stack.
+- **New Grafana dashboard:** `grafana/dashboard_model_performance.json`
+  (uid `marlin-model-perf`, "Model Performance & Usefulness") — 21 panels over the
+  `marlin_*` metrics from the tested 5-camera scenarios; imported live into Grafana
+  12.4.1. Fixed `grafana/setup_grafana.sh` (it imported a non-existent `dashboard.json`
+  under `set -e`) to loop all `dashboard_*.json` via `/api/dashboards/db`. Documented
+  in `spec/08-dashboards.md`.
+
 ## Not done / notes
 
-- **`nvidia/Cosmos-Reason2-2B` → 403 gated.** `gated=auto` did not auto-grant; user
-  `rajaghv-dev` must click "Agree and access" on the HF page, then
-  `python scripts/fetch_models.py nvidia/Cosmos-Reason2-2B`. Not on the critical path
-  (digital-twin = Phase 10, `enabled: false` in the active profile).
+- **`make setup-nvidia-docker`** still pending — needs **sudo** and this box has **no
+  passwordless sudo**, so the user must run it (before GPU containers ollama/dcgm).
 - **NGC-gated** DeepStream/NIM/TAO still blocked (no key). YOLOE/RT-DETR is the CV path.
-- **`make setup-nvidia-docker`** not yet run (needs sudo) — required before GPU
-  containers (ollama/dcgm).
-- Verified: `make lint`, `make config-check`, `make docker-config` all pass; validator
-  negative test passes. No worker/DB code yet — those are Phase 1/2.
+- Cosmos downloaded but `digital_twin_simulation` stays `enabled: false` in the profile
+  (Phase-10 wiring; model is ready).
+- Verified: `make lint` / `config-check` / `docker-config` pass; validator negative test
+  passes. No worker/DB code yet — Phase 1/2.
 
 ## Status
 
-**Phase 0 skeleton complete on branch `phase-0-skeleton`** (not pushed). Next:
-run `make setup-nvidia-docker`, `make up` to bring the base+observability stack green,
-then Phase 1 (ingestion).
+**Phase 0 complete + on main.** Next: user runs `make setup-nvidia-docker`; then
+Phase 1 (ingestion) — wrap the 5 `.mkv` into 10-sec clips + 5-sec windows → MinIO +
+Postgres + Redis.

@@ -8,6 +8,15 @@
     "revision": "0057b339059c0b9e1b4ba996f975410ebbfdfcc8",
     "url": "https://huggingface.co/nvidia/C-RADIOv4-H/tree/0057b339059c0b9e1b4ba996f975410ebbfdfcc8"
   },
+  "nvidia/Cosmos-Reason2-2B": {
+    "fetched_at": "2026-06-03T06:05:06+00:00",
+    "gated": "auto",
+    "license": "other",
+    "local_dir": "models/Cosmos-Reason2-2B",
+    "repo_id": "nvidia/Cosmos-Reason2-2B",
+    "revision": "9ce19a195e423419c349abfc86fd07178b230561",
+    "url": "https://huggingface.co/nvidia/Cosmos-Reason2-2B/tree/9ce19a195e423419c349abfc86fd07178b230561"
+  },
   "nvidia/Llama-3.1-Nemotron-Nano-VL-8B-V1": {
     "fetched_at": "2026-06-03T05:55:55+00:00",
     "gated": "False",

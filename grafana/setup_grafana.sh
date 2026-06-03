@@ -57,21 +57,25 @@ FOLDER_UID=$(${CURL} -X POST "${GRAFANA_URL}/api/folders" \
   -d '{"uid":"marlin","title":"Marlin Inference"}' 2>/dev/null \
   | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('uid','marlin'))" 2>/dev/null || echo "marlin")
 
-echo "==> Importing dashboard ..."
-DASHBOARD_JSON=$(cat "$(dirname "$0")/dashboard.json")
-${CURL} -X POST "${GRAFANA_URL}/api/dashboards/import" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "dashboard": '"${DASHBOARD_JSON}"',
-    "overwrite": true,
-    "folderUid": "marlin",
-    "inputs": []
-  }' | python3 -c "
+echo "==> Importing dashboards ..."
+for f in "$(dirname "$0")"/dashboard_*.json; do
+  [ -e "$f" ] || continue
+  DASHBOARD_JSON=$(cat "$f")
+  ${CURL} -X POST "${GRAFANA_URL}/api/dashboards/db" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "dashboard": '"${DASHBOARD_JSON}"',
+      "overwrite": true,
+      "folderUid": "marlin"
+    }' | python3 -c "
 import sys, json
-d = json.load(sys.stdin)
-url = d.get('importedUrl') or d.get('url') or '(check Grafana UI)'
-print('  Dashboard URL:', url)
-" 2>/dev/null || echo "  Dashboard imported (check Grafana UI at http://localhost:3000)"
+try:
+    d = json.load(sys.stdin)
+    print('  $(basename "$f") ->', d.get('url') or d.get('message','(check Grafana UI)'))
+except Exception:
+    print('  $(basename "$f") imported (check Grafana UI)')
+" 2>/dev/null || echo "  $(basename "$f") imported (check Grafana UI)"
+done
 
 echo ""
 echo "===================================================="
@@ -81,6 +85,7 @@ echo "  Login:            admin / admin"
 echo "  Dashboards:       Dashboards > Marlin Inference >"
 echo "    - Marlin-2B — Model & Runtime"
 echo "    - Marlin-2B — Application / Pipeline"
+echo "    - Marlin — Model Performance & Usefulness   (uid marlin-model-perf)"
 echo ""
 echo "  Run inference (10s test on one camera):"
 echo "    source .venv/bin/activate"

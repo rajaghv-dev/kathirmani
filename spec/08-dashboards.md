@@ -1,6 +1,6 @@
 # 08 — Grafana Dashboards
 
-There are 7 dashboards. They all read from **Prometheus** (the time-series DB that scrapes `serve_metrics:8900` and `netdata:19999`) except the Loki one, which reads log lines from **Loki**. If a panel says **"No data"** the usual cause is not the panel — it's that Prometheus or its scrape targets aren't running (see the troubleshooting note at the bottom).
+There are 8 dashboards (7 originals + a model performance & usefulness view). They all read from **Prometheus** (the time-series DB that scrapes `serve_metrics:8900` and `netdata:19999`) except the Loki one, which reads log lines from **Loki**. If a panel says **"No data"** the usual cause is not the panel — it's that Prometheus or its scrape targets aren't running (see the troubleshooting note at the bottom).
 
 ## Shared vocabulary
 
@@ -32,6 +32,18 @@ Not metrics — actual log lines. Live feed of all inference logs, plus per-came
 
 ### Compute Economy (`/d/marlin-economy`) — "what did this run cost / save?"
 The money + efficiency view. Energy (Wh), estimated cost (₹), cost per event, events per Wh, avg power, wall time. Plus the **"Compute saved — decode-once"** row: decode time saved, redundant decodes avoided, and decode-reduction %. Caveat: the decode-savings gauges are emitted **only by a live `run_inference.py` process**; `serve_metrics.py` (which feeds Grafana between runs) doesn't republish them, so that row is populated during a run and blank afterwards.
+
+### Model Performance & Usefulness (`/d/marlin-model-perf`) — "did the models earn their compute?"
+Source: `grafana/dashboard_model_performance.json` (import via `bash grafana/setup_grafana.sh`).
+Splits the cascade's results across the 5 tested-camera scenarios into two questions:
+- **Usefulness** — total + unique (deduped) events, find-query parse-success %, Qwen
+  security signals, cross-camera dedup %, and **events per Wh**. I.e. did the models
+  produce signal worth acting on.
+- **Performance** — total inference time, per-camera caption latency, GPU compute % /
+  power / temp / unified-memory, energy (Wh), **₹ run cost**, and **cost per event**.
+It reads the same `marlin_*` gauges as the others (so it persists between runs via
+`serve_metrics.py`), and is the OSS, results-driven precursor to the platform's model
+dashboards 11–18 (`spec/11`, master plan A7). Same "No data" caveat below.
 
 ## Troubleshooting — if everything says "No data"
 

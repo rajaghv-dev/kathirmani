@@ -47,9 +47,18 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   YOLOE/RT-DETR (TAO needs NGC). HF token works → acquirable now. → `spec/11` table.
 - **Box/env (GB10 aarch64, CUDA13, 1.1T free).** HF token present+working; **no NGC
   key** (`nvcr.io` 401 → DeepStream/NIM/TAO blocked). Docker + nvidia-ctk installed
-  but **nvidia runtime not registered** (`nvidia-ctk runtime configure --runtime=docker`
-  + restart). Default generative runtime = **Ollama/llama.cpp (GGUF)**, not vLLM
-  (unproven on aarch64+Blackwell); RADIO/Cosmos via transformers.
+  but **nvidia runtime not registered** — `make setup-nvidia-docker` (needs **sudo**,
+  not passwordless here → user must run it). Default generative runtime =
+  **Ollama/llama.cpp (GGUF)**, not vLLM (unproven on aarch64+Blackwell); RADIO/Cosmos
+  via transformers.
+- **Phase 0 done (on main).** Models fetched+pinned in `models/PROVENANCE.json` (all 3:
+  Nemotron-Nano-VL-8B, C-RADIOv4-H, Cosmos-Reason2-2B). Base services
+  (postgres/redis/minio) come up via `docker compose -f docker-compose.yml up -d`
+  (no port clash with the start_stack.sh observability stack). `make validate-model-config`
+  / `config-check` / `docker-config` green. Next: Phase 1 ingestion.
+- **New dashboard:** `grafana/dashboard_model_performance.json` (uid `marlin-model-perf`)
+  — model performance & usefulness from the tested 5-camera results. Imported via the
+  now-fixed `grafana/setup_grafana.sh` (loops all `dashboard_*.json`). → `spec/08`.
 - **Invariant — NVIDIA-only default models.** Qwen/Marlin/YOLOE are disallowed as
   defaults → kept as comparison-only `research_qwen_baseline` behind the plugin
   layer; NVIDIA models (maybe stubbed) are production default. Swap = config, not
