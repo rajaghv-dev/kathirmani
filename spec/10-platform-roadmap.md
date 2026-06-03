@@ -1,0 +1,112 @@
+# 10 — Platform Roadmap (OSS ingestion + NVIDIA model plugins)
+
+> **Forward-looking.** Docs `01`–`09` describe the **current system** (the offline
+> Marlin/Qwen cascade). This doc and [11-model-plugin-policy.md](11-model-plugin-policy.md)
+> describe the **target platform** the repo is heading toward, per the master plan
+> [`oss_ingestion_nvidia_model_plugin_master_plan_v2.md`](../oss_ingestion_nvidia_model_plugin_master_plan_v2.md)
+> at repo root (full 3.5k-line detail). This is the **execution plan** an agent
+> follows; the master plan is the *why*, this is the ordered *what-next*.
+
+## The shift in one line
+
+From an **offline research cascade** (one process reads 5 `.mkv` → `results/*.json`)
+to an **OSS-ingestion-first, NVIDIA-model-first, plugin-driven video intelligence
+platform**: durable 10-sec clips → 5-sec AI windows → queue → plugin-host AI workers
+→ deterministic rule engine → VLM verification → evidence package → human review →
+search → digital twin → Grafana. The current `src/marlin` pipeline becomes the
+**AI-worker seed**; nothing is thrown away.
+
+## What exists today vs. what the platform needs
+
+| Layer | Today (`src/marlin`) | Target | Reuse |
+|-------|----------------------|--------|-------|
+| Ingestion | none — `cli/run_inference.py` reads `.mkv` directly | FFmpeg/GStreamer service: 10-sec clips, 5-sec windows, RTSP reconnect, camera health | PyAV preload (`ffmpeg_preload.py`) |
+| Object store | raw `.mkv` + `results/*.json` on disk | MinIO / NVMe abstraction, evidence clips | `RESULTS_DIR` anchor |
+| Queue | none — synchronous in-process | Redis Streams (`video_segment.ready`, `ai_window.ready`) | — |
+| Metadata DB | **none, by design** (file-first) | Postgres + pgvector (master plan §6 + A6) | JSON→rows backfill adapter |
+| CV worker | `marlin.locate` (YOLOE, optional stub) | DeepStream+TensorRT **and** OSS YOLOE worker, one plugin contract | `pipeline.py` locate/route logic |
+| Rule engine | none | deterministic zone/dwell/interaction/bypass/health rules + incidents | — |
+| VLM worker | `qwen_vl.py`, hardcoded | **plugin host**, NVIDIA Nemotron-VL default, every run tracked | `qwen_vl.py` → baseline plugin |
+| Evidence + review | none (Streamlit = viz only) | pre/during/post stitching, timeline, audited verdicts | — |
+| Search | none | pgvector + multi-embedding fusion + Nemotron critic | — |
+| Digital twin | implicit (5 cameras, same area) | YAML store/camera/FOV/zone, event→twin mapping | camera roles |
+| Plugin layer | none — code is imported Python | `ModelPlugin` ABC + registry + profiles | `metrics.py` registry pattern |
+| Observability | 7 dashboards, `marlin_*` | +dashboards 01–18, `model_*` namespace, OTel, DCGM | the whole `04`/`08` stack |
+| Makefile / compose | none — `start_stack.sh` only | Makefile + 3 compose files, one-command stack | `start_stack.sh` logic |
+
+Strongest existing asset = observability ([04](04-observability-stack.md),
+[08-dashboards.md](08-dashboards.md)); extend it, don't replace it. The cascade-
+gating thesis ([05-performance-and-optimizations.md](05-performance-and-optimizations.md))
+survives: detector + rules gate the VLM — never run the VLM on every window.
+
+## The one hard reconciliation — model policy
+
+The master plan (Addendum A) mandates **NVIDIA-only default models** and explicitly
+disallows Qwen/LLaVA/InternVL as defaults. The current cascade (Marlin = Qwen3-VL
+based, Qwen2.5-VL, YOLOE) is **all disallowed-as-default**. Resolution: keep it as a
+runnable, comparison-only `research_qwen_baseline` profile behind the plugin layer;
+NVIDIA models (possibly stubbed until weights land) are the production/benchmark
+default. Because everything sits behind the plugin contract, swapping NVIDIA weights
+in is a config flip, not a refactor. Full detail in
+[11-model-plugin-policy.md](11-model-plugin-policy.md).
+
+## Phased build (master plan §15 + Addendum A12)
+
+Each phase = one branch = one PR, ends green (its test gate passes, observability
+shows the new signal, a `agents-memory/sessions/` entry is written). **Contracts
+before code** — write each layer's schema/interface + validator before its
+implementation.
+
+| Phase | Goal | Done-when |
+|-------|------|-----------|
+| **0** Skeleton | Makefile, 3 compose files (base/gpu/observability — wrap the existing stack), `configs/` (cameras/stores/zones/models/rules/retention), `ModelPlugin` interface, NVIDIA model policy + `validate-model-config` | `make up` green; policy validator passes NVIDIA / fails non-NVIDIA default |
+| **1** OSS ingestion | FFmpeg/GStreamer → 10-sec clips + 5-sec windows @2s stride → MinIO + Postgres rows + Redis messages; camera health. **Files first, RTSP second.** | 5-camera footage segmented, registered, queued, visible in Grafana |
+| **2** DB + API | `db/migrations` + `schema.sql` (§6 + A6 model tables); FastAPI CRUD + model-registry endpoints; seed kathirmani | workers/UI use stable API contracts; `make migrate && seed` idempotent |
+| **3** Observability | dashboards 01–18, `model_*` metrics (additive to `marlin_*`), Loki per-service, OTel traces, DCGM GPU | a failed event traces RTSP→model output |
+| **4** CV worker | `cv-oss-worker` (wrap `marlin.locate` YOLOE) first, then `cv-deepstream-worker` — same `DetectionPlugin` contract | CV worker emits common event schema, visible in dashboard 04 |
+| **5** Rule engine | deterministic zone/dwell/interaction/billing-bypass/health rules + incidents; start golden dataset | explainable suspicious-item events raised **without** a VLM |
+| **6** VLM worker | **plugin host** loading the active profile's VLM (Nemotron-VL / Qwen baseline); prompt packs, JSON repair, every run → `model_runs` | suspicious events get model explanation; profile swaps by config |
+| **7** Evidence + review | pre/during/post 20-sec stitch, timeline, approve/reject with audit | a human reviews a loss hypothesis in <60s |
+| **8** Search | embedding worker (pgvector) + metadata/embedding fusion + Nemotron critic rerank | "person picked an item and walked away" returns correct, time-accurate hits |
+| **9** VSS-parity | implement VSS-style capabilities in OSS+NVIDIA (RT-CV/embedding/LVS/search/VIOS); **VSS is reference, never a runtime dep**; dashboard 16 tracks parity | we know which capabilities reach parity |
+| **10** Digital twin | YAML store/camera/FOV/zone, event→twin mapping, twin UI | a second store onboards by YAML, zero code change |
+| **11** Benchmark + TCO | streams/GPU, clips/min/GPU, cost/store-month; benchmarks 1–6 → `model_benchmark_runs` | a TCO report ranks GPU/server profiles |
+| **12** Hardening | auth/RBAC, retention, backup/DR, model rollback, audit logs | survives restarts, camera/model failures, replays from clips |
+| **13** NVIDIA bake-off | model/runtime comparison (Ollama/llama.cpp/vLLM/Triton/NIM/TRT-LLM, dashboard 18); production + fallback profile + rollback | config-only NVIDIA profile swap with Grafana throughput/quality/latency/TCO deltas |
+
+## Critical path & parallelism
+
+- **Critical path** = 0 → 1 → 2 → (3 ∥ 4) → 5 → 6 → 7. That is the master plan §24
+  two-week demo: footage → clips → detections → suspicious event → VLM verification
+  → evidence → Grafana + review UI.
+- **Parallel once 0–2 land:** Phase 3 (observability) ∥ Phase 4 (CV worker); Phase 8
+  (search) and Phase 10 (twin) are independent after Phase 5 events exist.
+- **Gated on external availability:** real DeepStream install (Phase 4 accelerated
+  path), NVIDIA Nemotron/Cosmos weights (6/8/9/13), live RTSP (Phase 1 second half).
+  Build the wiring with the runnable baseline; flip when available.
+- **Always-on from Phase 1:** Grafana (master plan §20.5 "do not delay observability").
+
+## Anti-goals (master plan §20 — do not violate)
+
+1. Not model-first — twin → events → ingest → detect/track → reason → verify.
+2. Business logic is **not** inside DeepStream configs — DeepStream emits facts; the
+   platform decides incidents.
+3. Never skip the evidence package — without it, it's a demo.
+4. Don't optimize tokens/sec alone — measure video-sec/sec/GPU, clips/min/GPU,
+   precision/recall, p95, cost/store.
+5. Don't delay observability — Grafana from Phase 1.
+6. Don't make a non-NVIDIA model the production/benchmark default — Qwen is
+   comparison-only ([11-model-plugin-policy.md](11-model-plugin-policy.md)).
+
+## Acceptance (whole platform)
+
+Master plan §19's 13 criteria **plus** A12's profile-swap: 5 feeds ingested · 10-sec
+clips durable · 5-sec windows · CV worker emits detections/tracks/events · rules
+raise hypotheses · VLM verifies · evidence built · human approve/reject · Grafana
+shows ingestion/queue/AI/GPU/incident metrics · custom UI shows map/timeline/replay ·
+benchmark report compares GPU profiles · VSS-parity evaluated · second store
+onboards code-free · **+** config-only NVIDIA model-profile swap with Grafana deltas.
+
+## Related
+
+[11-model-plugin-policy.md](11-model-plugin-policy.md) · [02-architecture.md](02-architecture.md) · [05-performance-and-optimizations.md](05-performance-and-optimizations.md) · [09-repo-structure.md](09-repo-structure.md)
