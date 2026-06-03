@@ -1,0 +1,26 @@
+# GPU services (master plan §14.3). Needs the NVIDIA Docker runtime —
+# run `make setup-nvidia-docker` first. Ollama serves the Nemotron LLM tasks
+# (summarization / search-critic) per configs/models.yaml. VLM/CV workers land in
+# Phase 4/6; declared here as the slots they fill.
+name: kathirmani-platform
+
+services:
+  ollama:
+    image: ollama/ollama
+    ports: ["${OLLAMA_PORT:-11434}:11434"]
+    volumes:
+      - ollamadata:/root/.ollama
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: ["gpu"]
+    profiles: ["gpu"]
+
+  # --- filled in later phases (kept declared so the topology is visible) ---
+  # vlm-worker:   build ./ai-workers/vlm-worker      (Phase 6, plugin host)
+  # cv-oss-worker: build ./ai-workers/cv-oss-worker  (Phase 4)
+
+volumes:
+  ollamadata:

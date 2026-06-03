@@ -1,0 +1,16 @@
+# Store digital-twin root (master plan §12). One YAML per store → onboard a new
+# store by config, not code (Phase 10). Seeds the `stores` table (Phase 2).
+store:
+  id: kathirmani_01
+  name: "Kathirmani Store"
+  location: "Tamil Nadu, India"
+  timezone: Asia/Kolkata
+
+cameras_config: ../cameras.yaml
+zones_config: ../zones/kathirmani_zones.yaml
+
+# Physical/business context the twin maps events onto (relationships in spec/10).
+layout:
+  cameras_observe_same_area: true   # 5 angles on one floor
+  has_billing_counter: true
+  has_single_entry_exit: true

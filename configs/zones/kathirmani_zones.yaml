@@ -1,0 +1,42 @@
+# Zone definitions per camera (master plan §6.3). Polygons are normalized [0..1]
+# image coords; placeholders to be drawn against real frames in Phase 10 (zone
+# editor). zone_type ∈ shelf|billing_counter|entry|exit|staff_only|high_value_area
+# |queue_area|blind_spot.
+store_id: kathirmani_01
+
+zones:
+  - id: bill_counter_zone
+    camera_id: bill_counter
+    name: "Billing Counter"
+    zone_type: billing_counter
+    polygon: [[0.1, 0.4], [0.9, 0.4], [0.9, 0.95], [0.1, 0.95]]   # placeholder
+
+  - id: queue_zone
+    camera_id: bill_counter
+    name: "Counter Queue"
+    zone_type: queue_area
+    polygon: [[0.1, 0.1], [0.9, 0.1], [0.9, 0.4], [0.1, 0.4]]     # placeholder
+
+  - id: left_shelf_zone
+    camera_id: left_aisle
+    name: "Left Aisle Shelf"
+    zone_type: shelf
+    polygon: [[0.0, 0.2], [1.0, 0.2], [1.0, 0.9], [0.0, 0.9]]     # placeholder
+
+  - id: right_shelf_zone
+    camera_id: right_aisle
+    name: "Right Aisle Shelf"
+    zone_type: shelf
+    polygon: [[0.0, 0.2], [1.0, 0.2], [1.0, 0.9], [0.0, 0.9]]     # placeholder
+
+  - id: entry_zone
+    camera_id: entry_exit
+    name: "Entry"
+    zone_type: entry
+    polygon: [[0.0, 0.3], [0.5, 0.3], [0.5, 1.0], [0.0, 1.0]]     # placeholder
+
+  - id: exit_zone
+    camera_id: entry_exit
+    name: "Exit"
+    zone_type: exit
+    polygon: [[0.5, 0.3], [1.0, 0.3], [1.0, 1.0], [0.5, 1.0]]     # placeholder

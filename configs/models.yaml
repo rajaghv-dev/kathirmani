@@ -1,0 +1,107 @@
+# Model policy + profiles — NVIDIA-only, free/OSS, config-driven.
+# Spec: spec/11-model-plugin-policy.md.  Validate: `make validate-model-config`.
+#
+# Swap models without code:  MODEL_PROFILE=<name> make up
+# Every model_id in an active profile must be an `nvidia/...` repo, UNLESS the task
+# carries `vendor_exception: true` + `exception_reason` (logged, not silent), or the
+# whole profile is `non_default: true` (the comparison-only Qwen baseline).
+
+model_policy:
+  vendor_scope: nvidia_only
+  allow_non_nvidia_models: false        # non-NVIDIA only via explicit exceptions
+  allow_vss_runtime_dependency: false   # VSS is a reference, never a runtime dep
+  vss_allowed_as_reference: true
+
+active_profile: nvidia_gb10_retail_balanced
+
+profiles:
+
+  # ---- Production / benchmark default: free NVIDIA models, runnable on GB10 today.
+  nvidia_gb10_retail_balanced:
+    description: >-
+      Free/OSS NVIDIA models on the DGX Spark GB10 (aarch64, Blackwell, CUDA 13).
+      Generative tasks via Ollama/transformers (vLLM/TensorRT-LLM is the Phase-13
+      bake-off target, unproven on this arch). RADIO/Cosmos via transformers.
+      No NGC dependency — DeepStream/TAO deferred until an NGC key exists.
+    non_default: false
+    tasks:
+      detection:
+        enabled: true
+        plugin: cv_oss_detector
+        runtime: ultralytics
+        model_id: jameslahm/yoloe-11s-seg        # local: models/yoloe
+        endpoint: local
+        precision: fp16
+        vendor_exception: true
+        exception_reason: >-
+          NVIDIA TAO/DeepStream detector is NGC-gated (no key on this box); YOLOE is
+          the free interim CV path. Swap to nvidia/* TAO when an NGC key lands.
+        metrics: { enabled: true }
+
+      vlm_clip_reasoning:
+        enabled: true
+        plugin: nvidia_openai_compatible_vlm
+        runtime: transformers                     # ollama/llama.cpp once a GGUF is vetted
+        model_id: nvidia/Llama-3.1-Nemotron-Nano-VL-8B-V1
+        endpoint: local
+        prompt_pack: retail_loss_v1
+        max_frames: 16
+        max_output_tokens: 512
+        temperature: 0.1
+        metrics: { enabled: true }
+
+      embedding:
+        enabled: true
+        plugin: nvidia_embedding
+        runtime: transformers                     # Triton later
+        model_id: nvidia/C-RADIOv4-H
+        endpoint: local
+        vector_dim: tbd                           # resolve from model card in Phase 8;
+                                                  # db `embeddings` vector(N) must match
+        metrics: { enabled: true }
+
+      summarization:
+        enabled: true
+        plugin: nvidia_summary
+        runtime: ollama
+        model_id: nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16   # MoE, ~3B active
+        endpoint: http://ollama:11434
+        summary_chunk_min: 5
+        metrics: { enabled: true }
+
+      search_critic:
+        enabled: true
+        plugin: nvidia_search_critic
+        runtime: ollama
+        model_id: nvidia/NVIDIA-Nemotron-3-Nano-4B
+        endpoint: http://ollama:11434
+        metrics: { enabled: true }
+
+      digital_twin_simulation:
+        enabled: false                            # research; enable when needed
+        plugin: nvidia_cosmos
+        runtime: transformers
+        model_id: nvidia/Cosmos-Reason2-2B
+        endpoint: local
+        metrics: { enabled: true }
+
+  # ---- Comparison-only baseline: the current Qwen/Marlin/YOLOE cascade.
+  # NEVER the production default (master plan A1.2). Runnable today for the bake-off.
+  research_qwen_baseline:
+    description: "The existing src/marlin cascade as a comparison arm. Non-default."
+    non_default: true
+    tasks:
+      detection:
+        enabled: true
+        plugin: cv_oss_detector
+        runtime: ultralytics
+        model_id: jameslahm/yoloe-11s-seg
+        endpoint: local
+        metrics: { enabled: true }
+      vlm_clip_reasoning:
+        enabled: true
+        plugin: vlm_qwen_baseline
+        runtime: transformers
+        model_id: Qwen/Qwen2.5-VL-7B-Instruct     # disallowed-as-default; baseline only
+        endpoint: local
+        metrics: { enabled: true }

@@ -1,0 +1,20 @@
+{
+  "nvidia/C-RADIOv4-H": {
+    "fetched_at": "2026-06-03T05:55:56+00:00",
+    "gated": "False",
+    "license": "other",
+    "local_dir": "models/C-RADIOv4-H",
+    "repo_id": "nvidia/C-RADIOv4-H",
+    "revision": "0057b339059c0b9e1b4ba996f975410ebbfdfcc8",
+    "url": "https://huggingface.co/nvidia/C-RADIOv4-H/tree/0057b339059c0b9e1b4ba996f975410ebbfdfcc8"
+  },
+  "nvidia/Llama-3.1-Nemotron-Nano-VL-8B-V1": {
+    "fetched_at": "2026-06-03T05:55:55+00:00",
+    "gated": "False",
+    "license": "other",
+    "local_dir": "models/Llama-3.1-Nemotron-Nano-VL-8B-V1",
+    "repo_id": "nvidia/Llama-3.1-Nemotron-Nano-VL-8B-V1",
+    "revision": "437f4e28b989cc2d9a16b6767cc930cdf48797ff",
+    "url": "https://huggingface.co/nvidia/Llama-3.1-Nemotron-Nano-VL-8B-V1/tree/437f4e28b989cc2d9a16b6767cc930cdf48797ff"
+  }
+}

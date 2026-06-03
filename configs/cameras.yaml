@@ -1,0 +1,59 @@
+# Camera registry — the real Kathirmani 5-camera layout (same area, 5 angles).
+# Ingestion (Phase 1) reads `source_file` first; `rtsp_url_env` is for live RTSP later.
+store_id: kathirmani_01
+timezone: Asia/Kolkata
+
+# Clip/window geometry (master plan §3.2 defaults).
+segmenting:
+  storage_clip_duration_sec: 10
+  ai_window_duration_sec: 5
+  ai_window_stride_sec: 2
+  pre_event_context_sec: 5
+  post_event_context_sec: 10
+  evidence_clip_duration_sec: 20
+
+cameras:
+  - id: bill_counter
+    name: "Bill Counter"
+    role: billing
+    source_file: "Kathirmani Bill Counter.mkv"
+    rtsp_url_env: RTSP_BILL_COUNTER
+    fps_target: 10
+    segment_sec: 10
+    enabled: true
+
+  - id: center
+    name: "Center Camera"
+    role: overview
+    source_file: "Kathirmani Center Camera.mkv"
+    rtsp_url_env: RTSP_CENTER
+    fps_target: 10
+    segment_sec: 10
+    enabled: true
+
+  - id: left_aisle
+    name: "Left Side Camera"
+    role: shelf
+    source_file: "Kathirmani Left Side Camera.mkv"
+    rtsp_url_env: RTSP_LEFT_AISLE
+    fps_target: 10
+    segment_sec: 10
+    enabled: true
+
+  - id: entry_exit
+    name: "Near Entry Door Camera"
+    role: entry_exit
+    source_file: "Kathirmani Near Entry Door Camera.mkv"
+    rtsp_url_env: RTSP_ENTRY_EXIT
+    fps_target: 10
+    segment_sec: 10
+    enabled: true
+
+  - id: right_aisle
+    name: "Right Side Cam"
+    role: shelf
+    source_file: "Kathirmani Right Side Cam.mkv"
+    rtsp_url_env: RTSP_RIGHT_AISLE
+    fps_target: 10
+    segment_sec: 10
+    enabled: true

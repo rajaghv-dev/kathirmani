@@ -1,0 +1,68 @@
+# NVIDIA model catalog — free/OSS, HuggingFace-hosted, verified 2026-06-03.
+# Real IDs resolving the master plan's `*-or-compatible` placeholders (spec/11).
+# Fetch + pin:  python scripts/fetch_models.py <repo_id>   (writes models/PROVENANCE.json)
+catalog_version: 1
+
+models:
+  - id: nvidia/Llama-3.1-Nemotron-Nano-VL-8B-V1
+    family: nemotron
+    modality: [image, video, text]
+    tasks: [clip_reasoning, event_verification, visual_question_answering, timestamped_observation]
+    runtimes: [transformers, ollama, llama_cpp, vllm]
+    source_url: https://huggingface.co/nvidia/Llama-3.1-Nemotron-Nano-VL-8B-V1
+    license: nvidia-open-model-license
+    gated: false
+    default_metrics: [clips_per_min_gpu, video_sec_per_gpu_sec, ttft_ms, output_tokens_per_sec, parse_success_rate, event_verification_accuracy]
+    notes: "Default VLM. Bigger: nvidia/NVIDIA-Nemotron-Nano-12B-v2-VL-{BF16,FP8,NVFP4-QAD}."
+
+  - id: nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16
+    family: nemotron
+    modality: [text]
+    tasks: [summarization, search_critic, incident_explanation]
+    runtimes: [ollama, llama_cpp, vllm, tensorrt_llm]
+    source_url: https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16
+    license: nvidia-open-model-license
+    gated: false
+    default_metrics: [tokens_per_sec, ttft_ms, gpu_memory_gb]
+    notes: "MoE ~3B active. Smaller: nvidia/NVIDIA-Nemotron-3-Nano-4B. GGUF: unsloth/lmstudio-community."
+
+  - id: nvidia/C-RADIOv4-H
+    family: embedding
+    modality: [image, video_frame]
+    tasks: [visual_embedding, object_embedding, search, reidentification_support]
+    runtimes: [transformers, triton, custom_fastapi]
+    source_url: https://huggingface.co/nvidia/C-RADIOv4-H
+    license: nvidia-open-model-license
+    gated: false
+    default_metrics: [embeddings_per_sec_gpu, recall_at_5, recall_at_10, vector_latency_ms]
+    notes: "Visual embedding (RADIO family). Alts: nvidia/RADIO-L, nvidia/C-RADIOv3-H."
+
+  - id: nvidia/Cosmos-Reason2-2B
+    family: cosmos
+    modality: [video, world_state, text]
+    tasks: [digital_twin_simulation, physical_reasoning, action_prediction]
+    runtimes: [transformers]
+    source_url: https://huggingface.co/nvidia/Cosmos-Reason2-2B
+    license: nvidia-open-model-license
+    gated: auto                    # auto-grant on license acceptance; token reads it
+    default_metrics: [scenario_generation_latency, physical_reasoning_accuracy]
+    notes: "Alts: nvidia/Cosmos-Reason2-8B, nvidia/Cosmos-Embed1-448p-anomaly-detection."
+
+  # ---- NGC-gated NVIDIA CV (needs an NGC API key; not free on HF). Deferred.
+  - id: nvidia/tao-peoplenet            # placeholder until NGC access
+    family: cv
+    modality: [video, image]
+    tasks: [detection, person_detection]
+    runtimes: [deepstream_tensorrt]
+    source_url: https://catalog.ngc.nvidia.com/orgs/nvidia/models/peoplenet
+    license: nvidia-tao
+    gated: ngc_key_required
+    default_metrics: [fps_gpu, streams_gpu, detection_latency_ms, gpu_decoder_utilization]
+    notes: "DeepStream/TAO path — blocked until NGC key. Free interim: YOLOE / RT-DETR."
+
+# Free/OSS non-NVIDIA used only via explicit profile vendor_exception (interim CV):
+non_nvidia_exceptions:
+  - id: jameslahm/yoloe-11s-seg
+    reason: "Free interim open-vocab detector (already local at models/yoloe)."
+  - id: PekingU/rtdetr_v2_r50vd
+    reason: "Apache-2.0 open detector alternative."

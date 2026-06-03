@@ -1,0 +1,47 @@
+# Observability stack (master plan §13 / spec/observability). The TARGET unified
+# definition — Prometheus, Grafana, Loki, Netdata, DCGM. Today `bash start_stack.sh`
+# is still the live path (it builds serve_metrics + prometheus); this compose is the
+# Phase-3 migration target. Reuses the existing ./prometheus and ./grafana configs.
+name: kathirmani-platform
+
+services:
+  prometheus:
+    image: prom/prometheus
+    ports: ["${PROMETHEUS_PORT:-9090}:9090"]
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - promdata:/prometheus
+
+  grafana:
+    image: grafana/grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+    ports: ["${GRAFANA_PORT:-3000}:3000"]
+    volumes:
+      - ./grafana:/etc/grafana/provisioning
+      - grafanadata:/var/lib/grafana
+
+  loki:
+    image: grafana/loki
+    ports: ["${LOKI_PORT:-3100}:3100"]
+
+  netdata:
+    image: netdata/netdata
+    pid: host
+    cap_add: ["SYS_PTRACE"]
+    security_opt: ["apparmor:unconfined"]
+    ports: ["${NETDATA_PORT:-19999}:19999"]
+
+  # GPU metrics → Prometheus (master plan §14.2). Needs the NVIDIA Docker runtime
+  # (run `make setup-nvidia-docker` first).
+  dcgm-exporter:
+    image: nvcr.io/nvidia/k8s/dcgm-exporter:3.3.5-3.4.0-ubuntu22.04
+    ports: ["${DCGM_PORT:-9400}:9400"]
+    cap_add: ["SYS_ADMIN"]
+    runtime: nvidia
+    profiles: ["gpu-metrics"]   # opt-in: needs NGC pull + nvidia runtime
+
+volumes:
+  promdata:
+  grafanadata:

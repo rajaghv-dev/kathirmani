@@ -1,0 +1,22 @@
+# Data retention + privacy policy (master plan §12 hardening; spec/10 Security).
+# CCTV footage is PII/biometric — minimize and time-box. Enforced in Phase 1 (write
+# path) + Phase 12 (cleanup job). Evidence linked to an open incident is LOCKED and
+# exempt from cleanup until the incident closes (chain of custody).
+retention:
+  raw_clips_days: 14            # 10-sec clips in object store
+  thumbnails_days: 30
+  ai_windows_days: 14
+  detections_days: 30
+  events_days: 180
+  vlm_observations_days: 180
+  incidents_days: 1825          # 5y — loss/theft record
+  embeddings_days: 365
+
+privacy:
+  redact_faces_in_exports: true     # privacy-by-design on shared evidence
+  pii_classification: biometric
+  evidence_lock_until_incident_closed: true   # immutable while under review
+
+cleanup:
+  schedule_cron: "0 3 * * *"        # nightly 03:00 store-local
+  dry_run_default: true             # never delete silently — log first

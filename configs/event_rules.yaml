@@ -1,0 +1,33 @@
+# Deterministic event rules (master plan §7.3). The rule engine (Phase 5) turns
+# detections/tracks/zones into retail hypotheses. Safety logic stays deterministic —
+# never inside a learned policy (spec/intent design principle 3 / spec/10 anti-goals).
+rules:
+  - id: suspicious_item_interaction
+    description: "Person interacts with an item in a shelf zone"
+    conditions:
+      - person_in_zone: shelf
+      - object_near_person_hand: true
+      - dwell_time_sec_gte: 3
+    action:
+      create_event: suspicious_item_interaction
+      severity: medium
+      needs_vlm_verification: true
+
+  - id: possible_billing_bypass
+    description: "Person carrying an item moves to exit without billing interaction"
+    conditions:
+      - person_has_item: true
+      - visited_billing_zone: false
+      - moved_to_zone: exit
+    action:
+      create_incident: possible_loss
+      severity: high
+      needs_vlm_verification: true
+
+  - id: camera_health_issue
+    description: "Camera blocked, black/frozen frame, or low visibility"
+    conditions:
+      - camera_health_score_lte: 0.5
+    action:
+      create_event: camera_health_issue
+      severity: warning

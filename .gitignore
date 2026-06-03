@@ -1,4 +1,6 @@
 .venv/
+.env
+!.env.example
 # results/ intentionally tracked — inference JSONs are part of the repo
 *.mkv
 *.mp4
