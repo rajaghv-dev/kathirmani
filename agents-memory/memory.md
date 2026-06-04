@@ -103,6 +103,13 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   `make test` = 264 component tests green (isolated per-dir). Phase 13 W5:
   `benchmarks/bakeoff/` (runtime matrix + select_profiles production/fallback +
   rollback reusing API model_profiles.active; 20 tests). `make bakeoff`.
+- **Real Nemotron-VL WIRED (2026-06-04).** `ai-workers/vlm-worker/plugin.py` runs the
+  real `nvidia/Llama-3.1-Nemotron-Nano-VL-8B-V1` from local weights (verified on a real
+  clip, faked=False): PyAV frames → multi-image `model.chat`. Needed: `timm`/`einops`/
+  `open_clip_torch` (vision tower); `attn_implementation="eager"` (no FA2); a transformers-5.9
+  `all_tied_weights_keys` compat shim; `repetition_penalty=1.3`; parser repairs truncated
+  JSON. C-RADIO tower *code* fetched from HF on first load (network once). Qwen baseline
+  + fake_infer still intact. → `spec/13`.
 - **Honest caveats / real-hardware follow-ups** (code is wired + tested with fakes;
   these need real weights/runtimes/GPU): real Nemotron-VL chat-API + summary (fake
   now); GPU-real benchmark + bake-off numbers (synthetic now); C-RADIO dim≠768 →

@@ -38,6 +38,25 @@ Security). `make seed` loads the catalog + pinned revisions into the `model_regi
 table, so every model on disk is auditable from the DB. Weights live under `models/`
 (gitignored); only the provenance manifest is tracked.
 
+## Real Nemotron-VL wired (2026-06-04)
+
+The VLM plugin (`ai-workers/vlm-worker/plugin.py:NvidiaVlmPlugin`) now runs the **real**
+`nvidia/Llama-3.1-Nemotron-Nano-VL-8B-V1` from local weights — verified end-to-end on a
+real clip (`faked=False`): frames sampled via PyAV → multi-image `model.chat(...)` →
+structured verification. Loads via the model's own `trust_remote_code` API
+(`AutoModel`+`AutoTokenizer`+`AutoImageProcessor`, bf16, `attn_implementation="eager"`),
+with the fake_infer fallback intact for GPU-less/test runs. Notes:
+
+- **Extra deps** (vision tower C-RADIOv2-H): `timm`, `einops`, `open_clip_torch` (added
+  to `requirements/inference.txt`).
+- **transformers 5.9 shim**: the model's custom code predates `all_tied_weights_keys`;
+  a minimal per-instance compat shim in `plugin.py` lets it load. Flash-Attn-2 is
+  unsupported → eager attention.
+- **Generation**: `repetition_penalty=1.3` curbs small-VLM looping; the parser
+  (`parser.py`) repairs token-cap-truncated JSON (closes dangling strings/brackets).
+- **Offline caveat**: the C-RADIO vision-tower *code* is fetched from HF on first load
+  (network needed once); pin/cache it for a fully-offline box.
+
 ## Runtimes — config-driven, swappable
 
 Each task in `configs/models.yaml` binds a model + plugin + **runtime**; switch the

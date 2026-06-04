@@ -6,3 +6,7 @@ qwen-vl-utils>=0.0.14
 torchcodec          # decode backend (uses PyAV's bundled FFmpeg)
 av                  # PyAV — bundled FFmpeg libs; also the ingestion segmenter
 ultralytics         # YOLOE detector (Phase 4 cv-oss-worker); optional — worker degrades to fake_infer without it
+# Nemotron-Nano-VL vision tower (C-RADIOv2-H) — needed to load the real VLM (Phase 6).
+timm
+einops
+open_clip_torch

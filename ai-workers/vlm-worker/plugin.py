@@ -50,6 +50,30 @@ NVIDIA_VLM_ID = "nvidia/Llama-3.1-Nemotron-Nano-VL-8B-V1"
 NVIDIA_VLM_PATH = _REPO_ROOT / "models" / "Llama-3.1-Nemotron-Nano-VL-8B-V1"
 
 
+def _patch_tied_weights_compat() -> None:
+    """transformers 5.9 reads `model.all_tied_weights_keys` (a {target:source} dict)
+    that it normally sets in its own init path — which this model's custom __init__
+    bypasses, raising AttributeError on load. Add a per-instance default (empty dict,
+    settable) so normal models are unaffected and this one loads. Idempotent."""
+    from transformers.modeling_utils import PreTrainedModel as P
+    if getattr(P, "_kathir_tied_shim", False):
+        return
+    KEY = "all_tied_weights_keys"
+
+    def _get(self):
+        d = self.__dict__.get(KEY)
+        if d is None:
+            d = self.__dict__[KEY] = {}
+        return d
+
+    def _set(self, v):
+        self.__dict__[KEY] = v
+
+    if not isinstance(getattr(P, KEY, None), property):
+        setattr(P, KEY, property(_get, _set))
+    P._kathir_tied_shim = True
+
+
 # --------------------------------------------------------------------------
 # Shared base: prompt rendering, packaging, fake_infer, metrics mirror.
 # --------------------------------------------------------------------------
@@ -245,40 +269,93 @@ class NvidiaVlmPlugin(_VlmPluginBase):
     def __init__(self, config: PluginConfig | None = None) -> None:
         super().__init__(config or nvidia_default_config())
         self._weights = Path(self.config.params.get("weights", NVIDIA_VLM_PATH))
+        self._tokenizer = None
+        self._device = "cpu"
+        self._dtype = None
 
     def load(self) -> None:
-        """Try to load the Nemotron VLM. Idempotent + non-fatal (fake mode on any
-        failure). transformers/torch are heavy + optional — kept lazy."""
+        """Load Nemotron-Nano-VL via its `trust_remote_code` API (see the model's
+        examples.py): AutoModel(bf16, device_map) + AutoTokenizer + AutoImageProcessor.
+        Idempotent + non-fatal — any failure leaves the plugin in fake-infer mode."""
         if self._loaded or self._model is not None:
             return
         try:
             if not self._weights.exists():
                 raise FileNotFoundError(f"weights not found: {self._weights}")
-            import torch  # noqa: F401
-            from transformers import AutoModel, AutoProcessor
-            self._processor = AutoProcessor.from_pretrained(
-                str(self._weights), trust_remote_code=True, local_files_only=True)
+            import torch
+            from transformers import AutoImageProcessor, AutoModel, AutoTokenizer
+            _patch_tied_weights_compat()                  # transformers 5.9 ↔ model custom code
+            cuda = torch.cuda.is_available()
+            self._device = "cuda" if cuda else "cpu"
+            self._dtype = torch.bfloat16 if cuda else torch.float32
             self._model = AutoModel.from_pretrained(
+                str(self._weights), dtype=self._dtype, low_cpu_mem_usage=True,
+                trust_remote_code=True, local_files_only=True,
+                device_map=self._device,
+                attn_implementation="eager").eval()  # model lacks FlashAttention-2
+            self._tokenizer = AutoTokenizer.from_pretrained(
                 str(self._weights), trust_remote_code=True, local_files_only=True)
+            self._processor = AutoImageProcessor.from_pretrained(
+                str(self._weights), device=self._device, trust_remote_code=True,
+                local_files_only=True)
             self._loaded = True
             self._load_error = ""
         except Exception as e:                            # transformers/weights/GPU absent
-            self._model = None
-            self._processor = None
+            self._model = self._processor = self._tokenizer = None
             self._loaded = False
             self._load_error = f"{type(e).__name__}: {e}"
 
+    def _sample_frames(self, clip_path: str, n: int):
+        """Sample up to `n` evenly-spaced RGB frames from a clip as PIL Images
+        (an image is returned as-is). PyAV decode; preload bundled FFmpeg if present."""
+        from PIL import Image
+        if clip_path.lower().endswith((".jpg", ".jpeg", ".png", ".webp", ".bmp")):
+            return [Image.open(clip_path).convert("RGB")]
+        try:
+            from marlin.ffmpeg_preload import preload_av_ffmpeg
+            preload_av_ffmpeg()
+        except Exception:
+            pass
+        import av
+        frames = []
+        with av.open(clip_path) as c:
+            vs = c.streams.video[0]
+            total = vs.frames or 0
+            # decode and keep every k-th frame to land ~n samples
+            step = max(1, (total // n)) if total else 1
+            for i, fr in enumerate(c.decode(vs)):
+                if i % step == 0:
+                    frames.append(Image.fromarray(fr.to_ndarray(format="rgb24")))
+                    if len(frames) >= n:
+                        break
+        return frames or None
+
     def _run_model(self, clip_path: str, prompt: str) -> tuple[str, float, int]:
-        """Real Nemotron-Nano-VL path. Reached only when load() succeeded (real
-        weights present); on a fresh box infer() never gets here. Kept minimal +
-        defensive — the exact chat/vision API is resolved when weights are wired."""
+        """Real Nemotron-Nano-VL path (image VLM → sample clip frames as multi-image).
+        Builds `<image-k>` tags + the prompt, runs `model.chat(**image_features)`."""
+        n = int(self.config.params.get("frame_sample", 4))
+        frames = self._sample_frames(clip_path, n)
+        if not frames:
+            raise RuntimeError("no frames decoded from clip")
+        # image tags must match the number of images (see examples.py).
+        if len(frames) == 1:
+            question = "<image>\n" + prompt
+        else:
+            tags = "".join(f"<image-{i+1}>: <image>\n" for i in range(len(frames)))
+            question = tags + prompt
+        image_features = self._processor(frames if len(frames) > 1 else frames[0])
+        gen = dict(max_new_tokens=self._max_output_tokens, do_sample=False,
+                   repetition_penalty=1.3,               # curb small-VLM looping → valid JSON
+                   eos_token_id=self._tokenizer.eos_token_id)
         t0 = time.perf_counter()
-        raw = self._model.chat(  # type: ignore[attr-defined]
-            self._processor, clip_path, prompt,
-            max_new_tokens=self._max_output_tokens)
+        raw = self._model.chat(tokenizer=self._tokenizer, question=question,
+                               generation_config=gen, **image_features)
         ttft_ms = (time.perf_counter() - t0) * 1000.0
-        text = raw if isinstance(raw, str) else str(raw)
-        n_tokens = max(1, len(text.split()))
+        text = raw if isinstance(raw, str) else (raw[0] if isinstance(raw, tuple) else str(raw))
+        try:
+            n_tokens = len(self._tokenizer(text).input_ids)
+        except Exception:
+            n_tokens = max(1, len(text.split()))
         return text, ttft_ms, n_tokens
 
 

@@ -72,6 +72,41 @@ def _first_json_object(text: str) -> str | None:
     return None
 
 
+def _repair_truncated(text: str) -> str | None:
+    """Salvage a JSON object truncated mid-output (small VLMs hit the token cap):
+    close a dangling string, drop trailing commas, and append the missing closing
+    brackets in stack order. Returns the repaired ``{...}`` string or None."""
+    start = text.find("{")
+    if start < 0:
+        return None
+    stack: list[str] = []
+    in_str = esc = False
+    out: list[str] = []
+    for c in text[start:]:
+        out.append(c)
+        if in_str:
+            if esc:
+                esc = False
+            elif c == "\\":
+                esc = True
+            elif c == '"':
+                in_str = False
+            continue
+        if c == '"':
+            in_str = True
+        elif c in "{[":
+            stack.append("}" if c == "{" else "]")
+        elif c in "}]" and stack and stack[-1] == c:
+            stack.pop()
+    res = "".join(out)
+    if in_str:
+        res += '"'                       # close the dangling string
+    while stack:
+        res = res.rstrip().rstrip(",")   # no trailing comma before a closer
+        res += stack.pop()
+    return res
+
+
 def _try_load(text: str) -> dict[str, Any] | None:
     """json.loads that returns a dict or None (never raises)."""
     try:
@@ -154,6 +189,10 @@ def parse_verification(raw_text: str) -> tuple[dict[str, Any], str, bool]:
         span = _first_json_object(_strip_fences(raw_text))
         if span is not None:
             obj = _try_load(span)
+    if obj is None:                                   # 4) repair a truncated object
+        repaired = _repair_truncated(_strip_fences(raw_text))
+        if repaired is not None:
+            obj = _try_load(repaired)
 
     if obj is None:
         return asdict(_unparsed(raw_text)), raw_text, False

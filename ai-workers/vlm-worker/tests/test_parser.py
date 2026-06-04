@@ -14,6 +14,17 @@ def _valid(v: dict) -> None:
     VLMVerification(**{k: v[k] for k in _KEYS})            # round-trips
 
 
+def test_truncated_json_repaired():
+    # small-VLM output cut off mid-list (hit token cap) — repaired to valid JSON
+    trunc = ('{"verdict": "unclear", "confidence": 0.1, "observed_actions": '
+             '["Person at the counter.", "Shopping basket on the counter')
+    v, _, ok = parse_verification(trunc)
+    assert ok is True
+    _valid(v)
+    assert v["verdict"] == "unclear"
+    assert any("Shopping basket" in a for a in v["observed_actions"])
+
+
 def test_clean_json():
     raw = ('{"verdict": "suspicious", "confidence": 0.8, '
            '"observed_actions": ["picked up item"], "missing_evidence": [], '
