@@ -93,7 +93,7 @@ implementation.
 | **10 ✅** Digital twin | `services/digital-twin/` — `StoreTwin` (load/validate/zones_for_point/map_event/summary); `configs/digital_twin/second_store.yaml` proves YAML-only onboarding | second store loads + validates with the same code; 5 tests green |
 | **11 ✅** Benchmark + TCO | `benchmarks/` harness (p50/p95, clips-min/GPU, tokens/sec) + `tco.py` (cost/1000-clips, /camera-month, /store-month) + 6 configs → `model_benchmark_runs`. Fake-mode default (synthetic until GPU run); real runner pluggable | harness + TCO; 28 tests green |
 | **12 ✅** Hardening | `services/security/` — auth (PLATFORM_API_KEY) + RBAC (viewer/reviewer/admin) wired into the API, audit log (`audit_log` table, migration 0002), secret redaction, retention CLI (evidence-lock, dry-run default), backup | building blocks + API auth/RBAC; 38 tests green |
-| **13** NVIDIA bake-off | model/runtime comparison (Ollama/llama.cpp/vLLM/Triton/NIM/TRT-LLM, dashboard 18); production + fallback profile + rollback | config-only NVIDIA profile swap with Grafana throughput/quality/latency/TCO deltas |
+| **13 ✅** NVIDIA bake-off | `benchmarks/bakeoff/` — runtime matrix reusing the Phase-11 harness; `select_profiles()` → production+fallback by weighted score; `rollback.py` reuses the API's `model_profiles.active` switch; rows → `model_benchmark_runs` (dashboard 18) | config-only profile swap + rollback; 20 tests. Numbers synthetic until real runtimes on GPU |
 
 ## Critical path & parallelism
 

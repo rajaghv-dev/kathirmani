@@ -66,7 +66,7 @@ grafana: ## Print the Grafana URL
 	@echo "Grafana: http://localhost:3000 (admin/admin) — dashboards 01-18"
 
 # ---- DB + workers + tests (filled per phase) --------------------------------
-.PHONY: migrate migrate-down migrate-status seed backfill api run-cv-worker run-rule-engine run-vlm-worker index search run-review-ui summarize parity retention-dryrun retention-apply backup dashboards twin-validate ingest-sample run-workers test test-e2e bench evidence-demo
+.PHONY: migrate migrate-down migrate-status seed backfill api run-cv-worker run-rule-engine run-vlm-worker index search run-review-ui summarize parity retention-dryrun retention-apply backup dashboards twin-validate ingest-sample run-workers test test-e2e bench bakeoff evidence-demo
 migrate: ## Apply db/migrations (Postgres)
 	python3 scripts/db_migrate.py up
 migrate-down: ## Roll back the latest migration
@@ -108,7 +108,7 @@ dashboards: ## Phase 3: (re)generate the 01-18 Grafana dashboard JSONs
 	python3 observability/grafana/make_dashboards.py
 twin-validate: ## Phase 10: validate a store digital twin (STORE=configs/stores/kathirmani.yaml)
 	.venv/bin/python -c "import sys; sys.path.insert(0,'services/digital-twin'); from loader import load_twin; t=load_twin('$(or $(STORE),configs/stores/kathirmani.yaml)'); p=t.validate(); print(t.summary()); print('problems:',p); sys.exit(1 if p else 0)"
-TESTDIRS := tests/ ingestion/tests/ services/api/tests/ services/digital-twin/tests/ services/rule-engine/tests/ services/evidence-builder/tests/ services/review-ui/tests/ services/security/tests/ ai-workers/cv-oss-worker/tests/ ai-workers/vlm-worker/tests/ ai-workers/embedding-worker/tests/ ai-workers/vss-eval-worker/tests/ benchmarks/tests/ observability/tests/
+TESTDIRS := tests/ ingestion/tests/ services/api/tests/ services/digital-twin/tests/ services/rule-engine/tests/ services/evidence-builder/tests/ services/review-ui/tests/ services/security/tests/ ai-workers/cv-oss-worker/tests/ ai-workers/vlm-worker/tests/ ai-workers/embedding-worker/tests/ ai-workers/vss-eval-worker/tests/ benchmarks/tests/ benchmarks/bakeoff/tests/ observability/tests/
 # Per-component (isolated) runs: the hyphenated worker dirs aren't packages and share
 # module basenames (plugin.py/worker.py), so collecting them together clashes. The
 # tests/ deselect skips a live-Grafana integration test (env-dependent, not platform code).
@@ -121,6 +121,8 @@ test-e2e: ## Full-scenario chain: ingest → backfill → cv → rules → vlm �
 	@echo "e2e: make ingest-sample && make backfill && make run-workers ONCE=1 && make evidence-demo INCIDENT=<id>"
 bench: ## Phase 11: run all benchmarks (fake mode) → model_benchmark_runs + reports
 	.venv/bin/python -m benchmarks.run --all
+bakeoff: ## Phase 13: NVIDIA runtime bake-off (fake) → ranked production/fallback profile
+	.venv/bin/python -m benchmarks.bakeoff.run --task vlm_clip_reasoning
 evidence-demo: ## Phase 7: build an evidence package (INCIDENT=<incident_id>)
 	cd services/evidence-builder && ../../.venv/bin/python -m builder $(INCIDENT)
 

@@ -1,0 +1,204 @@
+{
+  "task": "vlm_clip_reasoning",
+  "model_profile_name": "nvidia_gb10_retail_balanced",
+  "gpu_name": "DGX_SPARK_GB10",
+  "dataset_name": "golden_retail_loss_v1",
+  "generated_at": "2026-06-04T10:12:04.219469+00:00",
+  "synthetic": true,
+  "synthetic_warning": "SYNTHETIC \u2014 fake timing model, not measured on a GPU. The bake-off structure, scoring, and rollback are real; throughput/latency/cost are placeholders until the candidate runtimes (vLLM/Triton/NIM/TensorRT-LLM) run on the GPU.",
+  "weights": {
+    "throughput": 0.35,
+    "latency": 0.25,
+    "quality": 0.25,
+    "cost": 0.15
+  },
+  "production": "llama_cpp",
+  "fallback": "transformers",
+  "rationale": {
+    "production": "llama_cpp: top balanced score 0.260 (weights {'throughput': 0.35, 'latency': 0.25, 'quality': 0.25, 'cost': 0.15}); available. SYNTHETIC ranking \u2014 re-run on GPU with real runtimes to confirm.",
+    "fallback": "transformers: most-robust degrade target (available=True, kind=local, score=0.250).",
+    "note": "All metrics are synthetic (fake timing model). The selection logic, scoring weights, and rollback are real; numbers are placeholders until the candidate runtimes run on the GPU."
+  },
+  "runtimes": [
+    {
+      "runtime": "tensorrt_llm",
+      "available": false,
+      "kind": "server",
+      "notes": "compiled engine; fastest target \u2014 UNPROVEN/uninstalled here.",
+      "clips_per_min": 63.324538258575195,
+      "p95_latency_ms": 1170.25,
+      "ttft_ms_p95": 210.0,
+      "tokens_per_sec": 254.11784095326297,
+      "quality_score": 0.96,
+      "avg_power_w": 260.0,
+      "cost_per_1000_clips_inr": 0.6843055555555556,
+      "tco": {
+        "avg_power_w": 260.0,
+        "electricity_rate_inr_per_kwh": 10.0,
+        "n_cameras": 5,
+        "cost_per_hour_inr": 2.6,
+        "cost_per_1000_clips_inr": 0.6843055555555556,
+        "cost_per_camera_month_inr": 374.4,
+        "cost_per_store_month_inr": 1872.0
+      },
+      "norm": {
+        "throughput": 1.0,
+        "latency": 1.0,
+        "quality": 1.0,
+        "cost": 1.0
+      },
+      "balanced_score": 1.0,
+      "synthetic": true
+    },
+    {
+      "runtime": "nim",
+      "available": false,
+      "kind": "container",
+      "notes": "NGC NIM container; needs NGC key + nvidia docker runtime \u2014 deferred.",
+      "clips_per_min": 57.295645530939645,
+      "p95_latency_ms": 1296.68,
+      "ttft_ms_p95": 240.0,
+      "tokens_per_sec": 232.64269841137954,
+      "quality_score": 0.96,
+      "avg_power_w": 250.0,
+      "cost_per_1000_clips_inr": 0.7272222222222223,
+      "tco": {
+        "avg_power_w": 250.0,
+        "electricity_rate_inr_per_kwh": 10.0,
+        "n_cameras": 5,
+        "cost_per_hour_inr": 2.5,
+        "cost_per_1000_clips_inr": 0.7272222222222223,
+        "cost_per_camera_month_inr": 360.0,
+        "cost_per_store_month_inr": 1800.0
+      },
+      "norm": {
+        "throughput": 0.8499727478627152,
+        "latency": 0.9382198441203059,
+        "quality": 1.0,
+        "cost": 0.9432506887052341
+      },
+      "balanced_score": 0.9235330260878118,
+      "synthetic": true
+    },
+    {
+      "runtime": "vllm",
+      "available": false,
+      "kind": "server",
+      "notes": "batched server; throughput target \u2014 UNPROVEN on aarch64/Blackwell.",
+      "clips_per_min": 46.278441959120705,
+      "p95_latency_ms": 1608.35,
+      "ttft_ms_p95": 300.0,
+      "tokens_per_sec": 188.66235996280815,
+      "quality_score": 0.96,
+      "avg_power_w": 240.0,
+      "cost_per_1000_clips_inr": 0.8643333333333334,
+      "tco": {
+        "avg_power_w": 240.0,
+        "electricity_rate_inr_per_kwh": 10.0,
+        "n_cameras": 5,
+        "cost_per_hour_inr": 2.4,
+        "cost_per_1000_clips_inr": 0.8643333333333334,
+        "cost_per_camera_month_inr": 345.6,
+        "cost_per_store_month_inr": 1728.0
+      },
+      "norm": {
+        "throughput": 0.5758128228501975,
+        "latency": 0.785921962422732,
+        "quality": 1.0,
+        "cost": 0.7619467401285583
+      },
+      "balanced_score": 0.7623069896225358,
+      "synthetic": true
+    },
+    {
+      "runtime": "llama_cpp",
+      "available": true,
+      "kind": "local",
+      "notes": "GGUF via llama.cpp; portable, slight quant quality loss.",
+      "clips_per_min": 29.347028613352897,
+      "p95_latency_ms": 2534.55,
+      "ttft_ms_p95": 470.0,
+      "tokens_per_sec": 119.3445990934022,
+      "quality_score": 0.93,
+      "avg_power_w": 145.0,
+      "cost_per_1000_clips_inr": 0.8234791666666668,
+      "tco": {
+        "avg_power_w": 145.0,
+        "electricity_rate_inr_per_kwh": 10.0,
+        "n_cameras": 5,
+        "cost_per_hour_inr": 1.45,
+        "cost_per_1000_clips_inr": 0.8234791666666668,
+        "cost_per_camera_month_inr": 208.8,
+        "cost_per_store_month_inr": 1044.0
+      },
+      "norm": {
+        "throughput": 0.15447949783973267,
+        "latency": 0.3333333333333332,
+        "quality": 0.0,
+        "cost": 0.8159687786960514
+      },
+      "balanced_score": 0.25979647438164744,
+      "synthetic": true
+    },
+    {
+      "runtime": "transformers",
+      "available": true,
+      "kind": "local",
+      "notes": "reference eager path (CUDA); installed today but slowest.",
+      "clips_per_min": 23.139220979560353,
+      "p95_latency_ms": 3216.7,
+      "ttft_ms_p95": 620.0,
+      "tokens_per_sec": 95.37701415143555,
+      "quality_score": 0.96,
+      "avg_power_w": 200.0,
+      "cost_per_1000_clips_inr": 1.4405555555555558,
+      "tco": {
+        "avg_power_w": 200.0,
+        "electricity_rate_inr_per_kwh": 10.0,
+        "n_cameras": 5,
+        "cost_per_hour_inr": 2.0,
+        "cost_per_1000_clips_inr": 1.4405555555555558,
+        "cost_per_camera_month_inr": 288.0,
+        "cost_per_store_month_inr": 1440.0
+      },
+      "norm": {
+        "throughput": 0.0,
+        "latency": 0.0,
+        "quality": 1.0,
+        "cost": 0.0
+      },
+      "balanced_score": 0.25,
+      "synthetic": true
+    },
+    {
+      "runtime": "ollama",
+      "available": true,
+      "kind": "server",
+      "notes": "portable GGUF; default generative runtime on this box.",
+      "clips_per_min": 27.347310847766636,
+      "p95_latency_ms": 2728.6,
+      "ttft_ms_p95": 500.0,
+      "tokens_per_sec": 111.06786626185163,
+      "quality_score": 0.93,
+      "avg_power_w": 150.0,
+      "cost_per_1000_clips_inr": 0.9141666666666668,
+      "tco": {
+        "avg_power_w": 150.0,
+        "electricity_rate_inr_per_kwh": 10.0,
+        "n_cameras": 5,
+        "cost_per_hour_inr": 1.5,
+        "cost_per_1000_clips_inr": 0.9141666666666668,
+        "cost_per_camera_month_inr": 216.0,
+        "cost_per_store_month_inr": 1080.0
+      },
+      "norm": {
+        "throughput": 0.10471709950648538,
+        "latency": 0.23851059151213075,
+        "quality": 0.0,
+        "cost": 0.6960514233241506
+      },
+      "balanced_score": 0.20068634620392517,
+      "synthetic": true
+    }
+  ]
+}

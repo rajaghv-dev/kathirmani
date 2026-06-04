@@ -99,6 +99,16 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   GStreamerSource is the live/Phase-4 slot.
 
 ## Phases status (parallel-agent build)
+- **ALL 14 PHASES (0–13) BUILT ✅** via 5 dependency-ordered waves of parallel agents.
+  `make test` = 264 component tests green (isolated per-dir). Phase 13 W5:
+  `benchmarks/bakeoff/` (runtime matrix + select_profiles production/fallback +
+  rollback reusing API model_profiles.active; 20 tests). `make bakeoff`.
+- **Honest caveats / real-hardware follow-ups** (code is wired + tested with fakes;
+  these need real weights/runtimes/GPU): real Nemotron-VL chat-API + summary (fake
+  now); GPU-real benchmark + bake-off numbers (synthetic now); C-RADIO dim≠768 →
+  projection or dim migration; DeepStream/NIM/TAO need an NGC key; multi-object
+  tracking (TrackingPlugin) for true track_ids; audit_log app-role GRANTs; live-RTSP
+  GStreamer splitmuxsink (Phase 1.5).
 - **0–12 ✅ (13 next).** W4 (parallel): Phase 7 `services/evidence-builder/`
   (PyAV 20s stitch + sha256 + timeline) + `services/review-ui/` (:8010 audited
   approve/reject); Phase 9 `ai-workers/vss-eval-worker/` (nvidia_summary + §A4.2
