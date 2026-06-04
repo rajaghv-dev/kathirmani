@@ -80,9 +80,9 @@ implementation.
 
 | Phase | Goal | Done-when |
 |-------|------|-----------|
-| **0** Skeleton | Makefile, 3 compose files (base/gpu/observability — wrap the existing stack), `configs/` (cameras/stores/zones/models/rules/retention), `ModelPlugin` interface, NVIDIA model policy + `validate-model-config` | `make up` green; policy validator passes NVIDIA / fails non-NVIDIA default |
-| **1** OSS ingestion | FFmpeg/GStreamer → 10-sec clips + 5-sec windows @2s stride → MinIO + Postgres rows + Redis messages; camera health. **Files first, RTSP second.** | 5-camera footage segmented, registered, queued, visible in Grafana |
-| **2** DB + API | `db/migrations` + `schema.sql` (§6 + A6 model tables); FastAPI CRUD + model-registry endpoints; seed kathirmani | workers/UI use stable API contracts; `make migrate && seed` idempotent |
+| **0 ✅** Skeleton | Makefile, 3 compose files (base/gpu/observability — wrap the existing stack), `configs/` (cameras/stores/zones/models/rules/retention), `ModelPlugin` interface, NVIDIA model policy + `validate-model-config` | `make up` green; policy validator passes NVIDIA / fails non-NVIDIA default |
+| **1 ✅** OSS ingestion | PyAV → 10-sec clips + 5-sec windows @2s stride → filesystem + JSONL + queue; camera health. **Files done; live RTSP (GStreamer) = 1.5.** | 5-camera footage segmented, registered, queued; `ingest_*` metrics |
+| **2 ✅** DB + API | `db/migrations` + `schema.sql` (§6 + A6, 19 tables, partitioned events, job_queue); `PgQueue` (SKIP LOCKED); JSON→rows backfill; FastAPI (+ model-registry endpoints); seed kathirmani | workers/UI use stable API contracts; `make migrate && seed && backfill` idempotent |
 | **3** Observability | dashboards 01–18, `model_*` metrics (additive to `marlin_*`), Loki per-service, OTel traces, DCGM GPU | a failed event traces RTSP→model output |
 | **4** CV worker | `cv-oss-worker` (wrap `marlin.locate` YOLOE) first, then `cv-deepstream-worker` — same `DetectionPlugin` contract | CV worker emits common event schema, visible in dashboard 04 |
 | **5** Rule engine | deterministic zone/dwell/interaction/billing-bypass/health rules + incidents; start golden dataset | explainable suspicious-item events raised **without** a VLM |

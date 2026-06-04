@@ -115,3 +115,10 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   schema `db/migrations/0001_init.up.sql` + `db/schema.sql` (19 tables incl. partitioned
   events + job_queue). `db/` is a package (`db/__init__.py`) — needed so the `db`
   validator doesn't shadow it. DSN default in `db/db.py`.
+- **Phase 2 complete (0✅1✅2✅).** `PgQueue` (SKIP LOCKED, `ingestion/bus.py`:
+  publish/consume/ack/fail) = the platform queue (Redis optional). `make backfill`
+  (scripts/backfill_ingest.py) loads ingestion JSONL → video_segments/ai_windows.
+  `make api` = FastAPI `services/api/app.py` (/health,/cameras,/segments,/events,
+  /incidents + A2.5 model-registry endpoints). 12 tests pass. Verified: migrate→seed→
+  ingest→backfill = 3 seg+10 win in PG. Next: Phase 3 (scrape `ingest_*`/`model_*`) ∥
+  Phase 4 (cv-oss-worker consuming PgQueue).

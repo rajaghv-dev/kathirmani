@@ -66,7 +66,7 @@ grafana: ## Print the Grafana URL
 	@echo "Grafana: http://localhost:3000 (admin/admin) — dashboards 01-18"
 
 # ---- DB + workers + tests (filled per phase) --------------------------------
-.PHONY: migrate migrate-down migrate-status seed ingest-sample run-workers test test-e2e bench evidence-demo
+.PHONY: migrate migrate-down migrate-status seed backfill api ingest-sample run-workers test test-e2e bench evidence-demo
 migrate: ## Apply db/migrations (Postgres)
 	python3 scripts/db_migrate.py up
 migrate-down: ## Roll back the latest migration
@@ -77,6 +77,10 @@ seed: ## Seed kathirmani store/cameras/zones + model profiles/registry
 	python3 scripts/db_seed.py
 ingest-sample: ## Segment the 5 .mkv into 10-sec clips + 5-sec windows (DURATION=secs)
 	python3 -m ingestion $(if $(DURATION),--duration $(DURATION),--duration 30) $(if $(CAMERA),--camera $(CAMERA),)
+backfill: ## Load ingestion JSONL (data/metadata) into Postgres
+	python3 scripts/backfill_ingest.py
+api: ## Run the platform API (FastAPI/uvicorn on :8000)
+	.venv/bin/uvicorn services.api.app:app --host 0.0.0.0 --port 8000
 run-workers: ## [stub→Phase 4/6] start cv/vlm/embedding plugin-host workers
 	@echo "[stub] Phase 4/6: start workers for profile=$(PROFILE)"
 test: ## Run the test suite (platform + ingestion)
