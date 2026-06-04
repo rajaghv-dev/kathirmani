@@ -1,0 +1,7 @@
+# Core model inference (the src/marlin cascade). Heavy; GPU box only.
+torch>=2.11.0
+transformers>=5.7.0
+accelerate
+qwen-vl-utils>=0.0.14
+torchcodec          # decode backend (uses PyAV's bundled FFmpeg)
+av                  # PyAV — bundled FFmpeg libs; also the ingestion segmenter

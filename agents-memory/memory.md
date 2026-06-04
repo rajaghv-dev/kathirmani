@@ -101,4 +101,17 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
 ## Spec index
 `01` overview · `02` architecture · `03` models/queries · `04` observability ·
 `05` performance · `06` hardware-portability · `07` runbook · `08` dashboards ·
-`09` repo-structure · `10` platform-roadmap · `11` model-plugin-policy.
+`09` repo-structure · `10` platform-roadmap · `11` model-plugin-policy ·
+`12` frameworks (requirements/ split + setup/validate) · `13` models (catalog/provenance).
+
+## Setup + validation framework (per component)
+- Frameworks per component: `requirements/{base,inference,ingestion,db,api,models,
+  observability,dev,optional}.txt`; root `requirements.txt` `-r`'s them.
+- Setup: `scripts/setup/<c>.sh` + `make setup-<c>` (env/ingestion/db/models/api/
+  observability/gpu). `make setup` = all Python deps; `make setup-inference` = torch.
+- Validate: `scripts/validate/<c>.py` + `make validate-<c>`; `make validate`/`doctor`
+  = status matrix. Rule: import-missing = FAIL, service-down = WARN. → `spec/12`.
+- DB now real: `make migrate`/`migrate-down`/`seed` (scripts/db_migrate.py, db_seed.py);
+  schema `db/migrations/0001_init.up.sql` + `db/schema.sql` (19 tables incl. partitioned
+  events + job_queue). `db/` is a package (`db/__init__.py`) — needed so the `db`
+  validator doesn't shadow it. DSN default in `db/db.py`.

@@ -1,0 +1,3 @@
+# Optional backends — OFF by default (Postgres + filesystem are the defaults; spec/10).
+redis               # high-fanout queue alternative to the Postgres job_queue
+minio               # S3/object-store alternative to local NVMe for clip blobs

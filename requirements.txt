@@ -1,26 +1,11 @@
-# Core inference
-torch>=2.11.0
-transformers>=5.7.0
-accelerate
-qwen-vl-utils>=0.0.14
-
-# Video decoding
-# torchcodec is the required backend; it uses PyAV's bundled FFmpeg via RTLD_GLOBAL preload
-# (no system FFmpeg install needed - run_inference.py handles this automatically)
-torchcodec
-av        # provides bundled FFmpeg shared libs used by torchcodec
-
-# Image processing
-pillow
-
-# Metrics
-prometheus_client
-requests
-
-# Platform — ingestion (Phase 1) + config
-pyyaml
-# Phase 2 (Postgres = metadata + queue via SKIP LOCKED; the core platform store):
-#   psycopg[binary]
-# Optional backends, only if scale demands them (off by default — see docker-compose):
-#   redis   # high-fanout queue alternative to Postgres
-#   minio   # S3/object-store alternative to local NVMe for clip blobs
+# Aggregate of the per-component framework files in requirements/.
+# Frameworks map + rationale: spec/12-frameworks.md.
+# Per-component setup:  bash scripts/setup/<component>.sh   ·  validate: make validate
+-r requirements/base.txt
+-r requirements/inference.txt
+-r requirements/ingestion.txt
+-r requirements/db.txt
+-r requirements/api.txt
+-r requirements/models.txt
+-r requirements/dev.txt
+# optional backends (not installed by default):  pip install -r requirements/optional.txt

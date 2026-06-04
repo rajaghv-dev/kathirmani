@@ -1,0 +1,6 @@
+# Shared runtime libs (every component). Frameworks map: spec/12-frameworks.md.
+prometheus_client
+requests
+pyyaml
+numpy
+pillow

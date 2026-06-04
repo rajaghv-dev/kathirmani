@@ -1,0 +1,2 @@
+# Observability is mostly Docker services (Prometheus/Grafana/Loki/Netdata/renderer/DCGM)
+# — see docker-compose.observability.yml. Python side uses prometheus_client (base.txt).

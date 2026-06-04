@@ -1,0 +1,3 @@
+# Dev + docs tooling.
+pytest
+matplotlib          # design/make_figures.py infographic figures

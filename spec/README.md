@@ -19,3 +19,5 @@ This spec/ directory is the reorganized, structured documentation for the Kathir
 | [09-repo-structure.md](09-repo-structure.md) | The `src/marlin` package layout, the root entry-point shims, path anchoring, and how every command stays unchanged. |
 | [10-platform-roadmap.md](10-platform-roadmap.md) | **Forward-looking.** The OSS-ingestion + NVIDIA-model platform the repo is heading toward (master plan v2): current-vs-target gap, the 14-phase build, critical path, anti-goals, acceptance. |
 | [11-model-plugin-policy.md](11-model-plugin-policy.md) | **Forward-looking.** The NVIDIA-only model policy + the `ModelPlugin` layer, registry/profiles/catalog, `model_runs` audit, additive `model_*` metrics, and why Qwen is comparison-only. |
+| [12-frameworks.md](12-frameworks.md) | Frameworks per component (the `requirements/` split) + how each is set up (`scripts/setup/`) and validated (`scripts/validate/` + `make validate`/`doctor`). |
+| [13-models.md](13-models.md) | Consolidated model map: current cascade + the free NVIDIA lineup (real IDs), provenance pinning, the config-driven runtimes, and per-inference tracking. |

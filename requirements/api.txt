@@ -1,0 +1,3 @@
+# Phase 2 — platform API + model-registry endpoints.
+fastapi
+uvicorn[standard]

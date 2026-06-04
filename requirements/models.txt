@@ -1,0 +1,2 @@
+# Model acquisition (free NVIDIA models from HuggingFace, pinned by revision).
+huggingface_hub

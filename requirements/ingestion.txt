@@ -1,0 +1,2 @@
+# Phase 1 ingestion. PyAV segments video; numpy/pillow (base) for health/thumbnails.
+av
