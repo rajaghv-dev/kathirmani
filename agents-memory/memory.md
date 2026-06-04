@@ -64,6 +64,18 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   layer; NVIDIA models (maybe stubbed) are production default. Swap = config, not
   code. → `spec/11`.
 
+## Grafana image renderer (live infra note, 2026-06-04)
+- The live `grafana` container was compose-managed by `~/Documents/raja/monitoring/`
+  but that compose file is **gone** (dir root-owned, only leftovers). State is in the
+  named volume `monitoring_grafanadata` on net `monitoring_default`; no provisioning
+  bind mount (dashboards live in the volume).
+- Added a `renderer` (grafana/grafana-image-renderer, arm64) sidecar on that net and
+  **recreated `grafana`** with `GF_RENDERING_SERVER_URL=http://renderer:8081/render`
+  + `GF_RENDERING_CALLBACK_URL=http://grafana:3000/` (same image/volume/port → data
+  preserved). Original config saved at `/tmp/grafana_original_inspect.json`.
+- Render dashboards → PNG: `bash scripts/render_dashboards.sh`. Codified in
+  `docker-compose.observability.yml` (renderer service + grafana rendering env).
+
 ## Data stack — Postgres + filesystem, drop Redis/MinIO from default (decision)
 - **Postgres (+pgvector) = ALL structured state incl. the job queue** (`SELECT … FOR
   UPDATE SKIP LOCKED`), replacing Redis. Modest msg rate at 30 cams → ample;

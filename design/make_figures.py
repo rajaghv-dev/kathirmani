@@ -122,6 +122,76 @@ def fig_cascade():
     fig.tight_layout(); fig.savefig(OUT / "cascade_flow.png", dpi=160); plt.close(fig)
 
 
-for f in (fig_events, fig_efficiency, fig_dedup, fig_cascade):
+# ---- Figure 5: platform architecture (landscape flow) -----------------------
+def fig_architecture():
+    fig, ax = plt.subplots(figsize=(13, 4.2)); ax.axis("off"); ax.set_xlim(0, 13); ax.set_ylim(0, 4.2)
+    boxes = [
+        ("Cameras", "5 CCTV feeds\n/ RTSP", 0.3),
+        ("Ingestion", "10-sec clips\n5-sec windows", 2.45),
+        ("Store", "Postgres + pgvector\n+ local NVMe", 4.6),
+        ("AI workers", "YOLOE / DeepStream\nNemotron-VL", 6.75),
+        ("Rules +\nevidence", "zones · dwell ·\nbilling-bypass", 8.9),
+        ("Review +\nGrafana", "approve/reject\ndashboards", 11.05),
+    ]
+    for title, desc, x in boxes:
+        ax.add_patch(FancyBboxPatch((x, 1.5), 1.75, 1.5, boxstyle="round,pad=0.04,rounding_size=0.1",
+                                    fc="#f5f7f2", ec=NV, lw=1.8))
+        ax.text(x + 0.875, 2.62, title, ha="center", va="center", fontsize=11.5, fontweight="bold", color=INK)
+        ax.text(x + 0.875, 1.95, desc, ha="center", va="center", fontsize=8.3, color=SLATE)
+    for x in (2.05, 4.2, 6.35, 8.5, 10.65):
+        ax.add_patch(FancyArrowPatch((x, 2.25), (x + 0.4, 2.25), arrowstyle="-|>", mutation_scale=16, color=SLATE, lw=1.8))
+    ax.text(6.5, 3.6, "Kathirmani Video-AI Platform — OSS ingestion, NVIDIA models, evidence-first",
+            ha="center", fontsize=15, fontweight="bold", color=INK)
+    ax.text(6.5, 0.75, "free/open NVIDIA models · swappable by config · explainable in Grafana",
+            ha="center", fontsize=9.5, style="italic", color=MUTED)
+    fig.tight_layout(); fig.savefig(OUT / "platform_architecture.png", dpi=160); plt.close(fig)
+
+
+# ---- Figure 6: operator one-pager (portrait composite) ----------------------
+def fig_one_pager():
+    total_ev = summary.get("total_events", 0)
+    fig = plt.figure(figsize=(8.5, 11)); fig.patch.set_facecolor(BG)
+    ax = fig.add_axes([0, 0, 1, 1]); ax.axis("off"); ax.set_xlim(0, 1); ax.set_ylim(0, 1)
+    # header band
+    ax.add_patch(plt.Rectangle((0, 0.9), 1, 0.1, color=NV))
+    ax.text(0.5, 0.95, "AI eyes on your store", ha="center", va="center", fontsize=26, fontweight="bold", color="white")
+    ax.text(0.5, 0.875, "Turn the CCTV you already have into alerts you can trust",
+            ha="center", fontsize=12, color=SLATE)
+    # step row
+    steps = [("5 cameras", "watch the store"), ("AI cascade", "finds what matters"),
+             ("Alerts + clips", "with human review")]
+    for i, (t, d) in enumerate(steps):
+        x = 0.18 + i * 0.32
+        ax.add_patch(plt.Circle((x, 0.76), 0.035, color=NV))
+        ax.text(x, 0.76, str(i + 1), ha="center", va="center", fontsize=14, fontweight="bold", color="white")
+        ax.text(x, 0.70, t, ha="center", fontsize=12, fontweight="bold", color=INK)
+        ax.text(x, 0.665, d, ha="center", fontsize=9, color=MUTED)
+    # what it finds
+    ax.text(0.08, 0.60, "What it spots", fontsize=15, fontweight="bold", color=NV)
+    finds = ["Suspicious item handling near shelves", "Leaving without billing (loss prevention)",
+             "Time-stamped events across all 5 cameras", "Camera health (blocked / frozen / dark)",
+             "Natural-language search of footage"]
+    for i, f in enumerate(finds):
+        ax.text(0.10, 0.555 - i * 0.038, "•", fontsize=14, color=NV)
+        ax.text(0.13, 0.555 - i * 0.038, f, fontsize=11, color=INK, va="center")
+    # stat cards
+    cards = [(f"₹{econ.get('cost_inr', 0):.3f}", "to analyze 5 cameras"),
+             (f"{econ.get('energy_wh', 0):.1f} Wh", "of electricity"),
+             (f"{total_ev}", "events flagged"),
+             (f"~{econ.get('wall_time_sec', 0)/60:.0f} min", "end to end")]
+    for i, (big, sub) in enumerate(cards):
+        x = 0.08 + (i % 2) * 0.46; y = 0.28 - (i // 2) * 0.13
+        ax.add_patch(FancyBboxPatch((x, y), 0.40, 0.10, boxstyle="round,pad=0.005,rounding_size=0.02",
+                                    fc="#f5f7f2", ec=NV, lw=1.3, transform=ax.transAxes))
+        ax.text(x + 0.20, y + 0.066, big, ha="center", fontsize=20, fontweight="bold", color=INK)
+        ax.text(x + 0.20, y + 0.025, sub, ha="center", fontsize=9.5, color=MUTED)
+    # footer
+    ax.add_patch(plt.Rectangle((0, 0), 1, 0.05, color=NV))
+    ax.text(0.5, 0.025, "Evidence, not just alerts — every flag links to a clip + a human decision",
+            ha="center", va="center", fontsize=11, fontweight="bold", color="white")
+    fig.savefig(OUT / "operator_one_pager.png", dpi=150); plt.close(fig)
+
+
+for f in (fig_events, fig_efficiency, fig_dedup, fig_cascade, fig_architecture, fig_one_pager):
     f(); print("wrote", f.__name__)
 print(f"figures -> {OUT.relative_to(ROOT)}")

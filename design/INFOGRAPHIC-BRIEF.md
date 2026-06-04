@@ -42,19 +42,35 @@ efficiency"). Make two variants if needed.
 5. **Explainable** — Grafana dashboards a non-ML operator can read.
 6. **Multi-store by design** — onboard a new store with YAML, not code.
 
-## 4. Rendered figures (in `design/figures/`)
+## 4. Rendered assets (in `design/figures/`)
+
+**Data figures** (matplotlib, from `results/*.json`; regenerate: `python design/make_figures.py`):
 
 | File | Use for |
 |------|---------|
 | `cascade_flow.png` | the 3-stage WHEN→WHERE→WHAT cascade |
+| `platform_architecture.png` | the full pipeline, left-to-right |
+| `operator_one_pager.png` | a ready vertical one-pager (owner audience) |
 | `events_per_camera.png` | per-camera activity bar chart |
 | `efficiency_cards.png` | the cost/energy stat cards |
 | `cross_camera_dedup.png` | 5 angles → one store-wide truth |
 
-**Live dashboard to screenshot in-browser** (the image-renderer plugin isn't
-installed, so capture manually): Grafana `http://localhost:3000` (admin/admin) →
-**Dashboards › Marlin Inference › "Model Performance & Usefulness"**
-(`/d/marlin-model-perf`). Run `bash start_stack.sh` first if panels are empty.
+**Real Grafana dashboard screenshots** (server-side rendered PNGs; regenerate:
+`bash scripts/render_dashboards.sh`):
+
+| File | Dashboard |
+|------|-----------|
+| `dashboard_model_performance.png` | Model Performance & Usefulness (headline) |
+| `dashboard_economy.png` | Compute economy / cost |
+| `dashboard_cameras.png` | Per-camera views |
+| `dashboard_fused.png` | Store-wide / fused |
+| `dashboard_pipeline.png` | Model output quality |
+| `dashboard_qwen.png` | Loss-prevention (Qwen) |
+
+> The Grafana **image renderer** is now installed (a `renderer` sidecar +
+> `GF_RENDERING_SERVER_URL` on Grafana). Live dashboard: `http://localhost:3000`
+> (admin/admin) → **Marlin Inference › Model Performance & Usefulness**
+> (`/d/marlin-model-perf`). Run `bash start_stack.sh` first if panels are empty.
 
 ## 5. Diagrams to render (Mermaid — paste into a Mermaid renderer or an AI tool)
 
