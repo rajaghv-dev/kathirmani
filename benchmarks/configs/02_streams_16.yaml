@@ -1,0 +1,18 @@
+# Phase 11 Benchmark 2 — 16 camera streams (mid-density store).
+# Detector-throughput shape (§A9.1). Higher stream count → higher power + latency.
+name: streams_16
+task: detection
+model_profile_name: nvidia_production_default
+gpu_name: DGX_SPARK_GB10
+dataset_name: kathirmani_live_16cam
+
+streams: 16
+n_items: 600
+video_sec_per_item: 5.0
+n_cameras: 16
+
+fake:
+  base_latency_ms: 70    # contention with 16 streams (synthetic)
+  jitter_ms: 25
+  power_w: 130
+  stages: [decode, preprocess, infer, postprocess, zone_map]

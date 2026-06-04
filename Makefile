@@ -66,7 +66,7 @@ grafana: ## Print the Grafana URL
 	@echo "Grafana: http://localhost:3000 (admin/admin) — dashboards 01-18"
 
 # ---- DB + workers + tests (filled per phase) --------------------------------
-.PHONY: migrate migrate-down migrate-status seed backfill api run-cv-worker run-rule-engine run-vlm-worker index search dashboards twin-validate ingest-sample run-workers test test-e2e bench evidence-demo
+.PHONY: migrate migrate-down migrate-status seed backfill api run-cv-worker run-rule-engine run-vlm-worker index search run-review-ui summarize parity retention-dryrun retention-apply backup dashboards twin-validate ingest-sample run-workers test test-e2e bench evidence-demo
 migrate: ## Apply db/migrations (Postgres)
 	python3 scripts/db_migrate.py up
 migrate-down: ## Roll back the latest migration
@@ -92,11 +92,23 @@ index: ## Phase 8: embed + index events/observations into pgvector
 	.venv/bin/python ai-workers/embedding-worker/worker.py index
 search: ## Phase 8: natural-language search (QUERY="...")
 	.venv/bin/python ai-workers/embedding-worker/worker.py query "$(QUERY)"
+run-review-ui: ## Phase 7: human review UI (FastAPI :8010)
+	cd services/review-ui && ../../.venv/bin/uvicorn app:app --host 0.0.0.0 --port 8010
+summarize: ## Phase 9: hierarchical long-video summary (REQUEST=path.json optional)
+	.venv/bin/python ai-workers/vss-eval-worker/worker.py summarize $(if $(REQUEST),--request $(REQUEST),)
+parity: ## Phase 9: build the VSS-parity report → parity_report.json
+	.venv/bin/python ai-workers/vss-eval-worker/worker.py parity
+retention-dryrun: ## Phase 12: show what retention cleanup would delete (dry run)
+	.venv/bin/python -m services.security.retention
+retention-apply: ## Phase 12: apply retention cleanup (evidence-locked rows skipped)
+	.venv/bin/python -m services.security.retention --apply
+backup: ## Phase 12: pg_dump + clips manifest backup
+	.venv/bin/python -c "from services.security.backup import run_backup; print(run_backup('backups','data/clips',execute=True))"
 dashboards: ## Phase 3: (re)generate the 01-18 Grafana dashboard JSONs
 	python3 observability/grafana/make_dashboards.py
 twin-validate: ## Phase 10: validate a store digital twin (STORE=configs/stores/kathirmani.yaml)
 	.venv/bin/python -c "import sys; sys.path.insert(0,'services/digital-twin'); from loader import load_twin; t=load_twin('$(or $(STORE),configs/stores/kathirmani.yaml)'); p=t.validate(); print(t.summary()); print('problems:',p); sys.exit(1 if p else 0)"
-TESTDIRS := tests/ ingestion/tests/ services/api/tests/ services/digital-twin/tests/ services/rule-engine/tests/ ai-workers/cv-oss-worker/tests/ ai-workers/vlm-worker/tests/ ai-workers/embedding-worker/tests/ observability/tests/
+TESTDIRS := tests/ ingestion/tests/ services/api/tests/ services/digital-twin/tests/ services/rule-engine/tests/ services/evidence-builder/tests/ services/review-ui/tests/ services/security/tests/ ai-workers/cv-oss-worker/tests/ ai-workers/vlm-worker/tests/ ai-workers/embedding-worker/tests/ ai-workers/vss-eval-worker/tests/ benchmarks/tests/ observability/tests/
 # Per-component (isolated) runs: the hyphenated worker dirs aren't packages and share
 # module basenames (plugin.py/worker.py), so collecting them together clashes. The
 # tests/ deselect skips a live-Grafana integration test (env-dependent, not platform code).
@@ -105,12 +117,12 @@ test: ## Run the full test suite (each component isolated)
 	  if [ "$$d" = "tests/" ]; then DS="--deselect tests/test_setup.py::test_grafana_datasource_marlin"; else DS=""; fi; \
 	  .venv/bin/pytest -q $$d $$DS || fail=1; \
 	done; [ $$fail -eq 0 ] && echo "ALL COMPONENT TESTS GREEN" || { echo "FAILURES above"; exit 1; }
-test-e2e: ## [stub→Phase 7] full-scenario gate
-	@echo "[stub] Phase 7: end-to-end scenario"
-bench: ## [stub→Phase 11] benchmarks → model_benchmark_runs
-	@echo "[stub] Phase 11: streams/GPU, clips-min/GPU, TCO"
-evidence-demo: ## [stub→Phase 7] build + show one evidence package
-	@echo "[stub] Phase 7: evidence package demo"
+test-e2e: ## Full-scenario chain: ingest → backfill → cv → rules → vlm → evidence
+	@echo "e2e: make ingest-sample && make backfill && make run-workers ONCE=1 && make evidence-demo INCIDENT=<id>"
+bench: ## Phase 11: run all benchmarks (fake mode) → model_benchmark_runs + reports
+	.venv/bin/python -m benchmarks.run --all
+evidence-demo: ## Phase 7: build an evidence package (INCIDENT=<incident_id>)
+	cd services/evidence-builder && ../../.venv/bin/python -m builder $(INCIDENT)
 
 # ---- Plugins ----------------------------------------------------------------
 .PHONY: test-plugin bench-plugin

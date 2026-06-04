@@ -1,0 +1,20 @@
+# Phase 11 Benchmark 5 — 100 suspicious-event VLM verifications.
+# VLM-clip-reasoning shape (§A9.2): the cascade's gated VLM step (retail_loss_v1).
+# Drives the vlm-worker plugin host in real mode; fake timing model by default.
+name: vlm_verify_100
+task: clip_reasoning
+model_profile_name: nvidia_production_default
+gpu_name: DGX_SPARK_GB10
+dataset_name: golden_retail_loss_v1
+
+n_items: 100              # 100 suspicious events to verify
+video_sec_per_item: 20.0  # pre/during/post ~20-sec evidence clip
+n_cameras: 5
+
+fake:
+  base_latency_ms: 2200   # verification VLM latency (synthetic)
+  jitter_ms: 600
+  power_w: 190
+  tokens_per_item: 180    # JSON verdict tokens (synthetic)
+  ttft_ms: 500
+  stages: [decode_clip, prefill, decode, parse]

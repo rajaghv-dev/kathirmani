@@ -1,0 +1,19 @@
+# Phase 11 Benchmark 6 — natural-language search over 24 hours of footage.
+# Embedding/search shape (§A9.3): embeddings/sec, query/fusion/critic latency.
+# 24h × 5 cameras of 5-sec windows ≈ a large index; we benchmark a fixed N queries
+# against a pre-built index (the embedding-worker C-RADIO plugin in real mode).
+name: search_24h
+task: video_search
+model_profile_name: nvidia_production_default   # C-RADIO embed + critic (A5)
+gpu_name: DGX_SPARK_GB10
+dataset_name: kathirmani_24h_index
+
+n_items: 200             # NL search queries to run over the 24h index
+video_sec_per_item: 0.0  # search is per-query, not per-video-second
+n_cameras: 5
+
+fake:
+  base_latency_ms: 320    # embed-query + pgvector fuse + Nemotron critic (synthetic)
+  jitter_ms: 80
+  power_w: 90
+  stages: [embed_query, vector_search, fuse, critic_rerank]

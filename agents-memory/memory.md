@@ -99,6 +99,16 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   GStreamerSource is the live/Phase-4 slot.
 
 ## Phases status (parallel-agent build)
+- **0–12 ✅ (13 next).** W4 (parallel): Phase 7 `services/evidence-builder/`
+  (PyAV 20s stitch + sha256 + timeline) + `services/review-ui/` (:8010 audited
+  approve/reject); Phase 9 `ai-workers/vss-eval-worker/` (nvidia_summary + §A4.2
+  staged LVS + `parity_report.json`); Phase 11 `benchmarks/` (harness + TCO + 6
+  configs → model_benchmark_runs, **fake-mode default**, real runner pluggable);
+  Phase 12 `services/security/` (auth+RBAC **wired into services/api**:
+  PLATFORM_API_KEY unset=dev-open via `_optional_auth`, set=enforced; admin-gate on
+  /activate; audit_log = migration **0002**; retention CLI evidence-lock dry-run;
+  redaction; backup). `make` targets: run-review-ui/summarize/parity/bench/
+  retention-dryrun/-apply/backup/evidence-demo. Benchmarks results gitignored.
 - **0✅1✅2✅3✅4✅5✅6✅8✅10✅.** W3 (parallel): Phase 6 VLM worker
   `ai-workers/vlm-worker/` (plugin host: Nemotron-VL/Qwen baseline + fake_infer,
   prompt pack, JSON repair, vlm_observations+model_runs; 22 tests; publishes

@@ -9,12 +9,32 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+import logging
+
+from fastapi import Depends, FastAPI, Header, HTTPException
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from db import connect  # noqa: E402
+from services.security.auth import _configured_key, require_auth  # noqa: E402
+from services.security.rbac import require_role  # noqa: E402
 
-app = FastAPI(title="Kathirmani Video-AI Platform API", version="0.2.0")
+if _configured_key() is None:  # secure-by-default primitive; the API opens it in dev
+    logging.getLogger("uvicorn.error").warning(
+        "PLATFORM_API_KEY unset — API is UNAUTHENTICATED (dev mode). Set it to enforce auth/RBAC.")
+
+
+def _optional_auth(authorization: str | None = Header(default=None),
+                   x_api_key: str | None = Header(default=None, alias="X-API-Key")) -> str:
+    """Dev-permissive wrapper over the strict require_auth: OPEN when no key is
+    configured (local/dev/tests), ENFORCED the moment PLATFORM_API_KEY is set."""
+    if _configured_key() is None:
+        return "anonymous-dev"
+    return require_auth(authorization, x_api_key)
+
+
+# Global authn (dev-permissive without a key); per-route RBAC below.
+app = FastAPI(title="Kathirmani Video-AI Platform API", version="0.2.0",
+              dependencies=[Depends(_optional_auth)])
 
 
 def _rows(sql: str, params: tuple = ()) -> list[dict]:
@@ -76,7 +96,8 @@ def active_profile():
     return rows[0]
 
 
-@app.post("/api/model-registry/activate/{profile_name}")
+@app.post("/api/model-registry/activate/{profile_name}",
+          dependencies=[Depends(require_role("admin"))])
 def activate(profile_name: str):
     with connect() as conn, conn.cursor() as cur:
         cur.execute("SELECT 1 FROM model_profiles WHERE profile_name=%s", (profile_name,))

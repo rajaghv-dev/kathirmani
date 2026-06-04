@@ -1,0 +1,22 @@
+# Phase 11 Benchmark 1 — 5 camera streams (the kathirmani pilot shape).
+# Detector-throughput shape per master plan §A9.1 (fps/streams/p95/gpu_mem).
+# Fake mode synthesizes timings; real mode drives the cv-oss-worker DetectionPlugin.
+name: streams_5
+task: detection
+model_profile_name: nvidia_production_default   # A5 NVIDIA-default profile
+gpu_name: DGX_SPARK_GB10
+dataset_name: kathirmani_live_5cam
+
+# Workload shape: 5 streams × 5-sec AI windows @2s stride over a window of footage.
+# 5 cameras, 1 window/2s → ~2.5 windows/sec target; we benchmark a fixed N clips.
+streams: 5
+n_items: 300            # synthetic clips to push through
+video_sec_per_item: 5.0 # each AI window is a 5-sec clip
+n_cameras: 5            # for TCO cost/camera-month
+
+# Fake timing model (synthetic — replace with real runner on the GPU).
+fake:
+  base_latency_ms: 45    # per 5-sec-clip detector latency (synthetic)
+  jitter_ms: 15
+  power_w: 70            # avg GPU power while serving 5 streams (synthetic)
+  stages: [decode, preprocess, infer, postprocess, zone_map]

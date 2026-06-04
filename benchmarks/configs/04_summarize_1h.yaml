@@ -1,0 +1,20 @@
+# Phase 11 Benchmark 4 — 1-hour archived-video summarization.
+# VLM-clip-reasoning shape (§A9.2): clips/min/GPU, video-sec/sec, ttft, tokens/sec.
+# 1 hour = 3600 video-sec; chunked into 30-sec summary clips → 120 items.
+name: summarize_1h
+task: clip_reasoning
+model_profile_name: nvidia_production_default   # Nemotron-VL default (A5)
+gpu_name: DGX_SPARK_GB10
+dataset_name: archived_1h_summary
+
+n_items: 120              # 3600s / 30s per summary chunk
+video_sec_per_item: 30.0  # 30-sec chunks → total_video_sec = 3600 (1 hour)
+n_cameras: 1
+
+fake:
+  base_latency_ms: 1800   # VLM clip summarization latency (synthetic)
+  jitter_ms: 400
+  power_w: 180
+  tokens_per_item: 256    # summary tokens (synthetic) → tokens/sec
+  ttft_ms: 450            # time-to-first-token (synthetic)
+  stages: [decode_clip, prefill, decode, parse]

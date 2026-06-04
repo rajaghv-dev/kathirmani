@@ -31,9 +31,23 @@ def test_cameras_list():
 
 
 @pytest.mark.skipif(not _db_ok(), reason="no Postgres")
-def test_model_registry_and_activate():
-    assert client.get("/api/model-registry").status_code == 200
-    r = client.post("/api/model-registry/activate/nvidia_gb10_retail_balanced")
-    assert r.status_code == 200
-    assert client.get("/api/model-registry/active").json()["profile_name"] == "nvidia_gb10_retail_balanced"
-    assert client.post("/api/model-registry/activate/does_not_exist").status_code == 404
+def test_model_registry_and_activate(monkeypatch):
+    assert client.get("/api/model-registry").status_code == 200   # dev-open read
+    # activate is admin-gated → run keyed (require_role enforces auth + role)
+    monkeypatch.setenv("PLATFORM_API_KEY", "k")
+    admin = {"X-API-Key": "k", "X-Role": "admin"}
+    assert client.post("/api/model-registry/activate/nvidia_gb10_retail_balanced", headers=admin).status_code == 200
+    assert client.get("/api/model-registry/active", headers={"X-API-Key": "k"}).json()["profile_name"] == "nvidia_gb10_retail_balanced"
+    assert client.post("/api/model-registry/activate/does_not_exist", headers=admin).status_code == 404
+    # right key, wrong role → 403 (RBAC)
+    assert client.post("/api/model-registry/activate/nvidia_gb10_retail_balanced",
+                       headers={"X-API-Key": "k", "X-Role": "viewer"}).status_code == 403
+    # keyed but no token → 401 (authn)
+    assert client.post("/api/model-registry/activate/nvidia_gb10_retail_balanced",
+                       headers={"X-Role": "admin"}).status_code == 401
+
+
+def test_auth_enforced_when_keyed(monkeypatch):
+    monkeypatch.setenv("PLATFORM_API_KEY", "secret-test-key")
+    assert client.get("/cameras").status_code == 401          # no creds → 401
+    assert client.get("/cameras", headers={"X-API-Key": "secret-test-key"}).status_code != 401  # valid key passes auth

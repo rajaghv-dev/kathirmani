@@ -1,0 +1,18 @@
+# Phase 11 Benchmark 3 — 32 camera streams (high-density / scale-out probe).
+# Detector-throughput shape (§A9.1). Stresses streams/GPU + p95 under load.
+name: streams_32
+task: detection
+model_profile_name: nvidia_production_default
+gpu_name: DGX_SPARK_GB10
+dataset_name: kathirmani_live_32cam
+
+streams: 32
+n_items: 1000
+video_sec_per_item: 5.0
+n_cameras: 32
+
+fake:
+  base_latency_ms: 110   # heavier contention with 32 streams (synthetic)
+  jitter_ms: 40
+  power_w: 220
+  stages: [decode, preprocess, infer, postprocess, zone_map]

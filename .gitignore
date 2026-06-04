@@ -37,3 +37,7 @@ grafana/results/
 
 # stray model artifact at repo root (TorchScript text embedder)
 mobileclip_blt.ts
+
+# synthetic benchmark outputs (regenerate via `make bench`)
+benchmarks/results/*.json
+backups/
