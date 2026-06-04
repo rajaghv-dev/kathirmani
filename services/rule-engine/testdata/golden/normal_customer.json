@@ -1,0 +1,48 @@
+{
+  "clip_id": "golden_normal_customer",
+  "notes": "Person picks an item at a shelf, then goes through the billing counter before leaving. Visiting billing suppresses the possible_loss incident; the brief shelf touch does not dwell long enough to be suspicious.",
+  "events": [
+    {
+      "type": "event.created",
+      "event_id": "bbbbbbbb-0000-0000-0000-000000000001",
+      "store_id": "kathirmani_01",
+      "camera_id": "left_aisle",
+      "event_type": "person_track",
+      "track_id": "p2",
+      "ts": 0.0,
+      "zones": ["left_shelf_zone"],
+      "zone_types": ["shelf"],
+      "objects": ["person", "item"],
+      "object_near_hand": false,
+      "has_item": true
+    },
+    {
+      "type": "event.created",
+      "event_id": "bbbbbbbb-0000-0000-0000-000000000002",
+      "store_id": "kathirmani_01",
+      "camera_id": "bill_counter",
+      "event_type": "person_track",
+      "track_id": "p2",
+      "ts": 12.0,
+      "zones": ["bill_counter_zone"],
+      "zone_types": ["billing_counter"],
+      "objects": ["person", "item"],
+      "has_item": true
+    },
+    {
+      "type": "event.created",
+      "event_id": "bbbbbbbb-0000-0000-0000-000000000003",
+      "store_id": "kathirmani_01",
+      "camera_id": "entry_exit",
+      "event_type": "person_track",
+      "track_id": "p2",
+      "ts": 20.0,
+      "zones": ["exit_zone"],
+      "zone_types": ["exit"],
+      "objects": ["person"],
+      "has_item": true
+    }
+  ],
+  "expected_events": [],
+  "expected_incident": null
+}

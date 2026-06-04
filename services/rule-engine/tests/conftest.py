@@ -1,0 +1,11 @@
+"""Test setup: put the repo root and this package dir on sys.path so
+`import rules`, `import engine`, `import worker`, and `from ingestion...` all
+work without an editable install (the dir name `rule-engine` isn't importable)."""
+import sys
+from pathlib import Path
+
+_PKG = Path(__file__).resolve().parents[1]            # services/rule-engine
+_ROOT = Path(__file__).resolve().parents[3]           # repo root
+for p in (str(_ROOT), str(_PKG)):
+    if p not in sys.path:
+        sys.path.insert(0, p)

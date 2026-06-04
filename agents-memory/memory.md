@@ -99,7 +99,12 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   GStreamerSource is the live/Phase-4 slot.
 
 ## Phases status (parallel-agent build)
-- **0✅1✅2✅3✅4✅10✅.** Wave-1 (parallel agents): `observability/` (dashboard
+- **0✅1✅2✅3✅4✅5✅10✅.** W2: Phase 5 rule engine `services/rule-engine/`
+  (deterministic per-track windows over event_rules.yaml; consumes/republishes
+  `event.created`; raises events + `possible_loss` incidents; golden fixtures; 22
+  tests). Integration gap: CV worker emits zone *ids* + no track_id/ts hints — engine
+  has fallbacks (cam:<id>); true tracking = future TrackingPlugin.
+- Wave-1 (parallel agents): `observability/` (dashboard
   generator + 18 JSONs + scrape/otel/promtail), `ai-workers/cv-oss-worker/` (YOLOE→
   DetectionPlugin, fake fallback, consumes ai_window.ready), `services/digital-twin/`
   (StoreTwin + second-store demo). `make run-cv-worker`/`dashboards`/`twin-validate`.

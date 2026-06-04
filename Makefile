@@ -66,7 +66,7 @@ grafana: ## Print the Grafana URL
 	@echo "Grafana: http://localhost:3000 (admin/admin) — dashboards 01-18"
 
 # ---- DB + workers + tests (filled per phase) --------------------------------
-.PHONY: migrate migrate-down migrate-status seed backfill api run-cv-worker dashboards twin-validate ingest-sample run-workers test test-e2e bench evidence-demo
+.PHONY: migrate migrate-down migrate-status seed backfill api run-cv-worker run-rule-engine dashboards twin-validate ingest-sample run-workers test test-e2e bench evidence-demo
 migrate: ## Apply db/migrations (Postgres)
 	python3 scripts/db_migrate.py up
 migrate-down: ## Roll back the latest migration
@@ -83,12 +83,14 @@ api: ## Run the platform API (FastAPI/uvicorn on :8000)
 	.venv/bin/uvicorn services.api.app:app --host 0.0.0.0 --port 8000
 run-cv-worker: ## Phase 4: OSS CV worker — consume ai_window.ready, emit detections/events
 	cd ai-workers/cv-oss-worker && INGEST_QUEUE=pg ../../.venv/bin/python -m worker $(if $(ONCE),--once,) --limit $(or $(LIMIT),8)
-run-workers: run-cv-worker ## Start the AI workers (cv now; vlm/embedding land Phase 6/8)
+run-rule-engine: ## Phase 5: rule engine — consume event.created, raise hypotheses + incidents
+	cd services/rule-engine && INGEST_QUEUE=pg ../../.venv/bin/python -m worker $(if $(ONCE),--once,) --limit $(or $(LIMIT),8)
+run-workers: run-cv-worker run-rule-engine ## Start the AI workers (cv + rules; vlm/embedding land Phase 6/8)
 dashboards: ## Phase 3: (re)generate the 01-18 Grafana dashboard JSONs
 	python3 observability/grafana/make_dashboards.py
 twin-validate: ## Phase 10: validate a store digital twin (STORE=configs/stores/kathirmani.yaml)
 	.venv/bin/python -c "import sys; sys.path.insert(0,'services/digital-twin'); from loader import load_twin; t=load_twin('$(or $(STORE),configs/stores/kathirmani.yaml)'); p=t.validate(); print(t.summary()); print('problems:',p); sys.exit(1 if p else 0)"
-TESTDIRS := tests/ ingestion/tests/ services/api/tests/ services/digital-twin/tests/ ai-workers/cv-oss-worker/tests/ observability/tests/
+TESTDIRS := tests/ ingestion/tests/ services/api/tests/ services/digital-twin/tests/ services/rule-engine/tests/ ai-workers/cv-oss-worker/tests/ observability/tests/
 test: ## Run the full test suite (platform + all components)
 	pytest -q $(TESTDIRS)
 test-e2e: ## [stub→Phase 7] full-scenario gate

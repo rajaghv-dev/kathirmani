@@ -1,0 +1,22 @@
+{
+  "clip_id": "golden_camera_blocked",
+  "notes": "A camera reports a low health score (blocked/black/frozen frame). Should raise a camera_health_issue event (warning), no incident.",
+  "events": [
+    {
+      "type": "event.created",
+      "event_id": "cccccccc-0000-0000-0000-000000000001",
+      "store_id": "kathirmani_01",
+      "camera_id": "right_aisle",
+      "event_type": "camera_health",
+      "ts": 0.0,
+      "zones": [],
+      "zone_types": [],
+      "objects": [],
+      "camera_health_score": 0.2
+    }
+  ],
+  "expected_events": [
+    {"event_type": "camera_health_issue", "rule_id": "camera_health_issue", "needs_vlm_verification": false}
+  ],
+  "expected_incident": null
+}
