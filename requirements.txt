@@ -16,3 +16,11 @@ pillow
 # Metrics
 prometheus_client
 requests
+
+# Platform — ingestion (Phase 1) + config
+pyyaml
+# Phase 2 (Postgres = metadata + queue via SKIP LOCKED; the core platform store):
+#   psycopg[binary]
+# Optional backends, only if scale demands them (off by default — see docker-compose):
+#   redis   # high-fanout queue alternative to Postgres
+#   minio   # S3/object-store alternative to local NVMe for clip blobs

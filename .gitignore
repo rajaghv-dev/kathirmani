@@ -1,6 +1,8 @@
 .venv/
 .env
 !.env.example
+# ingestion runtime output: clips, thumbnails, metadata, queue
+data/
 # results/ intentionally tracked — inference JSONs are part of the repo
 *.mkv
 *.mp4
@@ -32,3 +34,6 @@ prometheus/consoles/
 
 .claude/
 grafana/results/
+
+# stray model artifact at repo root (TorchScript text embedder)
+mobileclip_blt.ts

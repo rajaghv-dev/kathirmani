@@ -45,8 +45,8 @@ migrate: ## [stub→Phase 2] apply db/migrations
 	@echo "[stub] Phase 2: apply db/migrations to Postgres"
 seed: ## [stub→Phase 2] seed kathirmani store/cameras/zones
 	@echo "[stub] Phase 2: seed from configs/stores/kathirmani.yaml"
-ingest-sample: ## [stub→Phase 1] segment the 5 .mkv into clips/windows
-	@echo "[stub] Phase 1: ingest configs/cameras.yaml source files"
+ingest-sample: ## Segment the 5 .mkv into 10-sec clips + 5-sec windows (DURATION=secs)
+	python3 -m ingestion $(if $(DURATION),--duration $(DURATION),--duration 30) $(if $(CAMERA),--camera $(CAMERA),)
 run-workers: ## [stub→Phase 4/6] start cv/vlm/embedding plugin-host workers
 	@echo "[stub] Phase 4/6: start workers for profile=$(PROFILE)"
 test: ## Run the test suite

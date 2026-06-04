@@ -1,9 +1,13 @@
-# Base data services (master plan §14.2): Postgres+pgvector, Redis Streams, MinIO.
-# Phase 0 brings these up; Phase 1/2 use them. Secrets come from .env (never inline).
+# Data services. DECISION (2026-06-03): collapse the pilot stack onto **Postgres +
+# the local filesystem**. Postgres (+pgvector) holds ALL structured state — metadata,
+# events, vectors, model_runs, AND the job queue (SKIP LOCKED), replacing Redis. Clip
+# *blobs* live on local NVMe (ingestion LocalFSStorage), NOT in Postgres. Redis + MinIO
+# are kept as OPTIONAL backends (profile "optional") for if scale later demands them
+# (high-fanout queue / S3 multi-node). See spec/10 "Data stack". Secrets via .env.
 name: kathirmani-platform
 
 services:
-  postgres:
+  postgres:                              # core: structured state + queue (pgvector)
     image: pgvector/pgvector:pg16
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-kathir}
@@ -18,19 +22,20 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
+  redis:                                 # OPTIONAL — only if a high-fanout queue is needed
     image: redis:7
     command: ["redis-server", "--appendonly", "yes"]
     ports: ["${REDIS_PORT:-6379}:6379"]
     volumes:
       - redisdata:/data
+    profiles: ["optional"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  minio:
+  minio:                                 # OPTIONAL — only if S3 API / multi-node storage is needed
     image: minio/minio
     command: ["server", "/data", "--console-address", ":9001"]
     environment:
@@ -41,6 +46,7 @@ services:
       - "${MINIO_CONSOLE_PORT:-9001}:9001"
     volumes:
       - miniodata:/data
+    profiles: ["optional"]
     healthcheck:
       test: ["CMD", "mc", "ready", "local"]
       interval: 15s

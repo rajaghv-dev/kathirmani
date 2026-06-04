@@ -50,6 +50,27 @@ default. Because everything sits behind the plugin contract, swapping NVIDIA wei
 in is a config flip, not a refactor. Full detail in
 [11-model-plugin-policy.md](11-model-plugin-policy.md).
 
+## Data stack — Postgres + filesystem (decision, 2026-06-03)
+
+The master plan named Postgres + Redis + MinIO. For a single-box pilot we **collapse
+to Postgres + the local filesystem**, keeping Redis/MinIO as optional backends behind
+the ingestion abstractions (so nothing is wasted and scale can re-enable them):
+
+- **Postgres (+pgvector) holds ALL structured state** — metadata, events, vectors,
+  `model_runs`, **and the job queue** via `SELECT … FOR UPDATE SKIP LOCKED`. At
+  30-camera scale the message rate is modest, so a Postgres queue is ample; it adds
+  transactional enqueue+state (no dual-write), one fewer service, and an auditable
+  queue-as-table (good for the trust posture). **Redis** stays an *optional*
+  high-fanout backend (`RedisStreamQueue`) — revisit only at Kafka-scale fan-out.
+- **Clip blobs live on local NVMe**, not in Postgres. Storing video bytes in Postgres
+  (BYTEA/large objects) bloats the DB + WAL, wrecks backup/restore, and can't
+  range-serve video to the review UI. Postgres stores **paths + checksums**; the
+  filesystem stores the bytes (`LocalFSStorage`). **MinIO** stays an *optional* backend
+  for when S3 API / multi-node / lifecycle tiering is needed.
+- Net: the pilot runs on **one service (Postgres) + files** — smaller ops + security
+  surface, and it matches the repo's file-first ethos (spec/02). The ingestion backends
+  are pluggable (`ingestion/{storage,bus,metadata}.py`), so this is config, not a rewrite.
+
 ## Phased build (master plan §15 + Addendum A12)
 
 Each phase = one branch = one PR, ends green (its test gate passes, observability

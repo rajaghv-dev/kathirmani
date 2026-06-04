@@ -64,6 +64,28 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   layer; NVIDIA models (maybe stubbed) are production default. Swap = config, not
   code. → `spec/11`.
 
+## Data stack — Postgres + filesystem, drop Redis/MinIO from default (decision)
+- **Postgres (+pgvector) = ALL structured state incl. the job queue** (`SELECT … FOR
+  UPDATE SKIP LOCKED`), replacing Redis. Modest msg rate at 30 cams → ample;
+  transactional + auditable. Redis kept OPTIONAL (high-fanout only).
+- **Clip blobs on local NVMe** (`LocalFSStorage`), NOT in Postgres (BYTEA bloats
+  DB/WAL/backup, no range-serve). Postgres stores paths+checksums. MinIO OPTIONAL
+  (S3/multi-node only). → `spec/10` Data stack; docker-compose redis/minio = profile
+  "optional" (off by default). Pilot = one service (Postgres) + files.
+
+## Ingestion media stack — PyAV now, GStreamer for live/HW (decision)
+- **Files (Phase 1): PyAV** (libav) — vetted repo dep, bundled-FFmpeg preload, no
+  system ffmpeg, in-process + testable. `ingestion/` segments .mkv → 10-sec clips.
+- **Live RTSP: GStreamer** (`gst 1.24` on box; Python `gi` NOT installed → drive via
+  gst-launch/subprocess). `rtspsrc ! rtph264depay ! h264parse ! splitmuxsink
+  max-size-time=10s` = stream-copy 10-sec clips, no re-encode. The live clip writer.
+- **Frame gating = mechanism vs policy.** GStreamer/DeepStream supply the *mechanism*
+  to ignore frames for inference (`videorate` fps cap, keyframe-only, DeepStream
+  `nvinfer interval=N`, `motioncells`); the *policy* of which frames matter (motion,
+  zone activity, cascade `route_to_vlm`) stays OUR deterministic logic. = "do less
+  work" + hot/cold two-tier. `ingestion/sources.py` Source ABC: File/Rtsp (PyAV) now,
+  GStreamerSource is the live/Phase-4 slot.
+
 ## Spec index
 `01` overview · `02` architecture · `03` models/queries · `04` observability ·
 `05` performance · `06` hardware-portability · `07` runbook · `08` dashboards ·
