@@ -97,8 +97,14 @@ dashboards: ## Phase 3: (re)generate the 01-18 Grafana dashboard JSONs
 twin-validate: ## Phase 10: validate a store digital twin (STORE=configs/stores/kathirmani.yaml)
 	.venv/bin/python -c "import sys; sys.path.insert(0,'services/digital-twin'); from loader import load_twin; t=load_twin('$(or $(STORE),configs/stores/kathirmani.yaml)'); p=t.validate(); print(t.summary()); print('problems:',p); sys.exit(1 if p else 0)"
 TESTDIRS := tests/ ingestion/tests/ services/api/tests/ services/digital-twin/tests/ services/rule-engine/tests/ ai-workers/cv-oss-worker/tests/ ai-workers/vlm-worker/tests/ ai-workers/embedding-worker/tests/ observability/tests/
-test: ## Run the full test suite (platform + all components)
-	pytest -q $(TESTDIRS)
+# Per-component (isolated) runs: the hyphenated worker dirs aren't packages and share
+# module basenames (plugin.py/worker.py), so collecting them together clashes. The
+# tests/ deselect skips a live-Grafana integration test (env-dependent, not platform code).
+test: ## Run the full test suite (each component isolated)
+	@fail=0; for d in $(TESTDIRS); do echo "→ $$d"; \
+	  if [ "$$d" = "tests/" ]; then DS="--deselect tests/test_setup.py::test_grafana_datasource_marlin"; else DS=""; fi; \
+	  .venv/bin/pytest -q $$d $$DS || fail=1; \
+	done; [ $$fail -eq 0 ] && echo "ALL COMPONENT TESTS GREEN" || { echo "FAILURES above"; exit 1; }
 test-e2e: ## [stub→Phase 7] full-scenario gate
 	@echo "[stub] Phase 7: end-to-end scenario"
 bench: ## [stub→Phase 11] benchmarks → model_benchmark_runs
