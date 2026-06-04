@@ -1,0 +1,48 @@
+# Platform scrape configs (Phase 3) — the NEW `ingest_*` and `model_*` targets.
+#
+# This file is ADDITIVE to the existing prometheus/prometheus.yml (which already
+# scrapes `marlin_inference` on serve_metrics:8900 and `netdata`). It does NOT
+# replace it — Prometheus has no native include directive, so wire it in one of:
+#
+#   (a) Append these scrape_configs blocks under the existing `scrape_configs:`
+#       in prometheus/prometheus.yml, OR
+#   (b) Run a second Prometheus / use a config-merge step that concatenates this
+#       file's jobs into the live config.
+#
+# See observability/README.md for the exact integration line.
+#
+# Ports (documented):
+#   ingestion /metrics  -> :8901  (ingestion/config.py METRICS_PORT = 8901, ingest_*)
+#   model worker /metrics -> :8902 (chosen for the plugin-host worker, model_*)
+#   dcgm-exporter        -> :9400  (docker-compose.observability.yml DCGM_PORT, gpu-metrics profile)
+#
+# Hostnames assume the docker-compose.observability.yml network; for a bare-metal
+# run replace `ingestion`/`worker`/`dcgm-exporter` with `localhost`.
+
+scrape_configs:
+  # Ingestion service /metrics — the `ingest_*` family (segments, windows, frames,
+  # camera health). Powers dashboards 01 (ingestion), 02 (camera), 03 (queue), 09 (twin).
+  - job_name: kathir_ingestion
+    scrape_interval: 15s
+    static_configs:
+      - targets: ["ingestion:8901"]      # bare-metal: ["localhost:8901"]
+        labels:
+          service: ingestion
+
+  # Model plugin-host worker /metrics — the `model_*` namespace (requests, latency,
+  # ttft, tokens, clips, precision/recall). Powers dashboards 03-08 and 11-18.
+  - job_name: kathir_model_worker
+    scrape_interval: 15s
+    static_configs:
+      - targets: ["worker:8902"]         # bare-metal: ["localhost:8902"]
+        labels:
+          service: model-worker
+
+  # DCGM GPU exporter — optional, only when the `gpu-metrics` compose profile is up
+  # (needs the NVIDIA Docker runtime + NGC pull). Powers GPU panels in dashboard 06.
+  - job_name: kathir_dcgm
+    scrape_interval: 10s
+    static_configs:
+      - targets: ["dcgm-exporter:9400"]  # bare-metal: ["localhost:9400"]
+        labels:
+          service: dcgm

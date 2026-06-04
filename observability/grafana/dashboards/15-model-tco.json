@@ -1,0 +1,194 @@
+{
+  "title": "15 — Model TCO",
+  "uid": "kathir-15-model-tco",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "15s",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "tags": [
+    "kathir",
+    "model-benchmarks"
+  ],
+  "panels": [
+    {
+      "type": "text",
+      "title": "About this dashboard",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 5
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "### 15 — Model TCO\nCost efficiency per model/profile: clips/min/GPU and video-sec throughput as the per-GPU work rate, with GPU memory footprint as the capacity cost. Lets the Phase-13 bake-off rank GPU/server profiles by cost/store-month. **Template** for currency math (needs a price input); throughput + footprint are real. Metrics: `model_*`."
+      },
+      "id": 1
+    },
+    {
+      "type": "stat",
+      "title": "Video seconds processed",
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "options": {
+        "colorMode": "background",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "green"
+              }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(model_video_seconds_processed_total)",
+          "legendFormat": "Video seconds processed"
+        }
+      ],
+      "id": 2
+    },
+    {
+      "type": "stat",
+      "title": "Peak GPU memory",
+      "gridPos": {
+        "x": 6,
+        "y": 5,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "options": {
+        "colorMode": "background",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "orange"
+              }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "max(model_gpu_memory_used_bytes)",
+          "legendFormat": "Peak GPU memory"
+        }
+      ],
+      "id": 3
+    },
+    {
+      "type": "timeseries",
+      "title": "Clips/min/GPU by profile",
+      "gridPos": {
+        "x": 0,
+        "y": 9,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "drawStyle": "line"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "60 * sum(rate(model_clips_processed_total[5m])) by (profile)",
+          "legendFormat": "{{profile}}"
+        }
+      ],
+      "id": 4
+    },
+    {
+      "type": "bargauge",
+      "title": "Peak GPU memory by model",
+      "gridPos": {
+        "x": 0,
+        "y": 17,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "min": 0,
+          "color": {
+            "mode": "continuous-BlYlRd"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "max(model_gpu_memory_used_bytes) by (model_id)",
+          "legendFormat": "{{model_id}}"
+        }
+      ],
+      "id": 5
+    }
+  ]
+}

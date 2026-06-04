@@ -1,0 +1,309 @@
+{
+  "title": "14 — Model Quality",
+  "uid": "kathir-14-model-quality",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "15s",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "tags": [
+    "kathir",
+    "model-benchmarks"
+  ],
+  "panels": [
+    {
+      "type": "text",
+      "title": "About this dashboard",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 5
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "### 14 — Model Quality\nPrecision/recall and golden-regression per model/dataset — the accuracy arm of the bake-off. Pair with throughput (12) and latency (13) to judge whether a faster model sacrifices quality. JSON-parse success is the structured-output reliability proxy. Metrics: `model_event_precision`, `model_event_recall`, `model_golden_regression_score`, `model_json_parse_total`."
+      },
+      "id": 1
+    },
+    {
+      "type": "gauge",
+      "title": "Best precision",
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 6,
+        "h": 6
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "showThresholdMarkers": true
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "red"
+              },
+              {
+                "value": 0.6,
+                "color": "yellow"
+              },
+              {
+                "value": 0.85,
+                "color": "green"
+              }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "max(model_event_precision)",
+          "legendFormat": "Best precision"
+        }
+      ],
+      "id": 2
+    },
+    {
+      "type": "gauge",
+      "title": "Best recall",
+      "gridPos": {
+        "x": 6,
+        "y": 5,
+        "w": 6,
+        "h": 6
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "showThresholdMarkers": true
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "red"
+              },
+              {
+                "value": 0.6,
+                "color": "yellow"
+              },
+              {
+                "value": 0.85,
+                "color": "green"
+              }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "max(model_event_recall)",
+          "legendFormat": "Best recall"
+        }
+      ],
+      "id": 3
+    },
+    {
+      "type": "gauge",
+      "title": "Best golden score",
+      "gridPos": {
+        "x": 12,
+        "y": 5,
+        "w": 6,
+        "h": 6
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "showThresholdMarkers": true
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "red"
+              },
+              {
+                "value": 0.6,
+                "color": "yellow"
+              },
+              {
+                "value": 0.85,
+                "color": "green"
+              }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "max(model_golden_regression_score)",
+          "legendFormat": "Best golden score"
+        }
+      ],
+      "id": 4
+    },
+    {
+      "type": "bargauge",
+      "title": "Precision by model",
+      "gridPos": {
+        "x": 0,
+        "y": 11,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "color": {
+            "mode": "continuous-BlYlRd"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "max(model_event_precision) by (model_id)",
+          "legendFormat": "{{model_id}}"
+        }
+      ],
+      "id": 5
+    },
+    {
+      "type": "bargauge",
+      "title": "Recall by model",
+      "gridPos": {
+        "x": 0,
+        "y": 19,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "color": {
+            "mode": "continuous-BlYlRd"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "max(model_event_recall) by (model_id)",
+          "legendFormat": "{{model_id}}"
+        }
+      ],
+      "id": 6
+    },
+    {
+      "type": "timeseries",
+      "title": "JSON parse success ratio by model",
+      "gridPos": {
+        "x": 0,
+        "y": 27,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "drawStyle": "line"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(model_json_parse_total{result=\"ok\"}[15m])) by (model_id) / sum(rate(model_json_parse_total[15m])) by (model_id)",
+          "legendFormat": "{{model_id}}"
+        }
+      ],
+      "id": 7
+    }
+  ]
+}

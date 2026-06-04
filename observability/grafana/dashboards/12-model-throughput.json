@@ -1,0 +1,263 @@
+{
+  "title": "12 — Model Throughput",
+  "uid": "kathir-12-model-throughput",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "15s",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "tags": [
+    "kathir",
+    "model-benchmarks"
+  ],
+  "panels": [
+    {
+      "type": "text",
+      "title": "About this dashboard",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 5
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "### 12 — Model Throughput\nHow much video each model/profile chews through. clips/min/GPU and video-sec/sec are the platform's true throughput metrics (anti-goal #4). tok/s is shown for the generative VLM/LLM only. Compare profiles side by side here ahead of the Phase-13 bake-off. Metrics: `model_clips_processed_total`, `model_video_seconds_processed_total`, `model_tokens_per_second`."
+      },
+      "id": 1
+    },
+    {
+      "type": "stat",
+      "title": "Clips processed",
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "options": {
+        "colorMode": "background",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "green"
+              }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(model_clips_processed_total)",
+          "legendFormat": "Clips processed"
+        }
+      ],
+      "id": 2
+    },
+    {
+      "type": "stat",
+      "title": "Video seconds processed",
+      "gridPos": {
+        "x": 6,
+        "y": 5,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "options": {
+        "colorMode": "background",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "blue"
+              }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(model_video_seconds_processed_total)",
+          "legendFormat": "Video seconds processed"
+        }
+      ],
+      "id": 3
+    },
+    {
+      "type": "stat",
+      "title": "Output tokens",
+      "gridPos": {
+        "x": 12,
+        "y": 5,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "options": {
+        "colorMode": "background",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "purple"
+              }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(model_output_tokens_total)",
+          "legendFormat": "Output tokens"
+        }
+      ],
+      "id": 4
+    },
+    {
+      "type": "timeseries",
+      "title": "Clips/min by profile",
+      "gridPos": {
+        "x": 0,
+        "y": 9,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "drawStyle": "line"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "60 * sum(rate(model_clips_processed_total[5m])) by (profile)",
+          "legendFormat": "{{profile}}"
+        }
+      ],
+      "id": 5
+    },
+    {
+      "type": "timeseries",
+      "title": "Video-sec/sec by model",
+      "gridPos": {
+        "x": 0,
+        "y": 17,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "drawStyle": "line"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(model_video_seconds_processed_total[5m])) by (model_id)",
+          "legendFormat": "{{model_id}}"
+        }
+      ],
+      "id": 6
+    },
+    {
+      "type": "timeseries",
+      "title": "Decode tok/s by model",
+      "gridPos": {
+        "x": 0,
+        "y": 25,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "drawStyle": "line"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "model_tokens_per_second",
+          "legendFormat": "{{model_id}}"
+        }
+      ],
+      "id": 7
+    }
+  ]
+}

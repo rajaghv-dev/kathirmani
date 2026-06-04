@@ -1,0 +1,226 @@
+{
+  "title": "09 — Digital Twin",
+  "uid": "kathir-09-digital-twin",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "15s",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "tags": [
+    "kathir",
+    "platform"
+  ],
+  "panels": [
+    {
+      "type": "text",
+      "title": "About this dashboard",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 5
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "### 09 — Digital Twin\nStore/camera/zone rollup (YAML twin, Phase 10). Until twin-specific metrics exist, this rolls up the existing per-camera `ingest_*` and event signals by `store_id` so a second store onboards by YAML with this view already wired. **Template** — panels are valid and reference real metrics; richer zone overlays land with Phase 10."
+      },
+      "id": 1
+    },
+    {
+      "type": "stat",
+      "title": "Cameras reporting",
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "options": {
+        "colorMode": "background",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "blue"
+              }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "count(ingest_rtsp_connected)",
+          "legendFormat": "Cameras reporting"
+        }
+      ],
+      "id": 2
+    },
+    {
+      "type": "stat",
+      "title": "Stores reporting",
+      "gridPos": {
+        "x": 6,
+        "y": 5,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "options": {
+        "colorMode": "background",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "purple"
+              }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "count(count(ingest_camera_health_score) by (store_id))",
+          "legendFormat": "Stores reporting"
+        }
+      ],
+      "id": 3
+    },
+    {
+      "type": "timeseries",
+      "title": "Segments /s by store",
+      "gridPos": {
+        "x": 0,
+        "y": 9,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "drawStyle": "line"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(ingest_segments_written_total[5m])) by (store_id)",
+          "legendFormat": "{{store_id}}"
+        }
+      ],
+      "id": 4
+    },
+    {
+      "type": "bargauge",
+      "title": "Mean camera health by store",
+      "gridPos": {
+        "x": 0,
+        "y": 17,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "color": {
+            "mode": "continuous-BlYlRd"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "avg(ingest_camera_health_score) by (store_id)",
+          "legendFormat": "{{store_id}}"
+        }
+      ],
+      "id": 5
+    },
+    {
+      "type": "table",
+      "title": "Per-camera health by store",
+      "gridPos": {
+        "x": 0,
+        "y": 25,
+        "w": 24,
+        "h": 10
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "ingest_camera_health_score",
+          "legendFormat": "",
+          "instant": true,
+          "refId": "A"
+        },
+        {
+          "expr": "ingest_camera_fps_actual",
+          "legendFormat": "",
+          "instant": true,
+          "refId": "B"
+        }
+      ],
+      "id": 6
+    }
+  ]
+}

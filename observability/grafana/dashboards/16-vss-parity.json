@@ -1,0 +1,134 @@
+{
+  "title": "16 — VSS Parity",
+  "uid": "kathir-16-vss-parity",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "15s",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "tags": [
+    "kathir",
+    "model-benchmarks"
+  ],
+  "panels": [
+    {
+      "type": "text",
+      "title": "About this dashboard",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 5
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "### 16 — VSS Parity\nTracks which VSS-style capabilities the OSS+NVIDIA stack reaches parity on (RT-CV / embedding / LVS / search / VIOS — Phase 9). **VSS is a reference, never a runtime dependency** (spec/11). **Template:** proxies parity from quality (precision/recall) + throughput; a dedicated parity gauge lands in Phase 9. Metrics: `model_event_*`, `model_clips_processed_total`."
+      },
+      "id": 1
+    },
+    {
+      "type": "bargauge",
+      "title": "Capability quality proxy (precision by task)",
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "color": {
+            "mode": "continuous-BlYlRd"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "max(model_event_precision) by (task)",
+          "legendFormat": "{{task}}"
+        }
+      ],
+      "id": 2
+    },
+    {
+      "type": "timeseries",
+      "title": "Throughput by task (clips/min)",
+      "gridPos": {
+        "x": 0,
+        "y": 13,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "drawStyle": "line"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "60 * sum(rate(model_clips_processed_total[5m])) by (task)",
+          "legendFormat": "{{task}}"
+        }
+      ],
+      "id": 3
+    },
+    {
+      "type": "table",
+      "title": "Parity snapshot (precision / recall by task)",
+      "gridPos": {
+        "x": 0,
+        "y": 21,
+        "w": 24,
+        "h": 10
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "marlin-metrics"
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "max(model_event_precision) by (task)",
+          "legendFormat": "",
+          "instant": true,
+          "refId": "A"
+        },
+        {
+          "expr": "max(model_event_recall) by (task)",
+          "legendFormat": "",
+          "instant": true,
+          "refId": "B"
+        }
+      ],
+      "id": 4
+    }
+  ]
+}

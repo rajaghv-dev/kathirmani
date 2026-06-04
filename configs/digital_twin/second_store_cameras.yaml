@@ -1,0 +1,18 @@
+# DEMO second-store camera registry (same schema as configs/cameras.yaml).
+store_id: demo_store_02
+timezone: Asia/Kolkata
+
+cameras:
+  - id: demo_billing
+    name: "Demo Billing Cam"
+    role: billing
+    rtsp_url_env: RTSP_DEMO_BILLING
+    fps_target: 10
+    enabled: true
+
+  - id: demo_aisle
+    name: "Demo Aisle Cam"
+    role: shelf
+    rtsp_url_env: RTSP_DEMO_AISLE
+    fps_target: 10
+    enabled: true

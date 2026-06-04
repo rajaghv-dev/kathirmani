@@ -1,0 +1,68 @@
+# Promtail — ship structured per-service logs to Loki (Phase 3).
+#
+# Goal (spec/10 "Loki per-service" + the trace path): logs are searchable by
+# trace_id / camera_id / segment_id so a failed event can be traced RTSP -> model
+# output. Services should log JSON lines containing those keys; the json + labels
+# stages below promote them into Loki labels / extracted fields.
+#
+# Reads container stdout/stderr (docker compose) and any JSONL drop files under
+# the repo's logs dir. Loki is the existing service from docker-compose.observability.yml.
+#
+# Run:  promtail -config.file=observability/promtail/config.yml
+
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/promtail-positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push   # bare-metal: http://localhost:3100/...
+
+scrape_configs:
+  # ---- Docker container logs (compose stack) --------------------------------
+  - job_name: kathir_containers
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 15s
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        target_label: container
+      - source_labels: ['__meta_docker_container_label_com_docker_compose_service']
+        target_label: service
+    pipeline_stages:
+      # Parse structured JSON log lines; missing fields are simply skipped.
+      - json:
+          expressions:
+            trace_id: trace_id
+            camera_id: camera_id
+            segment_id: segment_id
+            level: level
+      - labels:
+          service:
+          camera_id:
+          level:
+      # trace_id / segment_id stay as extracted fields (high cardinality -> not labels),
+      # still searchable via LogQL `| json | trace_id="..."`.
+
+  # ---- Repo JSONL log drop files (e.g. ingestion / worker file logs) --------
+  - job_name: kathir_jsonl_files
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: kathir_jsonl
+          __path__: /var/log/kathir/*.jsonl
+    pipeline_stages:
+      - json:
+          expressions:
+            trace_id: trace_id
+            camera_id: camera_id
+            segment_id: segment_id
+            service: service
+            level: level
+      - labels:
+          service:
+          camera_id:
+          level:

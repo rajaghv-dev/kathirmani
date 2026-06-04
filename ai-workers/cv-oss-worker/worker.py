@@ -1,0 +1,226 @@
+"""cv-oss-worker loop (master plan Phase 4).
+
+Consumes the `ai_window.ready` stream, runs `CvOssDetector` per window, then:
+  * writes `detections` rows,
+  * writes a §8.3 `CommonEvent` into `events` (+ publishes it to the queue),
+  * writes a `model_runs` row,
+  * increments the `model_*` metrics (done inside the plugin).
+
+Everything that touches a service is guarded: with Postgres down, `make_queue`
+falls back to `FileQueue` and all DB writes no-op, so `run()` degrades to a
+hermetic "consume from file / write nothing" loop instead of crashing.
+
+Entrypoint: `run(once=False, limit=N)`.  `python -m` friendly via __main__.
+"""
+from __future__ import annotations
+
+import json
+import sys
+import time
+from pathlib import Path
+from typing import Any
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
+from ingestion.bus import make_queue                 # noqa: E402
+
+# Local package imports work both as a module and when run directly.
+try:
+    from .plugin import CvOssDetector
+except ImportError:                                  # run as a script
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from plugin import CvOssDetector
+
+STREAM = "ai_window.ready"
+EVENTS_DIR = _REPO_ROOT / "data" / "queue"           # FileQueue out_dir (hermetic default)
+
+
+# --------------------------------------------------------------------------
+# DB helpers — all best-effort; return False/None when Postgres is unavailable.
+# --------------------------------------------------------------------------
+def _db_conn():
+    try:
+        from db import connect
+        return connect()
+    except Exception:
+        return None
+
+
+def _safe_commit(conn) -> None:
+    """Commit; on any error roll back so the connection stays usable. All DB
+    writes are best-effort — a rejected row (e.g. missing FK row when running
+    against a not-yet-seeded DB) must never take down the worker loop."""
+    try:
+        conn.commit()
+    except Exception:
+        try:
+            conn.rollback()
+        except Exception:
+            pass
+
+
+def _write_detections(conn, window_id: str, detections: list[dict]) -> int:
+    """Insert detection rows; returns count written (0 if no DB / no window /
+    rejected). Each row is committed independently so one bad row (or a missing
+    ai_windows FK) doesn't poison the rest."""
+    if conn is None or not window_id:
+        return 0
+    n = 0
+    for d in detections:
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "INSERT INTO detections (ai_window_id, model_name, label, confidence, "
+                    "bbox_json, frame_time_sec) VALUES (%s, %s, %s, %s, %s::jsonb, %s)",
+                    (window_id, d.get("model_name", ""), d["label"], d["confidence"],
+                     json.dumps(d["bbox"]), d.get("frame_time_sec", 0.0)))
+            conn.commit()
+            n += 1
+        except Exception:
+            _safe_commit(conn)                          # rollback, keep going
+    return n
+
+
+def _write_event(conn, ev: dict) -> str | None:
+    """Insert a CommonEvent into `events` (best-effort); returns event_id or None."""
+    if conn is None:
+        return None
+    meta = {k: ev[k] for k in ("objects", "track_ids", "zones",
+                               "needs_vlm_verification", "evidence_path") if k in ev}
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO events (id, store_id, camera_id, segment_id, ai_window_id, "
+                "event_type, severity, confidence, source_engine, metadata_json) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s::jsonb)",
+                (ev["event_id"], ev["store_id"], ev.get("camera_id"),
+                 ev.get("segment_id"), ev.get("ai_window_id"), ev["event_type"],
+                 ev.get("severity", "info"), ev.get("confidence", 0.0),
+                 ev.get("source_engine", ""), json.dumps(meta)))
+        conn.commit()
+        return ev["event_id"]
+    except Exception:
+        _safe_commit(conn)
+        return None
+
+
+def _write_model_run(conn, run: dict, n_det: int) -> None:
+    if conn is None:
+        return
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO model_runs (model_profile_name, model_id, task, runtime, "
+                "latency_ms, error) VALUES (%s, %s, %s, %s, %s, %s)",
+                (run.get("model_profile_name", "unknown"), run.get("model_id", ""),
+                 run.get("task", "detection"), run.get("runtime", ""),
+                 run.get("latency_ms"), run.get("error")))
+        conn.commit()
+    except Exception:
+        _safe_commit(conn)
+
+
+# --------------------------------------------------------------------------
+# File fallback consumer — read unprocessed lines from the FileQueue jsonl.
+# --------------------------------------------------------------------------
+def _file_jobs(out_dir: Path, limit: int) -> list[dict]:
+    f = out_dir / f"{STREAM.replace('.', '_')}.jsonl"
+    if not f.exists():
+        return []
+    jobs: list[dict] = []
+    with open(f) as fh:
+        for line in fh:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                jobs.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+            if len(jobs) >= limit:
+                break
+    return jobs
+
+
+# --------------------------------------------------------------------------
+# Core: process one window with the plugin + persist its outputs.
+# --------------------------------------------------------------------------
+def process_window(window: dict, plugin: CvOssDetector, queue, conn) -> dict:
+    """Run the plugin on one ai_window.ready message and persist outputs.
+    Returns a small summary dict (counts) for logging/tests."""
+    out = plugin.infer(window)
+    n_det = _write_detections(conn, window.get("window_id"), out["detections"])
+    n_ev = 0
+    for ev in out["events"]:
+        _write_event(conn, ev)                       # no-op without DB
+        try:
+            queue.publish({"type": "event.created", **ev})
+        except Exception:
+            pass
+        n_ev += 1
+    _write_model_run(conn, out["model_run"], n_det)
+    return {"window_id": window.get("window_id"), "detections": len(out["detections"]),
+            "detections_written": n_det, "events": n_ev,
+            "faked": out["model_run"].get("faked", False)}
+
+
+def run(once: bool = False, limit: int = 8, backend: str | None = None,
+        sleep_sec: float = 2.0) -> list[dict]:
+    """Worker entrypoint.
+
+    once=True  -> drain up to `limit` windows then return.
+    once=False -> loop forever, polling `limit` at a time.
+    Returns the list of per-window summaries processed (useful in tests).
+    """
+    queue = make_queue(backend, EVENTS_DIR)
+    conn = _db_conn()
+    plugin = CvOssDetector()
+    plugin.load()                                    # lazy/non-fatal
+    is_pg = getattr(queue, "name", "") == "pg"
+    summaries: list[dict] = []
+    try:
+        while True:
+            if is_pg:
+                claimed = queue.consume(STREAM, limit=limit)    # [(job_id, payload)]
+                jobs = [(jid, p) for jid, p in claimed]
+            else:                                    # file fallback: no ack/claim
+                jobs = [(None, p) for p in _file_jobs(EVENTS_DIR, limit)]
+            for job_id, window in jobs:
+                try:
+                    s = process_window(window, plugin, queue, conn)
+                    summaries.append(s)
+                    if is_pg and job_id is not None:
+                        queue.ack(job_id)
+                except Exception as e:               # one bad window must not kill the loop
+                    print(f"[cv-worker] window failed: {e}")
+                    if is_pg and job_id is not None:
+                        queue.fail(job_id)
+            if once or not jobs:
+                if once:
+                    break
+                time.sleep(sleep_sec)                # idle backoff
+        return summaries
+    finally:
+        plugin.unload()
+        try:
+            queue.close()
+        except Exception:
+            pass
+        if conn is not None:
+            try:
+                conn.close()
+            except Exception:
+                pass
+
+
+if __name__ == "__main__":                           # python -m ai-workers... / direct
+    import argparse
+    ap = argparse.ArgumentParser(description="cv-oss-worker")
+    ap.add_argument("--once", action="store_true", help="drain then exit")
+    ap.add_argument("--limit", type=int, default=8)
+    ap.add_argument("--backend", default=None, help="pg|file|redis (default: env)")
+    args = ap.parse_args()
+    res = run(once=args.once, limit=args.limit, backend=args.backend)
+    print(f"[cv-worker] processed {len(res)} window(s): {res}")

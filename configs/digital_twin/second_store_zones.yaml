@@ -1,0 +1,16 @@
+# DEMO second-store zone defs (same schema as configs/zones/kathirmani_zones.yaml).
+# Normalized [0..1] polygons. zone_type ∈ shelf|billing_counter|entry|exit|...
+store_id: demo_store_02
+
+zones:
+  - id: demo_billing_zone
+    camera_id: demo_billing
+    name: "Demo Billing Counter"
+    zone_type: billing_counter
+    polygon: [[0.1, 0.4], [0.9, 0.4], [0.9, 0.95], [0.1, 0.95]]
+
+  - id: demo_shelf_zone
+    camera_id: demo_aisle
+    name: "Demo Aisle Shelf"
+    zone_type: shelf
+    polygon: [[0.0, 0.2], [1.0, 0.2], [1.0, 0.9], [0.0, 0.9]]

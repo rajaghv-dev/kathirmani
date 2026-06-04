@@ -98,6 +98,17 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   work" + hot/cold two-tier. `ingestion/sources.py` Source ABC: File/Rtsp (PyAV) now,
   GStreamerSource is the live/Phase-4 slot.
 
+## Phases status (parallel-agent build)
+- **0✅1✅2✅3✅4✅10✅.** Wave-1 (parallel agents): `observability/` (dashboard
+  generator + 18 JSONs + scrape/otel/promtail), `ai-workers/cv-oss-worker/` (YOLOE→
+  DetectionPlugin, fake fallback, consumes ai_window.ready), `services/digital-twin/`
+  (StoreTwin + second-store demo). `make run-cv-worker`/`dashboards`/`twin-validate`.
+  `make test` runs all component test dirs (TESTDIRS). ultralytics added to
+  inference.txt (optional). NEXT: W2 Phase 5 rule-engine → W3 6 vlm + 8 search →
+  W4 7 evidence/9 vss/11 bench/12 hardening → W5 13 bake-off.
+- Hyphenated dirs (`ai-workers/cv-oss-worker`, `services/digital-twin`) import flat
+  via per-dir conftest/pytest.ini (not valid package names).
+
 ## Spec index
 `01` overview · `02` architecture · `03` models/queries · `04` observability ·
 `05` performance · `06` hardware-portability · `07` runbook · `08` dashboards ·

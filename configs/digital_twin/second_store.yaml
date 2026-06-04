@@ -1,0 +1,16 @@
+# DEMO second store (Phase 10 proof: a new store onboards by YAML, zero code).
+# Same schema as configs/stores/kathirmani.yaml — only ids/values differ. Loaded
+# by services/digital-twin/loader.load_twin; validated by the same StoreTwin code.
+store:
+  id: demo_store_02
+  name: "Demo Store 02"
+  location: "Bengaluru, India"
+  timezone: Asia/Kolkata
+
+cameras_config: ./second_store_cameras.yaml
+zones_config: ./second_store_zones.yaml
+
+layout:
+  cameras_observe_same_area: false
+  has_billing_counter: true
+  has_single_entry_exit: true

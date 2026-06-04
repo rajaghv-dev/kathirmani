@@ -1,0 +1,67 @@
+# OpenTelemetry Collector — minimal config for the Phase-3 trace path
+# (master plan §13 / spec/10 "a failed event traces RTSP -> model output").
+#
+# Trace path:  segment (ingestion) -> queue (job_queue) -> worker (plugin host)
+#              -> event (rule engine / VLM verdict)
+# Each hop is a span; the shared trace_id is what ties an RTSP frame to a model
+# output. camera_id / segment_id / window_id ride as span attributes (and are also
+# stamped onto the structured logs Promtail ships — see observability/promtail/config.yml).
+#
+# Run:  otelcol --config observability/otel-collector/config.yaml
+# Services point OTEL_EXPORTER_OTLP_ENDPOINT at this collector (gRPC :4317 / HTTP :4318).
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch: {}
+  # Keep the join keys as first-class span attributes for trace search.
+  attributes/trace_keys:
+    actions:
+      - key: trace_id
+        action: upsert
+        from_attribute: trace_id
+      - key: camera_id
+        action: upsert
+        from_attribute: camera_id
+      - key: segment_id
+        action: upsert
+        from_attribute: segment_id
+
+exporters:
+  # Always-on: dump spans/metrics to the collector log (verifies wiring with zero deps).
+  logging:
+    verbosity: detailed
+
+  # --- Uncomment when the backing services are wired (Phase 3 stretch) ---------
+  # Export span-derived RED metrics into Prometheus (scraped alongside model_*).
+  # prometheus:
+  #   endpoint: 0.0.0.0:8889
+  #   namespace: kathir_trace
+  #
+  # Ship logs/log-records to Loki so trace_id is searchable next to the metrics.
+  # loki:
+  #   endpoint: http://loki:3100/loki/api/v1/push
+  #   default_labels_enabled:
+  #     exporter: false
+  #     job: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [attributes/trace_keys, batch]
+      exporters: [logging]          # add: prometheus (via spanmetrics), loki
+    # metrics:
+    #   receivers: [otlp]
+    #   processors: [batch]
+    #   exporters: [logging, prometheus]
+    # logs:
+    #   receivers: [otlp]
+    #   processors: [batch]
+    #   exporters: [logging, loki]
