@@ -99,6 +99,14 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   GStreamerSource is the live/Phase-4 slot.
 
 ## Phases status (parallel-agent build)
+- **0✅1✅2✅3✅4✅5✅6✅8✅10✅.** W3 (parallel): Phase 6 VLM worker
+  `ai-workers/vlm-worker/` (plugin host: Nemotron-VL/Qwen baseline + fake_infer,
+  prompt pack, JSON repair, vlm_observations+model_runs; 22 tests; publishes
+  `vlm.verified`); Phase 8 `ai-workers/embedding-worker/` (C-RADIOv4-H plugin fake
+  768-d, indexer, A4.3 parse→metadata→pgvector→fuse→critic; 26 tests, ran vs live
+  pgvector). FOLLOW-UPS: real Nemotron-VL chat-API shape unconfirmed; **C-RADIO native
+  dim ≠ 768 → needs projection head or a dim migration** (configs vector_dim: tbd).
+  Remaining: W4 (7 evidence/9 vss/11 bench/12 hardening) → W5 (13 bake-off).
 - **0✅1✅2✅3✅4✅5✅10✅.** W2: Phase 5 rule engine `services/rule-engine/`
   (deterministic per-track windows over event_rules.yaml; consumes/republishes
   `event.created`; raises events + `possible_loss` incidents; golden fixtures; 22

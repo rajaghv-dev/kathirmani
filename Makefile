@@ -66,7 +66,7 @@ grafana: ## Print the Grafana URL
 	@echo "Grafana: http://localhost:3000 (admin/admin) — dashboards 01-18"
 
 # ---- DB + workers + tests (filled per phase) --------------------------------
-.PHONY: migrate migrate-down migrate-status seed backfill api run-cv-worker run-rule-engine dashboards twin-validate ingest-sample run-workers test test-e2e bench evidence-demo
+.PHONY: migrate migrate-down migrate-status seed backfill api run-cv-worker run-rule-engine run-vlm-worker index search dashboards twin-validate ingest-sample run-workers test test-e2e bench evidence-demo
 migrate: ## Apply db/migrations (Postgres)
 	python3 scripts/db_migrate.py up
 migrate-down: ## Roll back the latest migration
@@ -85,12 +85,18 @@ run-cv-worker: ## Phase 4: OSS CV worker — consume ai_window.ready, emit detec
 	cd ai-workers/cv-oss-worker && INGEST_QUEUE=pg ../../.venv/bin/python -m worker $(if $(ONCE),--once,) --limit $(or $(LIMIT),8)
 run-rule-engine: ## Phase 5: rule engine — consume event.created, raise hypotheses + incidents
 	cd services/rule-engine && INGEST_QUEUE=pg ../../.venv/bin/python -m worker $(if $(ONCE),--once,) --limit $(or $(LIMIT),8)
-run-workers: run-cv-worker run-rule-engine ## Start the AI workers (cv + rules; vlm/embedding land Phase 6/8)
+run-vlm-worker: ## Phase 6: VLM worker — verify needs_vlm events → vlm_observations
+	cd ai-workers/vlm-worker && INGEST_QUEUE=pg ../../.venv/bin/python -m worker $(if $(ONCE),--once,) --limit $(or $(LIMIT),8)
+run-workers: run-cv-worker run-rule-engine run-vlm-worker ## Start the AI workers (cv + rules + vlm)
+index: ## Phase 8: embed + index events/observations into pgvector
+	.venv/bin/python ai-workers/embedding-worker/worker.py index
+search: ## Phase 8: natural-language search (QUERY="...")
+	.venv/bin/python ai-workers/embedding-worker/worker.py query "$(QUERY)"
 dashboards: ## Phase 3: (re)generate the 01-18 Grafana dashboard JSONs
 	python3 observability/grafana/make_dashboards.py
 twin-validate: ## Phase 10: validate a store digital twin (STORE=configs/stores/kathirmani.yaml)
 	.venv/bin/python -c "import sys; sys.path.insert(0,'services/digital-twin'); from loader import load_twin; t=load_twin('$(or $(STORE),configs/stores/kathirmani.yaml)'); p=t.validate(); print(t.summary()); print('problems:',p); sys.exit(1 if p else 0)"
-TESTDIRS := tests/ ingestion/tests/ services/api/tests/ services/digital-twin/tests/ services/rule-engine/tests/ ai-workers/cv-oss-worker/tests/ observability/tests/
+TESTDIRS := tests/ ingestion/tests/ services/api/tests/ services/digital-twin/tests/ services/rule-engine/tests/ ai-workers/cv-oss-worker/tests/ ai-workers/vlm-worker/tests/ ai-workers/embedding-worker/tests/ observability/tests/
 test: ## Run the full test suite (platform + all components)
 	pytest -q $(TESTDIRS)
 test-e2e: ## [stub→Phase 7] full-scenario gate
