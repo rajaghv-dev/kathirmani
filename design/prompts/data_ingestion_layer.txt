@@ -1,0 +1,19 @@
+Create a clean, horizontal (landscape) infographic titled
+"Data-ingestion layer — from RTSP to model feed".
+
+Draw a left-to-right pipeline of 7 rounded boxes with green borders, connected by arrows.
+Each box has a bold title and 2-3 lines of small supporting text:
+1. "Camera sources" — 5 CCTV feeds, RTSP H.264 / .mkv
+2. "Capture" — GStreamer splitmuxsink (stream-copy, no re-encode); PyAV for files
+3. "Segment" — 10-sec clips to NVMe; 5-sec AI windows; decode-once frames
+4. "Validate + tag" — health (frozen/dark/blocked); metadata (fps/codec/timestamp); sha256 checksum
+5. "Catalog" — Postgres rows: video_segments + ai_windows (paths, not blobs)
+6. "Queue" — PgQueue, SELECT ... FOR UPDATE SKIP LOCKED; publish ai_window.ready
+7. "Model feed" — frame-gate (motion/zone/fps) to CV (YOLOE) + VLM (Nemotron-VL)
+
+Bottom caption in muted italics: "clip blobs on NVMe, Postgres holds paths + checksums;
+at-least-once via SKIP LOCKED; evidence-first — every clip checksummed + path-addressed."
+
+Style: NVIDIA green #76B900 accent, ink #1A1A1A text, slate #3B4252, muted #8A8F98,
+off-white boxes #F5F7F2, white background. Flat vector, even spacing, crisp readable
+labels. Use ONLY the labels listed above — no extra or gibberish text.

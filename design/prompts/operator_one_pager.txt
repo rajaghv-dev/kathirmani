@@ -1,0 +1,20 @@
+Create a clean, vertical (portrait) one-page infographic titled "AI eyes on your store"
+for a retail store owner. Subtitle: "Turn the CCTV you already have into alerts you can trust."
+
+Layout top to bottom:
+- A green header band with the title in white.
+- A 3-step row with numbered circles: 1) "5 cameras — watch the store", 2) "AI cascade —
+  finds what matters", 3) "Alerts + clips — with human review".
+- A "What it spots" list with small green bullets: suspicious item handling near shelves;
+  leaving without billing (loss prevention); time-stamped events across all 5 cameras;
+  camera health (blocked / frozen / dark); natural-language search of footage.
+- Four rounded stat cards with green borders: "Rs 0.082 — to analyze 5 cameras",
+  "8.2 Wh — of electricity", "events flagged", "~9 min — end to end".
+- A green footer band, white text: "Evidence, not just alerts — every flag links to a clip
+  and a human decision."
+Icons allowed: camera, shopping cart, shield/lock, bar chart, lightning bolt.
+
+Style: NVIDIA green #76B900 accent, ink #1A1A1A text, slate #3B4252, muted #8A8F98,
+off-white cards #F5F7F2, white background, optional alert-red #E5484D. Flat vector,
+clean and technical-but-approachable, generous white space, big numbers. Render text
+crisply; use ONLY the labels given above — no placeholder or gibberish text.

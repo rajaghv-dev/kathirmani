@@ -1,0 +1,17 @@
+Create a clean, horizontal 3-step infographic of a "cheapest-gate-first" AI perception
+cascade. Title: "The 3-stage perception cascade". Subtitle: "the expensive model only runs
+when needed — do less work".
+
+Three rounded boxes with green borders, left to right, joined by arrows:
+- Step 1 "WHEN" — Marlin-2B — time-grounded events
+- Step 2 "WHERE" — Locate / YOLOE — objects + the cheap gate
+- Step 3 "WHAT" — Nemotron-VL — loss-prevention verification
+
+Make each step visually heavier/more expensive than the last (e.g. a thin funnel narrowing
+left to right, or increasing box weight) to show that only suspicious windows reach the
+expensive VLM. Caption under the arrows: "cheapest gate first — only suspicious windows
+reach the expensive VLM."
+
+Style: NVIDIA green #76B900 accent, ink #1A1A1A text, slate #3B4252, muted #8A8F98,
+off-white boxes #F5F7F2, white background. Flat vector, bold step labels, generous white
+space. Use ONLY the labels listed — no extra or gibberish text.

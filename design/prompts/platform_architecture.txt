@@ -1,0 +1,17 @@
+Create a clean, horizontal (landscape) architecture infographic titled
+"Kathirmani Video-AI Platform — OSS ingestion, NVIDIA models, evidence-first".
+
+Draw a left-to-right flow of 6 rounded boxes with green borders, connected by arrows:
+1. "Cameras" — 5 CCTV feeds / RTSP
+2. "Ingestion" — 10-sec clips, 5-sec windows
+3. "Store" — Postgres + pgvector, local NVMe
+4. "AI workers" — YOLOE / DeepStream, Nemotron-VL
+5. "Rules + evidence" — zones, dwell, billing-bypass
+6. "Review + Grafana" — approve/reject, dashboards
+
+Add a small side caption: "Free / open NVIDIA models, swappable by config, explainable in
+Grafana." Icons allowed: camera, database cylinder, neural-net node, shield/lock, bar chart.
+
+Style: NVIDIA green #76B900 accent, ink #1A1A1A text, slate #3B4252, muted #8A8F98,
+off-white boxes #F5F7F2, white background. Flat vector, lots of white space, crisp
+readable labels. Use ONLY the labels listed — no extra or gibberish text.

@@ -1,0 +1,16 @@
+Design a set of 6 stat cards in a 2-row by 3-column grid. Title across the top:
+"Cost & efficiency — one 5-camera analysis run".
+
+Each card is a rounded rectangle with a green border and off-white fill: a big bold number,
+a green label under it, and a small muted sub-line. The six cards:
+1. "8.2"  / "watt-hours" / "energy for the full run"
+2. "Rs 0.082" / "cost" / "to analyze 5 cameras"
+3. "1.1" / "events / Wh" / "useful signal per energy"
+4. "Rs 0.0091" / "cost / event" / "marginal cost"
+5. "55 W" / "avg GPU power" / "during inference"
+6. "9 min" / "wall time" / "end to end"
+
+Style: NVIDIA green #76B900 accent, ink #1A1A1A for the big numbers, slate #3B4252,
+muted #8A8F98 sub-lines, off-white cards #F5F7F2, white background. Flat vector, very large
+numbers, lots of white space, consistent card sizing. Use ONLY the text above — no extra or
+gibberish text.

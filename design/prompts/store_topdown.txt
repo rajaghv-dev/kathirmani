@@ -1,0 +1,13 @@
+Create a clean top-down (floor-plan) illustration of a small retail grocery store, used as
+a "digital twin" diagram. Title: "Store digital twin — 5 cameras, mapped zones".
+
+Show the store floor with shelving aisles, a billing/checkout counter, and an entry/exit
+door. Place 5 ceiling camera icons with green fan-shaped fields-of-view, labeled:
+"Bill counter", "Center", "Left aisle", "Entry/Exit", "Right aisle". Shade and label a few
+named zones: "checkout zone", "high-value shelf", "entry zone". Use small dashed lines to
+suggest a person's path crossing from one camera's view into another (cross-camera tracking).
+
+Style: NVIDIA green #76B900 accent for cameras/zones, ink #1A1A1A labels, slate #3B4252,
+muted #8A8F98, off-white fills #F5F7F2, white background, optional alert-red #E5484D for the
+high-value shelf. Flat vector, clean architectural look, crisp labels. Use ONLY the labels
+listed — no extra or gibberish text.

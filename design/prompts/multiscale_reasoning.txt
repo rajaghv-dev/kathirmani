@@ -1,0 +1,18 @@
+Create a clean, horizontal timeline infographic titled "Ingest once at 10s — reason at any
+scale". Subtitle: "subtle actions vary in length and cross clip + camera boundaries; spans
+are reconstructed from Postgres, not from the model's fixed window".
+
+Draw a horizontal time axis (0 to 50 seconds). Below it, show a row of five 10-second clip
+boxes labeled "Camera A — 10s clips (video_segments)". Above the clips, draw three colored
+duration bars of different lengths to show variable-extent actions:
+- a short green bar "palming - 3s" (fits inside one clip)
+- a medium amber bar "tag-swap - 12s" (crossing a clip boundary)
+- a long red bar "sweethearting - 35s" (spanning four clips)
+Add a second short lane "Camera B (aisle)" and a dashed arrow from the long red action to a
+box on Camera B labeled "same person - track_id" (cross-camera link).
+Under the clips, show a finer row of 5-second "ai_windows" tick boxes. Caption at the bottom:
+"a single fixed window can't contain the 12s / 35s actions — connect them via incidents".
+
+Style: NVIDIA green #76B900, amber #D08700, alert-red #C0392B for the action bars; ink
+#1A1A1A text, slate #3B4252, muted #8A8F98, off-white boxes #F5F7F2, white background.
+Flat vector, crisp readable labels. Use ONLY the labels listed — no extra or gibberish text.
