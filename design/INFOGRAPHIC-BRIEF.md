@@ -139,3 +139,22 @@ flowchart LR
 > *'Cost & efficiency — one 5-camera run'*. Rounded cards, NVIDIA-green borders."
 
 > Attach the matching PNG from `design/figures/` to any prompt as a visual reference.
+
+---
+
+## AI image generation (Nano Banana + gpt-image-1)
+
+`design/ai_images.py` turns these prompts into images via **Google "Nano Banana"**
+(`gemini-2.5-flash-image`) and **OpenAI** (`gpt-image-1`). This is *design-time tooling
+only* — it does **not** touch the production NVIDIA-only inference pipeline (spec/11).
+
+```bash
+make setup-design                                    # installs google-genai + openai + pillow
+# keys via env / .env only (spec/10): GEMINI_API_KEY / OPENAI_API_KEY
+make gen-image PROVIDER=both PROMPT="$(cat <<<'C — the cascade explainer …')" OUT=cascade
+# editing/fusion: feed an existing figure as a reference (Nano Banana excels at this)
+python design/ai_images.py --provider gemini --ref design/figures/platform_architecture.png \
+    --prompt "redraw as a glossy 3D isometric infographic, keep the labels" --out arch_iso
+```
+
+Outputs land in `design/figures/generated/<out>__<provider>.png` (gitignored — regenerable).

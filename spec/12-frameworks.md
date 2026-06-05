@@ -55,6 +55,21 @@ WARN   api            (FastAPI installed; app/endpoint Phase 2)
 WARN   gpu            (Docker NVIDIA runtime not registered — make setup-gpu)
 ```
 
+## Design-asset image generation (design-time only, 2026-06-05)
+
+`requirements/design.txt` + `design/ai_images.py` add **AI image generation for design
+assets** — Google **"Nano Banana"** (`gemini-2.5-flash-image`) and OpenAI
+**`gpt-image-1`** — behind a small provider abstraction (text→image and ref-image
+editing/fusion). `make setup-design` installs deps; `make gen-image PROVIDER=… PROMPT=…
+OUT=…` runs it; `make figures` re-renders the matplotlib infographics. Outputs go to
+`design/figures/generated/` (gitignored — regenerable).
+
+**Policy boundary:** this is *design-time tooling*, NOT the production inference pipeline.
+The NVIDIA-only model policy (`spec/11`) governs the task-contract plugins; design-asset
+generation is a separate concern, so Gemini/OpenAI here do not violate it. Keys come from
+the **environment only** (`GEMINI_API_KEY`/`GOOGLE_API_KEY`, `OPENAI_API_KEY` in `.env`,
+gitignored) — never hard-coded or logged (`spec/10` Security).
+
 ## Deliberate choices
 
 - **PyAV, not system FFmpeg** — bundled FFmpeg libs, no apt install; GStreamer is

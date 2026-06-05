@@ -41,3 +41,7 @@ mobileclip_blt.ts
 # synthetic benchmark outputs (regenerate via `make bench`)
 benchmarks/results/*.json
 backups/
+
+# AI-generated design assets (need API keys; regenerable via design/ai_images.py)
+design/figures/generated/*
+!design/figures/generated/.gitkeep

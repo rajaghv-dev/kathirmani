@@ -1,0 +1,5 @@
+# Design-asset image generation (design/ai_images.py) — OPTIONAL, design-time only.
+# NOT part of the production NVIDIA-only inference pipeline (spec/11). Keys via env (spec/10).
+google-genai        # Google Gemini 2.5 Flash Image — "Nano Banana"
+openai              # OpenAI gpt-image-1
+pillow              # ref-image loading for editing/fusion

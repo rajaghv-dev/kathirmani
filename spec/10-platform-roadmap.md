@@ -71,6 +71,30 @@ the ingestion abstractions (so nothing is wasted and scale can re-enable them):
   surface, and it matches the repo's file-first ethos (spec/02). The ingestion backends
   are pluggable (`ingestion/{storage,bus,metadata}.py`), so this is config, not a rewrite.
 
+## Temporal correlation — why pg-cataloged spans (2026-06-05)
+
+Ingestion is not a fire-and-forget pipe; it's the **durable, time-indexed substrate**
+for multi-scale, *connected* reasoning. Subtle retail-loss actions have **variable
+extent** (palming ≈3s · tag-swap 5–15s · sweethearting/basket-to-bag 10–40s · return
+fraud = minutes) and each micro-action looks innocent — only the **sequence**, often
+**across clip + camera boundaries**, is suspicious. A fire-and-forget design (decode →
+infer once → discard) is blind to anything longer than its window, can't take a second
+look, and has no shared timeline to link views. So the same stream must be re-windowable
+at any scale, replayable byte-for-byte, and correlatable — which is exactly what the
+Postgres catalog provides: the hierarchy `video_segments` (abs span + sha256) →
+`ai_windows` (offsets) → `events` (partitioned by `event_time`) → **`incidents`
+(arbitrary span)** linked via **`incident_events` (M:N)** and `tracks`
+(`first_seen`/`last_seen`); `embeddings vector(768)` for "similar moments"; `job_queue`
+(SKIP LOCKED) to **replay** a span on a new model; `sha256` + append-only `audit_log`
+for tamper-evidence. Figures: `design/figures/ingest_multiscale_time.png`,
+`ingest_coverage_quadrant.png`, `ingest_reasoning.png`, `data_ingestion_layer.png`.
+
+**Open follow-up (the one honest gap):** `ai_windows` store *relative* sec-offsets and
+indexes are plain btree on `(camera_id, start_time)`. True "give me everything
+overlapping [t0,t1]" wants an **absolute `tstzrange` column + `btree_gist` overlap
+index** (and a GiST/exclusion path on `events`/`incidents`), so cross-clip and
+cross-camera spans are first-class joins, not app-side reconstruction.
+
 ## Phased build (master plan §15 + Addendum A12)
 
 Each phase = one branch = one PR, ends green (its test gate passes, observability

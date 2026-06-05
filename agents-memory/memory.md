@@ -149,6 +149,19 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
 - Hyphenated dirs (`ai-workers/cv-oss-worker`, `services/digital-twin`) import flat
   via per-dir conftest/pytest.ini (not valid package names).
 
+## Design assets + AI image-gen (2026-06-05) → sessions/2026-06-05
+- Figures live in `design/figures/` via `design/make_figures.py` (`make figures`); NV green
+  `#76B900`. New: `data_ingestion_layer.png` + 3 "why pg-cataloged ingestion" figs
+  (`ingest_multiscale_time/coverage_quadrant/reasoning.png`) — grounded in `db/schema.sql`.
+- **AI image gen = design-time only, NOT inference.** `design/ai_images.py` wraps Google
+  **Nano Banana** (`gemini-2.5-flash-image`, `google-genai`) + OpenAI **`gpt-image-1`**
+  (`openai`); text→image + `--ref` editing. `requirements/design.txt`, `make setup-design`/
+  `gen-image`. Keys env-only (`GEMINI_API_KEY`/`OPENAI_API_KEY`); `generated/` gitignored.
+  NVIDIA-only policy (spec/11) is unaffected — it governs the inference plugins. → spec/12.
+- **Temporal-correlation follow-up (spec/10):** `ai_windows` use relative sec-offsets +
+  btree indexes; true overlap joins for long/cross-clip subtle actions need an absolute
+  `tstzrange` + `btree_gist` index on segments/events/incidents. Not built yet.
+
 ## Spec index
 `01` overview · `02` architecture · `03` models/queries · `04` observability ·
 `05` performance · `06` hardware-portability · `07` runbook · `08` dashboards ·

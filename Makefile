@@ -106,6 +106,13 @@ backup: ## Phase 12: pg_dump + clips manifest backup
 	.venv/bin/python -c "from services.security.backup import run_backup; print(run_backup('backups','data/clips',execute=True))"
 dashboards: ## Phase 3: (re)generate the 01-18 Grafana dashboard JSONs
 	python3 observability/grafana/make_dashboards.py
+figures: ## Design: (re)render the matplotlib infographics into design/figures/
+	.venv/bin/python design/make_figures.py
+setup-design: ## Design: install AI image-gen deps (Nano Banana + gpt-image-1)
+	.venv/bin/pip install -r requirements/design.txt
+gen-image: ## Design: AI image (PROVIDER=gemini|openai|both PROMPT="..." OUT=name [REF=path])
+	.venv/bin/python design/ai_images.py --provider $(or $(PROVIDER),gemini) \
+		--prompt "$(PROMPT)" --out $(or $(OUT),generated) $(if $(REF),--ref $(REF),)
 twin-validate: ## Phase 10: validate a store digital twin (STORE=configs/stores/kathirmani.yaml)
 	.venv/bin/python -c "import sys; sys.path.insert(0,'services/digital-twin'); from loader import load_twin; t=load_twin('$(or $(STORE),configs/stores/kathirmani.yaml)'); p=t.validate(); print(t.summary()); print('problems:',p); sys.exit(1 if p else 0)"
 TESTDIRS := tests/ ingestion/tests/ services/api/tests/ services/digital-twin/tests/ services/rule-engine/tests/ services/evidence-builder/tests/ services/review-ui/tests/ services/security/tests/ ai-workers/cv-oss-worker/tests/ ai-workers/vlm-worker/tests/ ai-workers/embedding-worker/tests/ ai-workers/vss-eval-worker/tests/ benchmarks/tests/ benchmarks/bakeoff/tests/ observability/tests/
