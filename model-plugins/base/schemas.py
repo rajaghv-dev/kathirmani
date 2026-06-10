@@ -83,6 +83,7 @@ class Detection:                                # DetectionPlugin output element
     bbox: list[float]                           # [x, y, w, h] normalized
     frame_time_sec: float
     model_name: str = ""
+    track_id: str | None = None                 # persistent id from the Tracker (None until assigned)
 
 
 KNOWN_TASKS = set(TASK_CONTRACTS)

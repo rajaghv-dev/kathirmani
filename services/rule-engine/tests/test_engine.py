@@ -142,6 +142,40 @@ def test_action_to_event_dict_is_deterministic_and_shaped():
 
 
 # --------------------------------------------------------------------------
+# track_id provenance: prefer the real track_id; fall back to cam:<id> only when
+# the CV worker emits no identity at all (the known Phase-4 follow-up).
+# --------------------------------------------------------------------------
+def test_real_track_id_buckets_two_subjects_separately():
+    """Two distinct track_ids on the same camera must NOT share a context, so
+    one subject's evidence can't satisfy a rule on the other's behalf."""
+    from engine import _track_key
+    eng = RuleEngine()
+    # subject p_a dwells in shelf; subject p_b appears once with an item near hand.
+    eng.feed_many([
+        {"event_id": "a1", "camera_id": "left_aisle", "track_id": "p_a", "ts": 0.0,
+         "zone_types": ["shelf"], "objects": ["person"]},
+        {"event_id": "a2", "camera_id": "left_aisle", "track_id": "p_a", "ts": 4.0,
+         "zone_types": ["shelf"], "objects": ["person"]},
+    ])
+    b_actions = eng.feed({"event_id": "b1", "camera_id": "left_aisle",
+                          "track_id": "p_b", "ts": 5.0, "zone_types": ["shelf"],
+                          "objects": ["person", "item"], "object_near_hand": True})
+    # p_b alone has no dwell -> must not fire; the contexts are keyed by real id.
+    assert _track_key({"track_id": "p_a", "camera_id": "left_aisle"}) == "p_a"
+    assert not any(a.type == "suspicious_item_interaction" for a in b_actions)
+
+
+def test_track_ids_list_from_cv_worker_is_used_over_camera_fallback():
+    """The CV worker emits `track_ids` (list); the engine must bucket by that
+    real id, not the cam:<id> fallback."""
+    from engine import _track_key
+    ev = {"camera_id": "left_aisle", "track_ids": ["42"], "zone_types": ["shelf"]}
+    assert _track_key(ev) == "42"
+    # only when no identity is present do we fall back to the camera bucket
+    assert _track_key({"camera_id": "left_aisle"}) == "cam:left_aisle"
+
+
+# --------------------------------------------------------------------------
 # Golden regression — replay fixtures, assert expected_events / expected_incident.
 # --------------------------------------------------------------------------
 def _run_golden(path: Path):

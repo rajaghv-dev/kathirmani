@@ -112,3 +112,22 @@ def activate(profile_name: str):
 def model_runs(limit: int = 50):
     return _rows("SELECT model_profile_name, model_id, task, runtime, latency_ms, ttft_ms, "
                  "parse_success, created_at FROM model_runs ORDER BY created_at DESC LIMIT %s", (limit,))
+
+
+# ---- Natural-language search (Phase 8) — the same A4.3 pipeline `make search`
+# runs, exposed over HTTP so the console / clients can query results uniformly.
+@app.get("/search")
+def search(q: str, k: int = 10):
+    """Run the natural-language video search and return ranked hits. Degrades to an
+    empty result set (with an `error` note) when the embedding worker or DB is
+    absent, so the endpoint never 500s the console."""
+    if not q or not q.strip():
+        return {"query": q, "results": [], "error": "empty query"}
+    try:
+        _ew = str(Path(__file__).resolve().parents[2] / "ai-workers" / "embedding-worker")
+        if _ew not in sys.path:
+            sys.path.insert(0, _ew)
+        from worker import query_run  # embedding-worker/worker.py (flat import)
+        return {"query": q, "results": query_run(q, k=k)}
+    except Exception as e:
+        return {"query": q, "results": [], "error": f"{type(e).__name__}: {e}"}

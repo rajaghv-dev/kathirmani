@@ -82,6 +82,33 @@ def test_lifecycle_and_health_metrics():
     assert p.metrics()["model_loaded"] == 0.0
 
 
+def test_detections_carry_track_id():
+    """Every emitted detection gets a persistent track_id from the Tracker."""
+    p = CvOssDetector()
+    out = p.infer(_window())
+    assert out["detections"]
+    for d in out["detections"]:
+        assert d.get("track_id"), "detection must carry a track_id"
+
+
+def test_event_carries_track_ids_and_persist_across_windows():
+    """The suspicious-item event carries real track_ids, and the same camera's
+    subject keeps its id across successive windows (persistent identity)."""
+    p = CvOssDetector()
+    w0 = _window()
+    out0 = p.infer(w0)
+    assert out0["events"]
+    tids0 = out0["events"][0]["track_ids"]
+    assert tids0, "event must carry track_ids"
+    # person id is stable across a second window on the same camera
+    w1 = _window()
+    w1["window_start_sec"] = 1.0
+    out1 = p.infer(w1)
+    person0 = next(d["track_id"] for d in out0["detections"] if d["label"] == "person")
+    person1 = next(d["track_id"] for d in out1["detections"] if d["label"] == "person")
+    assert person0 == person1, "same person should keep its track_id across windows"
+
+
 def test_default_config_matches_detection_task():
     cfg = default_config()
     assert cfg.task == "detection"

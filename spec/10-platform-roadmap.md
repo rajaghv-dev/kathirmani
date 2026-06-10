@@ -89,11 +89,12 @@ Postgres catalog provides: the hierarchy `video_segments` (abs span + sha256) �
 for tamper-evidence. Figures: `design/figures/ingest_multiscale_time.png`,
 `ingest_coverage_quadrant.png`, `ingest_reasoning.png`, `data_ingestion_layer.png`.
 
-**Open follow-up (the one honest gap):** `ai_windows` store *relative* sec-offsets and
-indexes are plain btree on `(camera_id, start_time)`. True "give me everything
-overlapping [t0,t1]" wants an **absolute `tstzrange` column + `btree_gist` overlap
-index** (and a GiST/exclusion path on `events`/`incidents`), so cross-clip and
-cross-camera spans are first-class joins, not app-side reconstruction.
+**Resolved (migration 0004, 2026-06-10):** `video_segments`/`incidents` got generated
+absolute `tstzrange span` columns and `ai_windows` a trigger-maintained `span` (derived
+from the parent segment + offsets); composite **`btree_gist` GiST overlap indexes**
+`(camera_id|store_id, span)` make cross-clip / cross-camera "everything overlapping
+[t0,t1]" a first-class index-served join. Migration applied + verified against real
+Postgres on 2026-06-10. (`events` stays point-in-time; its btree suffices.)
 
 ## Phased build (master plan §15 + Addendum A12)
 
@@ -105,19 +106,58 @@ implementation.
 | Phase | Goal | Done-when |
 |-------|------|-----------|
 | **0 ✅** Skeleton | Makefile, 3 compose files (base/gpu/observability — wrap the existing stack), `configs/` (cameras/stores/zones/models/rules/retention), `ModelPlugin` interface, NVIDIA model policy + `validate-model-config` | `make up` green; policy validator passes NVIDIA / fails non-NVIDIA default |
-| **1 ✅** OSS ingestion | PyAV → 10-sec clips + 5-sec windows @2s stride → filesystem + JSONL + queue; camera health. **Files done; live RTSP (GStreamer) = 1.5.** | 5-camera footage segmented, registered, queued; `ingest_*` metrics |
+| **1 ✅** OSS ingestion | PyAV → 10-sec clips + 5-sec windows @2s stride → filesystem + JSONL + queue; camera health. **Files done; live RTSP (GStreamer `splitmuxsink`, Phase 1.5) now implemented** (`GStreamerSource` + `catalog_live_clips`). | 5-camera footage segmented, registered, queued; `ingest_*` metrics |
 | **2 ✅** DB + API | `db/migrations` + `schema.sql` (§6 + A6, 19 tables, partitioned events, job_queue); `PgQueue` (SKIP LOCKED); JSON→rows backfill; FastAPI (+ model-registry endpoints); seed kathirmani | workers/UI use stable API contracts; `make migrate && seed && backfill` idempotent |
 | **3 ✅** Observability | dashboards 01–18 (`observability/grafana/`, generator + 18 JSONs), `model_*`/`ingest_*` scrape, OTel + promtail configs, additive to `marlin_*` | dashboards generated + validated; scrape wiring documented (panels light up as producers expose /metrics) |
 | **4 ✅** CV worker | `ai-workers/cv-oss-worker` — YOLOE behind `DetectionPlugin` (fake-infer fallback), consumes `ai_window.ready`, writes detections/events/model_runs, zone-maps, emits `suspicious_item_interaction`. DeepStream worker later. | CV worker emits common event schema; 14 tests green |
 | **5 ✅** Rule engine | `services/rule-engine/` — deterministic per-track context windows over `event_rules.yaml`; consumes/republishes `event.created`, raises explainable events + `possible_loss` incidents; golden fixtures | suspicious-item events raised **without** a VLM; 22 tests green |
 | **6 ✅** VLM worker | `ai-workers/vlm-worker/` — plugin host (Nemotron-VL / Qwen baseline + fake_infer); prompt pack `retail_loss_v1`, JSON repair, writes `vlm_observations` + `model_runs`, updates event confidence | suspicious events get explanation; profile-selected; 22 tests green |
 | **7 ✅** Evidence + review | `services/evidence-builder/` (PyAV 20-sec stitch + sha256 + timeline, manifest-only fallback) + `services/review-ui/` (:8010 approve/reject, audit reviewer/ts/model_version) | reviewable incidents; 24 tests green |
-| **8 ✅** Search | `ai-workers/embedding-worker/` — C-RADIOv4-H embedding plugin (fake 768-d) + indexer + parse→metadata→pgvector→fuse→critic search | NL search returns ranked, time-stamped hits; 26 tests green (ran vs live pgvector). Follow-up: C-RADIO dim≠768 → projection/migration |
+| **8 ✅** Search | `ai-workers/embedding-worker/` — C-RADIOv4-H embedding plugin (fake 768-d) + indexer + parse→metadata→pgvector→fuse→critic search | NL search returns ranked, time-stamped hits; 26 tests green (ran vs live pgvector). C-RADIO dim≠768 **resolved**: cosine-preserving random-projection head (`plugin._project`) maps to the `vector(768)` column, `vector_dim: 768` |
 | **9 ✅** VSS-parity | `ai-workers/vss-eval-worker/` — `nvidia_summary` plugin + §A4.2 staged LVS (clip→5min→hour→report) + `parity.py`→`parity_report.json` (rt_cv/embedding/lvs/search/vios). VSS reference-only | parity report (honest measured/fake/pending); 24 tests green |
 | **10 ✅** Digital twin | `services/digital-twin/` — `StoreTwin` (load/validate/zones_for_point/map_event/summary); `configs/digital_twin/second_store.yaml` proves YAML-only onboarding | second store loads + validates with the same code; 5 tests green |
 | **11 ✅** Benchmark + TCO | `benchmarks/` harness (p50/p95, clips-min/GPU, tokens/sec) + `tco.py` (cost/1000-clips, /camera-month, /store-month) + 6 configs → `model_benchmark_runs`. Fake-mode default (synthetic until GPU run); real runner pluggable | harness + TCO; 28 tests green |
 | **12 ✅** Hardening | `services/security/` — auth (PLATFORM_API_KEY) + RBAC (viewer/reviewer/admin) wired into the API, audit log (`audit_log` table, migration 0002), secret redaction, retention CLI (evidence-lock, dry-run default), backup | building blocks + API auth/RBAC; 38 tests green |
 | **13 ✅** NVIDIA bake-off | `benchmarks/bakeoff/` — runtime matrix reusing the Phase-11 harness; `select_profiles()` → production+fallback by weighted score; `rollback.py` reuses the API's `model_profiles.active` switch; rows → `model_benchmark_runs` (dashboard 18) | config-only profile swap + rollback; 20 tests. Numbers synthetic until real runtimes on GPU |
+
+## Entry point — the Console (2026-06-10)
+
+All 14 phases shipped many surfaces (api, review-ui, Grafana, search) but **no single
+front door**. Added `services/console/` — a BFF/gateway on **:8080** that serves one
+unified SPA and proxies the upstreams server-side — plus `Dockerfile.app` +
+`docker-compose.platform.yml` + **`make platform`** for a one-command launch of the
+whole stack behind that URL. Design + ports + env: [14-console-and-deployment.md](14-console-and-deployment.md).
+
+## What's to be done (roadmap)
+
+The 14 phases + the code-doable real-hardware follow-ups + the entry-point Console are
+**done**. What remains:
+
+**A. Blocked on infra / user action (cannot be coded here):**
+- `make setup-nvidia-docker` — needs **sudo** (not passwordless); registers the NVIDIA
+  Docker runtime → required for GPU containers.
+- **No NGC key** (`nvcr.io` 401) → DeepStream / NIM / TAO still blocked; YOLOE/RT-DETR
+  remains the free CV path.
+- **Real-GPU numbers** — Phase 11/13 benchmark + bake-off run in fake mode, and the VSS
+  hierarchical summary (Phase 9) is still synthetic; both need real weights on the GPU.
+  (The Nemotron-VL chat path itself is real + verified on a clip.)
+- **Apply migrations on each deployment's Postgres** — `make migrate` (0001–0004).
+  Verified applying cleanly on 2026-06-10; just needs running wherever PG lives.
+
+**B. Deferred refactor (planned, not done — chosen to keep the suite green + invariants):**
+- **Hyphen→underscore package rename** (`cv-oss-worker` → `cv_oss_worker`, etc.) so the
+  worker/service dirs become real importable packages, removing the ~27 `sys.path`
+  shims + 8 `conftest.py`/`pytest.ini` hacks (also touches Makefile + compose
+  `working_dir`). Mechanical but broad (~40 files); do it as one isolated PR.
+- Possible relocation of the legacy `src/marlin` layer — currently **invariant-protected**
+  (keep root shims + path anchors + `learning.md`); only after the baseline is no longer
+  needed as a live comparison arm.
+
+**C. Open code follow-ups:**
+- **Cross-camera track handoff** — `Tracker` gives per-camera persistent `track_id`s;
+  linking a person across cameras (and the rule-engine consuming it) is the next step.
+- **Nemotron-VL production edge cases** — very long / multi-language prompts, batching.
+- **`serve_stream.py` parallel-GPU frame batching** — design-only (spec/02), no code yet.
 
 ## Critical path & parallelism
 
@@ -132,8 +172,9 @@ implementation.
   ([11-model-plugin-policy.md](11-model-plugin-policy.md)).
 - **Still gated on external access:** DeepStream/NIM/TAO CV (need an **NGC key**,
   `nvcr.io` is 401) → YOLOE/RT-DETR is the free CV path meanwhile; the Docker NVIDIA
-  runtime needs registering (Phase 0); live RTSP cameras (Phase 1 second half).
-  Build the wiring with what's free; add NGC assets when a key exists.
+  runtime needs registering (`make setup-nvidia-docker`, needs sudo). Live RTSP capture
+  (GStreamer Phase 1.5) is now implemented. Build the wiring with what's free; add NGC
+  assets when a key exists. Full remaining-work list: *What's to be done* above.
 - **Always-on from Phase 1:** Grafana (master plan §20.5 "do not delay observability").
 
 ## Anti-goals (master plan §20 — do not violate)

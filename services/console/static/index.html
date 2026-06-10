@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kathirmani Console</title>
+<style>
+  :root{
+    --nv:#76B900; --nv-dim:#5c9100; --bg:#0e1116; --panel:#161b22; --panel2:#1c2230;
+    --line:#262d3a; --txt:#e6edf3; --muted:#8b97a7; --danger:#e5534b; --warn:#d2a000;
+    --radius:12px; --sb:240px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--txt);font:14px/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  a{color:var(--nv);text-decoration:none}
+  /* shell */
+  .app{display:grid;grid-template-columns:var(--sb) 1fr;height:100vh}
+  .side{background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden}
+  .brand{display:flex;align-items:center;gap:10px;padding:18px 18px 14px;border-bottom:1px solid var(--line)}
+  .brand .dot{width:26px;height:26px;border-radius:7px;background:var(--nv);display:grid;place-items:center;color:#06210b;font-weight:800}
+  .brand b{font-size:15px;letter-spacing:.2px}
+  .brand small{display:block;color:var(--muted);font-size:11px;font-weight:400}
+  nav{padding:10px 8px;overflow:auto;flex:1}
+  nav a{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:9px;color:var(--muted);font-weight:500;margin:2px 0}
+  nav a .ic{width:18px;text-align:center;opacity:.9}
+  nav a:hover{background:var(--panel2);color:var(--txt)}
+  nav a.active{background:linear-gradient(90deg,rgba(118,185,0,.18),rgba(118,185,0,.04));color:var(--txt);box-shadow:inset 2px 0 0 var(--nv)}
+  .side .foot{padding:12px 16px;border-top:1px solid var(--line);color:var(--muted);font-size:11px}
+  /* main */
+  .main{display:flex;flex-direction:column;overflow:hidden}
+  .top{display:flex;align-items:center;justify-content:space-between;padding:16px 26px;border-bottom:1px solid var(--line);background:rgba(14,17,22,.6);backdrop-filter:blur(6px)}
+  .top h1{font-size:18px;margin:0;font-weight:650}
+  .top .sub{color:var(--muted);font-size:12px;margin-top:2px}
+  .pill{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);padding:6px 11px;border:1px solid var(--line);border-radius:20px}
+  .pill .led{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+  .pill.ok .led{background:var(--nv);box-shadow:0 0 8px var(--nv)}
+  .pill.bad .led{background:var(--danger)}
+  .view{padding:26px;overflow:auto;flex:1}
+  /* cards / grid */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px}
+  .kpi .n{font-size:30px;font-weight:700;letter-spacing:-.5px}
+  .kpi .l{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
+  .kpi .l .ic{color:var(--nv);margin-right:6px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:20px}
+  .panel h2{font-size:13px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin:0;padding:14px 18px;border-bottom:1px solid var(--line)}
+  .panel .body{padding:6px 0}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px;padding:10px 18px}
+  td{padding:11px 18px;border-top:1px solid var(--line)}
+  tr:hover td{background:var(--panel2)}
+  .tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid var(--line)}
+  .sev-high,.sev-critical{color:#ff8a80;border-color:#5a2a28;background:#2a1614}
+  .sev-medium{color:#ffd27a;border-color:#5a4a1e;background:#241d10}
+  .sev-low,.sev-info{color:#9fd2ff;border-color:#234055;background:#10202b}
+  .st-open{color:var(--warn)} .st-confirmed{color:var(--nv)} .st-dismissed{color:var(--muted)}
+  .empty{padding:40px 18px;text-align:center;color:var(--muted)}
+  .empty .big{font-size:30px;opacity:.5;margin-bottom:8px}
+  /* search */
+  .search-bar{display:flex;gap:10px;margin-bottom:18px}
+  input,button,select{font:inherit}
+  .inp{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:12px 14px;outline:none}
+  .inp:focus{border-color:var(--nv)}
+  .btn{background:var(--nv);color:#06210b;border:none;border-radius:10px;padding:0 18px;font-weight:700;cursor:pointer}
+  .btn:hover{background:var(--nv-dim)}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}
+  .btn.danger{background:var(--danger);color:#fff}
+  .btn.sm{padding:6px 12px;font-size:12px;border-radius:8px;height:auto}
+  .hit{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px 16px;margin-bottom:10px}
+  .hit .score{float:right;color:var(--nv);font-weight:700}
+  /* drawer */
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none}
+  .scrim.show{display:block}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:min(560px,92vw);background:var(--panel);border-left:1px solid var(--line);transform:translateX(100%);transition:transform .2s;overflow:auto;z-index:5}
+  .drawer.show{transform:none}
+  .drawer .dh{display:flex;justify-content:space-between;align-items:flex-start;padding:18px 20px;border-bottom:1px solid var(--line)}
+  .drawer .dh b{font-size:16px}
+  .drawer .sec{padding:16px 20px;border-bottom:1px solid var(--line)}
+  .drawer .sec h3{margin:0 0 10px;font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
+  .kv{display:flex;justify-content:space-between;padding:4px 0;color:var(--muted)}
+  .kv b{color:var(--txt);font-weight:500}
+  .tl{border-left:2px solid var(--line);margin-left:6px;padding-left:14px}
+  .tl .ev{position:relative;padding:6px 0}
+  .tl .ev::before{content:"";position:absolute;left:-21px;top:11px;width:9px;height:9px;border-radius:50%;background:var(--nv)}
+  .actions{display:flex;gap:10px;padding:16px 20px}
+  .muted{color:var(--muted)} .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+  .grow{flex:1}
+  iframe{width:100%;height:72vh;border:1px solid var(--line);border-radius:var(--radius);background:#fff}
+  .note{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--muted);margin-bottom:16px;font-size:13px}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <div class="dot">K</div>
+      <div><b>Kathirmani</b><small>Video-AI Console</small></div>
+    </div>
+    <nav id="nav">
+      <a data-view="overview"><span class="ic">▦</span> Overview</a>
+      <a data-view="incidents"><span class="ic">▲</span> Incidents</a>
+      <a data-view="events"><span class="ic">◷</span> Events</a>
+      <a data-view="search"><span class="ic">⌕</span> Search</a>
+      <a data-view="segments"><span class="ic">▭</span> Segments</a>
+      <a data-view="cameras"><span class="ic">◉</span> Cameras</a>
+      <a data-view="models"><span class="ic">❖</span> Models</a>
+      <a data-view="observability"><span class="ic">∿</span> Observability</a>
+    </nav>
+    <div class="foot">Single front door · proxies API · review · Grafana</div>
+  </aside>
+
+  <main class="main">
+    <header class="top">
+      <div><h1 id="title">Overview</h1><div class="sub" id="subtitle">Store-wide situational awareness</div></div>
+      <span class="pill" id="conn"><span class="led"></span><span id="connTxt">connecting…</span></span>
+    </header>
+    <section class="view" id="view"></section>
+  </main>
+</div>
+
+<div class="scrim" id="scrim" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer"></aside>
+
+<script>
+const GW = p => "/backend" + p;          // platform API proxy
+const RV = p => "/review" + p;            // review-UI proxy
+let CONFIG = {grafana_url:"http://localhost:3000"};
+
+async function jget(url){
+  try{
+    const r = await fetch(url, {headers:{accept:"application/json"}});
+    const j = await r.json();
+    if(j && j.error==="upstream_unreachable") return {__offline:true};
+    return j;
+  }catch(e){ return {__offline:true}; }
+}
+async function jpost(url, body){
+  const r = await fetch(url, {method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
+  return r.json();
+}
+const esc = s => (s==null?"":String(s)).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const sev = s => `<span class="tag sev-${esc(s||"info")}">${esc(s||"info")}</span>`;
+const when = t => t? new Date(t).toLocaleString() : "—";
+const offline = (what) => `<div class="empty"><div class="big">⚡</div>${what} service is offline.<br><span class="mono">start it, then refresh</span></div>`;
+const none = (what) => `<div class="empty"><div class="big">∅</div>No ${what} yet.</div>`;
+
+const TITLES = {
+  overview:["Overview","Store-wide situational awareness"],
+  incidents:["Incidents","Loss hypotheses awaiting human review"],
+  events:["Events","Perception + rule-engine signal stream"],
+  search:["Search","Ask the footage in plain language"],
+  segments:["Segments","Ingested 10-second video clips"],
+  cameras:["Cameras","Store camera fleet"],
+  models:["Models","Active profile, registry & recent runs"],
+  observability:["Observability","Grafana metrics & dashboards"],
+};
+
+const VIEWS = {
+  async overview(el){
+    const [cams, segs, incs, evs] = await Promise.all([
+      jget(GW("/cameras")), jget(GW("/segments?limit=1000")),
+      jget(GW("/incidents?limit=1000")), jget(GW("/events?limit=8"))]);
+    const off = [cams,segs,incs,evs].some(x=>x.__offline);
+    const n = x => Array.isArray(x)?x.length:"—";
+    const openInc = Array.isArray(incs)? incs.filter(i=>i.status==="open").length : "—";
+    el.innerHTML = `
+      ${off?`<div class="note">⚡ The platform API isn't reachable — showing what's available. Start it with <span class="mono">make api</span>.</div>`:""}
+      <div class="kpis">
+        <div class="kpi"><div class="n">${n(cams)}</div><div class="l"><span class="ic">◉</span>Cameras</div></div>
+        <div class="kpi"><div class="n">${n(segs)}</div><div class="l"><span class="ic">▭</span>Segments</div></div>
+        <div class="kpi"><div class="n">${openInc}</div><div class="l"><span class="ic">▲</span>Open incidents</div></div>
+        <div class="kpi"><div class="n">${n(evs)===0?0:(Array.isArray(evs)?"live":"—")}</div><div class="l"><span class="ic">◷</span>Event stream</div></div>
+      </div>
+      <div class="panel"><h2>Recent events</h2><div class="body">${tableEvents(evs)}</div></div>`;
+  },
+  async incidents(el){
+    const incs = await jget(GW("/incidents?limit=100"));
+    if(incs.__offline) return el.innerHTML = offline("Platform API");
+    if(!incs.length) return el.innerHTML = none("incidents");
+    el.innerHTML = `<div class="panel"><h2>${incs.length} incidents</h2><div class="body">
+      <table><thead><tr><th>Title</th><th>Type</th><th>Severity</th><th>Status</th><th>Started</th><th></th></tr></thead><tbody>
+      ${incs.map(i=>`<tr>
+        <td><b>${esc(i.title)}</b></td><td>${esc(i.incident_type)}</td><td>${sev(i.severity)}</td>
+        <td class="st-${esc(i.status)}">${esc(i.status)}</td><td class="muted">${when(i.start_time)}</td>
+        <td><button class="btn ghost sm" onclick='openIncident(${JSON.stringify(i.id)})'>Review →</button></td>
+      </tr>`).join("")}
+      </tbody></table></div></div>`;
+  },
+  async events(el){
+    const evs = await jget(GW("/events?limit=100"));
+    if(evs.__offline) return el.innerHTML = offline("Platform API");
+    el.innerHTML = `<div class="panel"><h2>${Array.isArray(evs)?evs.length:0} events</h2><div class="body">${tableEvents(evs)}</div></div>`;
+  },
+  async search(el){
+    el.innerHTML = `
+      <div class="note">Natural-language search over events, observations & embeddings (Phase 8). Try: <i>“person leaving without paying near the entry door”</i>.</div>
+      <div class="search-bar">
+        <input class="inp" id="q" placeholder="Describe what you're looking for…" onkeydown="if(event.key==='Enter')runSearch()" />
+        <button class="btn" onclick="runSearch()">Search</button>
+      </div><div id="results"></div>`;
+    document.getElementById("q").focus();
+  },
+  async segments(el){
+    const segs = await jget(GW("/segments?limit=100"));
+    if(segs.__offline) return el.innerHTML = offline("Platform API");
+    if(!segs.length) return el.innerHTML = none("segments");
+    el.innerHTML = `<div class="panel"><h2>${segs.length} segments</h2><div class="body">
+      <table><thead><tr><th>Camera</th><th>Start</th><th>Duration</th><th>Checksum</th><th>Path</th></tr></thead><tbody>
+      ${segs.map(s=>`<tr><td>${esc(s.camera_id)}</td><td class="muted">${when(s.start_time)}</td>
+        <td>${esc(s.duration_sec)}s</td><td class="mono muted">${esc((s.checksum||"").slice(0,12))}</td>
+        <td class="mono muted">${esc(s.storage_path)}</td></tr>`).join("")}
+      </tbody></table></div></div>`;
+  },
+  async cameras(el){
+    const cams = await jget(GW("/cameras"));
+    if(cams.__offline) return el.innerHTML = offline("Platform API");
+    if(!cams.length) return el.innerHTML = none("cameras");
+    el.innerHTML = `<div class="kpis">${cams.map(c=>`
+      <div class="kpi"><div class="n" style="font-size:18px">${esc(c.name||c.id)}</div>
+      <div class="l"><span class="ic">◉</span>${esc(c.role||"camera")} · ${c.enabled?"enabled":"disabled"}</div>
+      <div class="muted mono" style="margin-top:6px">${esc(c.id)}</div></div>`).join("")}</div>`;
+  },
+  async models(el){
+    const [active, reg, runs] = await Promise.all([
+      jget(GW("/api/model-registry/active")), jget(GW("/api/model-registry")), jget(GW("/api/model-runs?limit=20"))]);
+    if(active.__offline) return el.innerHTML = offline("Platform API");
+    const a = active && !active.detail ? active : null;
+    el.innerHTML = `
+      <div class="panel"><h2>Active profile</h2><div class="body" style="padding:16px 18px">
+        ${a?`<div class="kv"><span>Profile</span><b>${esc(a.profile_name)}</b></div>
+            <div class="muted">${esc(a.description||"")}</div>`:`<div class="muted">No active profile set.</div>`}
+      </div></div>
+      <div class="panel"><h2>Model registry</h2><div class="body">${Array.isArray(reg)&&reg.length?`
+        <table><thead><tr><th>Model</th><th>Vendor</th><th>Tasks</th><th>Revision</th></tr></thead><tbody>
+        ${reg.map(m=>`<tr><td class="mono">${esc(m.model_id)}</td><td>${esc(m.vendor)}</td>
+          <td class="muted">${esc((m.supported_tasks||[]).join? m.supported_tasks.join(", "):m.supported_tasks)}</td>
+          <td class="mono muted">${esc(m.revision)}</td></tr>`).join("")}</tbody></table>`:none("registered models")}</div></div>
+      <div class="panel"><h2>Recent model runs</h2><div class="body">${Array.isArray(runs)&&runs.length?`
+        <table><thead><tr><th>Task</th><th>Model</th><th>Runtime</th><th>Latency</th><th>When</th></tr></thead><tbody>
+        ${runs.map(r=>`<tr><td>${esc(r.task)}</td><td class="mono">${esc(r.model_id)}</td><td>${esc(r.runtime)}</td>
+          <td>${r.latency_ms!=null?esc(Math.round(r.latency_ms))+" ms":"—"}</td><td class="muted">${when(r.created_at)}</td></tr>`).join("")}
+        </tbody></table>`:none("model runs")}</div></div>`;
+  },
+  async observability(el){
+    el.innerHTML = `<div class="note">Live Grafana dashboards (Prometheus + Loki). Opens the embedded board; full Grafana at
+      <a href="${CONFIG.grafana_url}" target="_blank">${esc(CONFIG.grafana_url)} ↗</a>.</div>
+      <iframe src="${CONFIG.grafana_url}" referrerpolicy="no-referrer"></iframe>`;
+  },
+};
+
+function tableEvents(evs){
+  if(evs && evs.__offline) return offline("Platform API");
+  if(!Array.isArray(evs) || !evs.length) return none("events");
+  return `<table><thead><tr><th>Type</th><th>Camera</th><th>Severity</th><th>Confidence</th><th>When</th></tr></thead><tbody>
+    ${evs.map(e=>`<tr><td><b>${esc(e.event_type)}</b></td><td>${esc(e.camera_id)}</td><td>${sev(e.severity)}</td>
+      <td>${e.confidence!=null?esc(e.confidence):"—"}</td><td class="muted">${when(e.event_time)}</td></tr>`).join("")}
+    </tbody></table>`;
+}
+
+async function runSearch(){
+  const q = document.getElementById("q").value.trim();
+  const box = document.getElementById("results");
+  if(!q){ box.innerHTML=""; return; }
+  box.innerHTML = `<div class="empty">Searching…</div>`;
+  const res = await jget(GW("/search?q="+encodeURIComponent(q)+"&k=12"));
+  if(res.__offline) return box.innerHTML = offline("Platform API");
+  const hits = res.results||[];
+  if(res.error && !hits.length) box.innerHTML = `<div class="note">No results — ${esc(res.error)}</div>`;
+  else if(!hits.length) box.innerHTML = none("matches");
+  else box.innerHTML = hits.map(h=>`<div class="hit">
+      ${h.score!=null?`<span class="score">${(h.score*100|0)/100}</span>`:""}
+      <b>${esc(h.event_type||h.entity_type||"match")}</b> ${h.camera_id?`· ${esc(h.camera_id)}`:""}
+      <div class="muted">${esc(h.text_repr||h.summary||h.title||JSON.stringify(h).slice(0,160))}</div>
+      <div class="muted mono" style="margin-top:4px">${esc(when(h.event_time||h.created_at))}</div></div>`).join("");
+}
+
+async function openIncident(id){
+  const d = document.getElementById("drawer");
+  document.getElementById("scrim").classList.add("show"); d.classList.add("show");
+  d.innerHTML = `<div class="empty">Loading…</div>`;
+  const x = await jget(RV("/incidents/"+id));
+  if(x.__offline){ d.innerHTML = `<div class="dh"><b>Incident</b><button class="btn ghost sm" onclick="closeDrawer()">✕</button></div>${offline("Review UI")}`; return; }
+  const inc = x.incident||{};
+  const tl = x.timeline||[];
+  d.innerHTML = `
+    <div class="dh"><div><b>${esc(inc.title||"Incident")}</b><div class="muted">${esc(inc.incident_type||"")}</div></div>
+      <button class="btn ghost sm" onclick="closeDrawer()">✕</button></div>
+    <div class="sec"><h3>Details</h3>
+      <div class="kv"><span>Severity</span><b>${sev(inc.severity)}</b></div>
+      <div class="kv"><span>Status</span><b class="st-${esc(inc.status)}">${esc(inc.status)}</b></div>
+      <div class="kv"><span>Started</span><b>${when(inc.start_time)}</b></div>
+      ${x.headline_verdict?`<div class="kv"><span>VLM verdict</span><b>${esc(x.headline_verdict)}</b></div>`:""}
+      ${x.evidence_path?`<div class="kv"><span>Evidence</span><b class="mono">${esc(x.evidence_path)}</b></div>`:""}
+    </div>
+    ${tl.length?`<div class="sec"><h3>Timeline</h3><div class="tl">${tl.map(e=>`<div class="ev"><b>${esc(e.label||e.event_type||"event")}</b> <span class="muted">${esc(e.t||when(e.event_time))}</span></div>`).join("")}</div></div>`:""}
+    ${(x.events||[]).length?`<div class="sec"><h3>Source events (${x.events.length})</h3>${x.events.map(e=>`<div class="kv"><span>${esc(e.event_type)} · ${esc(e.camera_id)}</span><b>${sev(e.severity)}</b></div>`).join("")}</div>`:""}
+    <div class="sec"><h3>Reviewer decision</h3>
+      <input class="inp" id="rv-notes" placeholder="Notes (optional)" style="margin-bottom:10px"/>
+      <input class="inp" id="rv-who" placeholder="Your name" value="console-operator" style="margin-bottom:6px"/>
+    </div>
+    <div class="actions">
+      <button class="btn grow" onclick="decide('${esc(id)}','approve')">✓ Approve (confirm loss)</button>
+      <button class="btn danger grow" onclick="decide('${esc(id)}','reject')">✕ Reject (dismiss)</button>
+    </div>`;
+}
+async function decide(id, decision){
+  const reviewer = (document.getElementById("rv-who").value||"console-operator").trim();
+  const notes = document.getElementById("rv-notes").value.trim();
+  const r = await jpost(RV("/incidents/"+id+"/review"), {decision, reviewer, notes});
+  closeDrawer();
+  if(location.hash.slice(1)==="incidents") route();
+  toast(r && r.status ? `Incident ${decision==="approve"?"confirmed":"dismissed"} (→ ${r.status})` : "Saved");
+}
+function closeDrawer(){ document.getElementById("drawer").classList.remove("show"); document.getElementById("scrim").classList.remove("show"); }
+function toast(msg){ const t=document.createElement("div"); t.textContent=msg;
+  t.style.cssText="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--nv);color:#06210b;font-weight:700;padding:12px 20px;border-radius:10px;z-index:9";
+  document.body.appendChild(t); setTimeout(()=>t.remove(),2600); }
+
+async function route(){
+  const v = (location.hash.slice(1)||"overview");
+  const view = VIEWS[v]?v:"overview";
+  document.querySelectorAll("#nav a").forEach(a=>a.classList.toggle("active", a.dataset.view===view));
+  const [t,s] = TITLES[view]; document.getElementById("title").textContent=t; document.getElementById("subtitle").textContent=s;
+  const el = document.getElementById("view"); el.innerHTML = `<div class="empty">Loading…</div>`;
+  await VIEWS[view](el);
+}
+async function pollConn(){
+  const h = await jget("/healthz");
+  const ok = h && h.upstreams && h.upstreams.api && h.upstreams.api.ok;
+  const pill = document.getElementById("conn");
+  pill.className = "pill " + (ok?"ok":"bad");
+  document.getElementById("connTxt").textContent = ok? "platform online" : "API offline";
+}
+document.getElementById("nav").addEventListener("click",e=>{const a=e.target.closest("a"); if(a){location.hash=a.dataset.view;}});
+window.addEventListener("hashchange", route);
+(async()=>{ const c=await jget("/config"); if(c && !c.__offline) CONFIG=c; route(); pollConn(); setInterval(pollConn, 15000); })();
+</script>
+</body>
+</html>

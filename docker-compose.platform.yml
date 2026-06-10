@@ -1,0 +1,73 @@
+# App tier — the navigation + query surface, wired so ONE command brings the whole
+# platform up behind ONE URL (http://localhost:8080). Layer it on the base stack:
+#   docker compose -f docker-compose.yml -f docker-compose.observability.yml \
+#                  -f docker-compose.platform.yml up -d --build      (= `make platform`)
+#
+# `migrate` runs schema + seed once Postgres is healthy; api/review-ui/console then
+# start. The repo is bind-mounted so code changes need no rebuild. Console proxies to
+# api + review-ui by service name (single origin, no CORS). Grafana is embedded from
+# the browser, so its URL is the host-facing localhost:3000.
+services:
+  migrate:                               # one-shot: apply migrations + seed, then exit
+    build: { context: ., dockerfile: Dockerfile.app }
+    image: kathirmani-app
+    command: ["sh", "-lc", "python scripts/db_migrate.py up && python scripts/db_seed.py"]
+    working_dir: /app
+    volumes: ["./:/app"]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-kathir}:${POSTGRES_PASSWORD:-change_me_in_env}@postgres:5432/${POSTGRES_DB:-kathirmani}
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: "no"
+
+  api:                                   # platform read/query API (+ /docs, /search)
+    image: kathirmani-app
+    build: { context: ., dockerfile: Dockerfile.app }
+    command: ["uvicorn", "services.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
+    working_dir: /app
+    volumes: ["./:/app"]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-kathir}:${POSTGRES_PASSWORD:-change_me_in_env}@postgres:5432/${POSTGRES_DB:-kathirmani}
+      PLATFORM_API_KEY: ${PLATFORM_API_KEY:-}
+    ports: ["${API_PORT:-8000}:8000"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      migrate: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health').status==200 else 1)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  review-ui:                             # human approve/reject of loss hypotheses
+    image: kathirmani-app
+    build: { context: ., dockerfile: Dockerfile.app }
+    command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8010"]
+    working_dir: /app/services/review-ui
+    volumes: ["./:/app"]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-kathir}:${POSTGRES_PASSWORD:-change_me_in_env}@postgres:5432/${POSTGRES_DB:-kathirmani}
+      PYTHONPATH: /app
+    ports: ["${REVIEW_PORT:-8010}:8010"]
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  console:                               # ☜ THE FRONT DOOR — SPA + gateway on :8080
+    image: kathirmani-app
+    build: { context: ., dockerfile: Dockerfile.app }
+    command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
+    working_dir: /app/services/console
+    volumes: ["./:/app"]
+    environment:
+      CONSOLE_API_URL: http://api:8000
+      CONSOLE_REVIEW_URL: http://review-ui:8010
+      CONSOLE_GRAFANA_URL: http://localhost:${GRAFANA_PORT:-3000}   # browser-facing
+    ports: ["${CONSOLE_PORT:-8080}:8080"]
+    depends_on:
+      api: { condition: service_healthy }
+      review-ui: { condition: service_started }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8080/config').status==200 else 1)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

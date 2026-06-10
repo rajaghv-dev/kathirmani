@@ -98,6 +98,27 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   work" + hot/cold two-tier. `ingestion/sources.py` Source ABC: File/Rtsp (PyAV) now,
   GStreamerSource is the live/Phase-4 slot.
 
+## Front door — the Console (2026-06-10) → sessions/2026-06-10, PLATFORM.md
+- **Single entry = `services/console/` (BFF gateway) on :8080.** Serves one cohesive
+  SPA (`static/index.html`) + proxies server-side to API:8000 (`/backend/*`),
+  review-ui:8010 (`/review/*`), embeds Grafana:3000 — one origin, no CORS, auth
+  passthrough. `make console`. Was: scattered ports (8000/8010/3000/streamlit) with
+  no cohesive UX. Sections: Overview/Incidents(approve-reject)/Events/Search/Segments/
+  Cameras/Models/Observability; offline-degrading. `GET /search?q=` added to
+  services/api (wraps embedding-worker query_run). **PLATFORM.md** = the start-here
+  guide (README is still the old src/marlin doc).
+
+## Real-hardware follow-ups CLEARED (2026-06-10, code-doable ones) → sessions/2026-06-10
+- C-RADIO: random-projection head (`plugin._project`, cosine-preserving) replaces
+  truncate/pad; vector_dim tbd→768 (kept the pgvector index). TrackingPlugin
+  (`cv-oss-worker/tracking.py`) → real per-camera track_ids into events + `tracks`.
+  GStreamerSource live-RTSP splitmuxsink recorder implemented. Migration **0003**
+  audit_log append-only GRANTs (role `marlin_app`); **0004** tstzrange + btree_gist
+  overlap indexes (segments/incidents generated, ai_windows trigger-maintained).
+- STILL blocked on user/infra: `setup-nvidia-docker` (sudo), NGC key (DeepStream/
+  NIM/TAO), real-GPU benchmark numbers + real VSS summary (weights+GPU), and applying
+  0003/0004 (`make migrate`, no PG on dev box).
+
 ## Phases status (parallel-agent build)
 - **ALL 14 PHASES (0–13) BUILT ✅** via 5 dependency-ordered waves of parallel agents.
   `make test` = 264 component tests green (isolated per-dir). Phase 13 W5:
@@ -162,11 +183,24 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   btree indexes; true overlap joins for long/cross-clip subtle actions need an absolute
   `tstzrange` + `btree_gist` index on segments/events/incidents. Not built yet.
 
+## What's to be done (roadmap) → spec/10 "What's to be done", spec/14
+- **A. Blocked on infra/user:** `make setup-nvidia-docker` (sudo) · NGC key (DeepStream/
+  NIM/TAO) · real-GPU benchmark+bakeoff numbers + real VSS summary (fake now) · `make
+  migrate` on each deploy's PG (0001–0004; verified applying clean 2026-06-10).
+- **B. Deferred refactor (planned, NOT done — keeps suite green + invariants):**
+  hyphen→underscore package rename (`cv-oss-worker`→`cv_oss_worker` …; ~27 sys.path +
+  8 conftest/pytest.ini + Makefile/compose `working_dir`; ~40 files, do as 1 isolated
+  PR) · legacy `src/marlin` relocation (invariant-protected until baseline not needed).
+- **C. Open code follow-ups:** cross-camera track handoff (Tracker = per-camera ids
+  only) · Nemotron-VL prod edge cases (long/multilingual, batching) · serve_stream
+  parallel-GPU batching (design-only, spec/02).
+
 ## Spec index
 `01` overview · `02` architecture · `03` models/queries · `04` observability ·
 `05` performance · `06` hardware-portability · `07` runbook · `08` dashboards ·
-`09` repo-structure · `10` platform-roadmap · `11` model-plugin-policy ·
-`12` frameworks (requirements/ split + setup/validate) · `13` models (catalog/provenance).
+`09` repo-structure · `10` platform-roadmap (+ What's-to-be-done) · `11` model-plugin-policy ·
+`12` frameworks (requirements/ split + setup/validate) · `13` models (catalog/provenance) ·
+`14` console + one-command deployment (the front door).
 
 ## Setup + validation framework (per component)
 - Frameworks per component: `requirements/{base,inference,ingestion,db,api,models,

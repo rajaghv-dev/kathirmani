@@ -9,8 +9,11 @@ Persistence is best-effort and degrades gracefully:
   2. else                            → append a line to data/audit/audit.jsonl.
 Records are redacted before writing, so secrets never enter the audit trail.
 
-`audit_log` is NOT created here (we don't edit db/); see the migration DDL in the
-module docstring footer / integration notes.
+`audit_log` is created by migration db/migrations/0002_audit_log; its append-only
+posture (app role gets INSERT/SELECT only, never UPDATE/DELETE) is enforced at the
+privilege layer by migration 0003_audit_grants (group role `marlin_app`). In prod,
+connect this writer as a login role that is a member of `marlin_app` so the trail
+is tamper-evident even if the app credential is compromised.
 """
 from __future__ import annotations
 

@@ -56,8 +56,14 @@ profiles:
         runtime: transformers                     # Triton later
         model_id: nvidia/C-RADIOv4-H
         endpoint: local
-        vector_dim: tbd                           # resolve from model card in Phase 8;
-                                                  # db `embeddings` vector(N) must match
+        vector_dim: 768                           # db `embeddings` vector(768). RADIO's
+                                                  # native feature dim (~1280/3072, head-
+                                                  # dependent) is mapped down to this by a
+                                                  # cosine-preserving Gaussian random-
+                                                  # projection head (plugin._project), so
+                                                  # the table + pgvector index stay at 768.
+                                                  # To use the native dim instead: change
+                                                  # this + migrate the column.
         metrics: { enabled: true }
 
       summarization:

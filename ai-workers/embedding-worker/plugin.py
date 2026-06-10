@@ -15,11 +15,17 @@ infer(request): one of {text}, {image}, {clip_path}  ->
 
 DIM NOTE (spec/11 + db/schema.sql): the `embeddings` column is `vector(768)`.
 C-RADIOv4-H's native summary/feature dim is NOT 768 (RADIO summary features are
-~1280/3072 depending on the head). Until a migration changes the column, every
-vector this plugin emits — real OR fake — is **projected/padded to EMBED_DIM
-(768)** by `_to_dim()` so it always matches the table. If real RADIO is wired in,
-swap the projection for a learned/PCA head and bump the column in one migration
-(follow-up; flagged in the worker's integration notes).
+~1280/3072 depending on the head). Rather than migrate the column (which would
+drop the pgvector index and has no single "native" dim — it varies by head), we
+keep the table at 768 and map every real RADIO feature vector down to it with a
+proper **Gaussian random-projection head** (`_project`, Johnson–Lindenstrauss):
+a fixed N(0, 1/target) matrix, deterministic per (source_dim → target_dim) shape,
+that *approximately preserves cosine distance* — unlike the old truncate/pad which
+discarded ~40% of the features. Identical inputs still map to identical vectors
+(projection is linear), so the fake-path determinism contract holds. The target
+dim is config-driven (`vector_dim` in configs/models.yaml, default EMBED_DIM=768).
+To move to RADIO's native dim instead, set `vector_dim` + add a column migration;
+the projection becomes a no-op when source_dim == target_dim.
 """
 from __future__ import annotations
 
@@ -42,6 +48,10 @@ from base.plugin import Health, ModelPlugin, PluginConfig      # noqa: E402
 EMBED_DIM = 768
 DEFAULT_MODEL_ID = "nvidia/C-RADIOv4-H"
 
+# Fixed random-projection matrices, one per (source_dim, target_dim) shape. Built
+# once, deterministic from the shape (see `_projection_matrix`), shared process-wide.
+_PROJECTION_CACHE: dict[tuple[int, int], Any] = {}
+
 
 def default_config(profile: str = "nvidia_gb10_retail_balanced") -> PluginConfig:
     """A PluginConfig matching the `embedding` task of the active profile, so the
@@ -54,7 +64,7 @@ def default_config(profile: str = "nvidia_gb10_retail_balanced") -> PluginConfig
         runtime="transformers",
         endpoint="local",
         profile=profile,
-        params={"dim": EMBED_DIM},
+        params={"dim": EMBED_DIM},        # = configs/models.yaml embedding.vector_dim
     )
 
 
@@ -209,17 +219,49 @@ class NvidiaEmbeddingPlugin(ModelPlugin):
 
     # ---- dim coercion + deterministic fake vector --------------------------
     def _to_dim(self, vec: list[float]) -> list[float]:
-        """Project/pad an arbitrary-length feature vector to EMBED_DIM so it fits
-        the db `vector(768)` column. FOLLOW-UP: replace truncate/pad with a learned
-        or PCA projection head and migrate the column to RADIO's native dim."""
+        """Coerce an arbitrary-length feature vector to EMBED_DIM so it fits the db
+        `vector(N)` column. When the source dim already matches, just normalise;
+        otherwise apply the Gaussian random-projection head (`_project`), which
+        approximately preserves cosine distance (JL lemma) instead of the old
+        lossy truncate/pad. Always L2-normalised so cosine == dot product."""
         n = self._dim
         if len(vec) == n:
             return self._l2norm(vec)
-        if len(vec) > n:                          # truncate (cheap projection)
-            vec = vec[:n]
-        else:                                     # pad with zeros
-            vec = vec + [0.0] * (n - len(vec))
-        return self._l2norm(vec)
+        projected = self._project(vec, n)
+        return self._l2norm(projected)
+
+    @staticmethod
+    def _projection_matrix(source_dim: int, target_dim: int):
+        """A fixed (target_dim x source_dim) Gaussian random-projection matrix,
+        deterministic per shape and cached, with entries ~ N(0, 1/target_dim).
+        Deterministic ⇒ the same source vector always maps to the same output, so
+        cosine similarity is preserved across calls and the fake-path determinism
+        contract still holds. JL guarantees pairwise distances are ~preserved."""
+        key = (source_dim, target_dim)
+        mat = _PROJECTION_CACHE.get(key)
+        if mat is None:
+            import numpy as np
+            # Seed from the shape only — stable across processes/runs (no RNG state
+            # leak), so projections are reproducible everywhere.
+            rng = np.random.default_rng(seed=(source_dim * 1_000_003 + target_dim))
+            mat = rng.standard_normal((target_dim, source_dim)).astype("float64")
+            mat /= math.sqrt(target_dim)
+            _PROJECTION_CACHE[key] = mat
+        return mat
+
+    def _project(self, vec: list[float], target_dim: int) -> list[float]:
+        """Random-project `vec` to `target_dim`. Falls back to truncate/pad only if
+        numpy is somehow unavailable (base dep, so this is belt-and-suspenders) —
+        the coercion must never raise and break indexing."""
+        try:
+            import numpy as np
+            mat = self._projection_matrix(len(vec), target_dim)
+            out = mat @ np.asarray(vec, dtype="float64")
+            return [float(x) for x in out]
+        except Exception:                          # numpy missing → degrade, don't crash
+            if len(vec) > target_dim:
+                return vec[:target_dim]
+            return vec + [0.0] * (target_dim - len(vec))
 
     @staticmethod
     def _seed_of(request: dict[str, Any]) -> str:

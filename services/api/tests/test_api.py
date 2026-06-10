@@ -49,5 +49,7 @@ def test_model_registry_and_activate(monkeypatch):
 
 def test_auth_enforced_when_keyed(monkeypatch):
     monkeypatch.setenv("PLATFORM_API_KEY", "secret-test-key")
-    assert client.get("/cameras").status_code == 401          # no creds → 401
-    assert client.get("/cameras", headers={"X-API-Key": "secret-test-key"}).status_code != 401  # valid key passes auth
+    assert client.get("/cameras").status_code == 401          # no creds → 401 (before DB)
+    # valid key passes auth — assert against /health (auth-gated but DB-independent:
+    # it swallows DB errors) so this security check runs even with no Postgres.
+    assert client.get("/health", headers={"X-API-Key": "secret-test-key"}).status_code != 401

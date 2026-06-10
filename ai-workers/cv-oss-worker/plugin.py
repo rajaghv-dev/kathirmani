@@ -30,6 +30,12 @@ for _p in (str(_REPO_ROOT), str(_REPO_ROOT / "model-plugins")):
 from base.plugin import Health, ModelPlugin, PluginConfig      # noqa: E402
 from base.schemas import CommonEvent, Detection                # noqa: E402
 
+# Local helper import works both as a package module and when run directly.
+try:
+    from .tracking import Tracker
+except ImportError:                              # run as a script / flat import
+    from tracking import Tracker
+
 # Default weights location (configs/models.yaml: model_id jameslahm/yoloe-11s-seg,
 # local: models/yoloe). Resolved lazily — absence is non-fatal.
 DEFAULT_WEIGHTS = _REPO_ROOT / "models" / "yoloe" / "yoloe-11s-seg.pt"
@@ -62,6 +68,9 @@ class CvOssDetector(ModelPlugin):
         self._load_error = ""
         self._classes = list(self.config.params.get("classes", DEFAULT_CLASSES))
         self._weights = Path(self.config.params.get("weights", DEFAULT_WEIGHTS))
+        # Persistent multi-object tracker — pure-python, no GPU/weights. Shared
+        # across infer() calls so track_ids persist across windows per camera.
+        self._tracker = Tracker()
         # lightweight metric counters (also mirrored to prometheus in infer())
         self._n_requests = 0
         self._n_fake = 0
@@ -115,6 +124,12 @@ class CvOssDetector(ModelPlugin):
             "last_latency_ms": float(self._last_latency_ms),
             "model_loaded": 1.0 if self._loaded else 0.0,
         }
+
+    # ---- tracking accessor (for persistence) -------------------------------
+    def live_tracks(self, camera_id: str | None = None) -> list:
+        """Snapshot of the tracker's live tracks (used by the worker to persist
+        `tracks` rows). Best-effort: returns [] if the tracker is unset."""
+        return self._tracker.live_tracks(camera_id) if self._tracker else []
 
     # ---- inference ---------------------------------------------------------
     def fake_infer(self, request: dict[str, Any]) -> dict[str, Any]:
@@ -182,6 +197,13 @@ class CvOssDetector(ModelPlugin):
     # ---- packaging: detections + the §8.3 event hypothesis -----------------
     def _package(self, dets: list[Detection], request: dict[str, Any],
                  faked: bool) -> dict[str, Any]:
+        # Assign persistent track_ids (in place) before building events/rows, so
+        # detections, the §8.3 event, and the tracks table all share one identity.
+        camera_id = request.get("camera_id", "")
+        frame_time = float(request.get("window_start_sec", 0.0))
+        if dets:
+            frame_time = dets[0].frame_time_sec or frame_time
+        self._tracker.update(dets, camera_id, frame_time)
         events = self.detections_to_events(dets, request)
         return {
             "detections": [asdict(d) for d in dets],
@@ -214,6 +236,10 @@ class CvOssDetector(ModelPlugin):
             zone_ids = map_detection_to_zones(tuple(p.bbox), camera_id, zm)
             zone_types = zm.zone_types(zone_ids)
             if "shelf" in zone_types and items:
+                # Carry real persistent track_ids for the subjects in this event;
+                # the person's id leads so the rule engine buckets by that subject.
+                track_ids = [t for t in ([p.track_id] + [i.track_id for i in items])
+                             if t is not None]
                 ev = CommonEvent(
                     event_id=self._event_id(request, "suspicious_item_interaction"),
                     store_id=store_id,
@@ -225,6 +251,7 @@ class CvOssDetector(ModelPlugin):
                     ai_window_id=request.get("window_id"),
                     segment_id=request.get("segment_id"),
                     objects=[d.label for d in dets],
+                    track_ids=track_ids,
                     zones=zone_ids,
                     needs_vlm_verification=True,
                     evidence_path=request.get("clip_path"),

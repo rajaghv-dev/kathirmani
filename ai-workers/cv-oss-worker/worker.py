@@ -106,6 +106,43 @@ def _write_event(conn, ev: dict) -> str | None:
         return None
 
 
+def _write_tracks(conn, camera_id: str, tracks: list) -> int:
+    """Upsert the tracker's live tracks into the `tracks` table (best-effort).
+
+    Keyed on (camera_id, track_external_id): an existing row has its last_seen +
+    metadata refreshed, otherwise a new row is inserted. Returns count touched.
+    Each track is committed independently so one bad/rejected row (e.g. a missing
+    cameras FK against an unseeded DB) never poisons the rest or the loop."""
+    if conn is None or not tracks:
+        return 0
+    n = 0
+    for t in tracks:
+        ext_id = str(getattr(t, "track_id", ""))
+        if not ext_id:
+            continue
+        meta = json.dumps({"first_seen_sec": getattr(t, "first_seen", 0.0),
+                            "last_seen_sec": getattr(t, "last_seen", 0.0),
+                            "hits": getattr(t, "hits", 0)})
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "UPDATE tracks SET last_seen = now(), label = %s, "
+                    "metadata_json = %s::jsonb "
+                    "WHERE camera_id = %s AND track_external_id = %s",
+                    (getattr(t, "label", ""), meta, camera_id, ext_id))
+                if cur.rowcount == 0:
+                    cur.execute(
+                        "INSERT INTO tracks (camera_id, track_external_id, label, "
+                        "first_seen, last_seen, metadata_json) "
+                        "VALUES (%s, %s, %s, now(), now(), %s::jsonb)",
+                        (camera_id, ext_id, getattr(t, "label", ""), meta))
+            conn.commit()
+            n += 1
+        except Exception:
+            _safe_commit(conn)                          # rollback, keep going
+    return n
+
+
 def _write_model_run(conn, run: dict, n_det: int) -> None:
     if conn is None:
         return
@@ -152,6 +189,8 @@ def process_window(window: dict, plugin: CvOssDetector, queue, conn) -> dict:
     Returns a small summary dict (counts) for logging/tests."""
     out = plugin.infer(window)
     n_det = _write_detections(conn, window.get("window_id"), out["detections"])
+    camera_id = window.get("camera_id", "")
+    n_trk = _write_tracks(conn, camera_id, plugin.live_tracks(camera_id))
     n_ev = 0
     for ev in out["events"]:
         _write_event(conn, ev)                       # no-op without DB
@@ -162,7 +201,7 @@ def process_window(window: dict, plugin: CvOssDetector, queue, conn) -> dict:
         n_ev += 1
     _write_model_run(conn, out["model_run"], n_det)
     return {"window_id": window.get("window_id"), "detections": len(out["detections"]),
-            "detections_written": n_det, "events": n_ev,
+            "detections_written": n_det, "tracks_written": n_trk, "events": n_ev,
             "faked": out["model_run"].get("faked", False)}
 
 

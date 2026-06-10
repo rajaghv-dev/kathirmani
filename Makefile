@@ -2,6 +2,7 @@
 # Targets marked [stub] print intent until their phase lands (see spec/10-platform-roadmap).
 COMPOSE := docker compose -f docker-compose.yml -f docker-compose.observability.yml
 COMPOSE_GPU := $(COMPOSE) -f docker-compose.gpu.yml
+COMPOSE_PLATFORM := $(COMPOSE) -f docker-compose.platform.yml
 PROFILE ?= $(or $(MODEL_PROFILE),nvidia_gb10_retail_balanced)
 
 .PHONY: help
@@ -53,7 +54,19 @@ lint: ## Byte-compile python sources
 	@python3 -m py_compile scripts/*.py scripts/validate/*.py model-plugins/base/*.py ingestion/*.py db/*.py && echo "lint OK"
 
 # ---- Stack lifecycle --------------------------------------------------------
-.PHONY: up down logs grafana observability
+.PHONY: up down logs grafana observability platform platform-down platform-logs
+platform: ## ☜ ONE COMMAND: bring up the whole platform behind http://localhost:8080
+	$(COMPOSE_PLATFORM) up -d --build
+	@echo ""; echo "  ┌────────────────────────────────────────────────────┐"
+	@echo "  │  Kathirmani platform is up.                            │"
+	@echo "  │  ▶ Console (front door):  http://localhost:8080        │"
+	@echo "  │    API + Swagger /docs:   http://localhost:8000/docs   │"
+	@echo "  │    Grafana:               http://localhost:3000        │"
+	@echo "  └────────────────────────────────────────────────────┘"
+platform-down: ## Stop the whole platform (app tier + base + observability)
+	$(COMPOSE_PLATFORM) down
+platform-logs: ## Tail the app-tier logs (console/api/review-ui)
+	$(COMPOSE_PLATFORM) logs -f --tail=100 console api review-ui
 up: ## Bring up base + observability stack
 	$(COMPOSE) up -d
 down: ## Stop the stack
@@ -66,7 +79,7 @@ grafana: ## Print the Grafana URL
 	@echo "Grafana: http://localhost:3000 (admin/admin) — dashboards 01-18"
 
 # ---- DB + workers + tests (filled per phase) --------------------------------
-.PHONY: migrate migrate-down migrate-status seed backfill api run-cv-worker run-rule-engine run-vlm-worker index search run-review-ui summarize parity retention-dryrun retention-apply backup dashboards twin-validate ingest-sample run-workers test test-e2e bench bakeoff evidence-demo
+.PHONY: migrate migrate-down migrate-status seed backfill api run-cv-worker run-rule-engine run-vlm-worker index search run-review-ui console run-console summarize parity retention-dryrun retention-apply backup dashboards twin-validate ingest-sample run-workers test test-e2e bench bakeoff evidence-demo
 migrate: ## Apply db/migrations (Postgres)
 	python3 scripts/db_migrate.py up
 migrate-down: ## Roll back the latest migration
@@ -94,6 +107,9 @@ search: ## Phase 8: natural-language search (QUERY="...")
 	.venv/bin/python ai-workers/embedding-worker/worker.py query "$(QUERY)"
 run-review-ui: ## Phase 7: human review UI (FastAPI :8010)
 	cd services/review-ui && ../../.venv/bin/uvicorn app:app --host 0.0.0.0 --port 8010
+console: ## THE FRONT DOOR — unified console gateway (SPA + proxy) on :8080
+	cd services/console && ../../.venv/bin/uvicorn app:app --host 0.0.0.0 --port 8080
+run-console: console ## alias for `make console`
 summarize: ## Phase 9: hierarchical long-video summary (REQUEST=path.json optional)
 	.venv/bin/python ai-workers/vss-eval-worker/worker.py summarize $(if $(REQUEST),--request $(REQUEST),)
 parity: ## Phase 9: build the VSS-parity report → parity_report.json
@@ -117,7 +133,7 @@ gen-image: ## Design: AI image (PROVIDER=gemini|openai|both OUT=name PROMPT="...
 		$(if $(REF),--ref $(REF),)
 twin-validate: ## Phase 10: validate a store digital twin (STORE=configs/stores/kathirmani.yaml)
 	.venv/bin/python -c "import sys; sys.path.insert(0,'services/digital-twin'); from loader import load_twin; t=load_twin('$(or $(STORE),configs/stores/kathirmani.yaml)'); p=t.validate(); print(t.summary()); print('problems:',p); sys.exit(1 if p else 0)"
-TESTDIRS := tests/ ingestion/tests/ services/api/tests/ services/digital-twin/tests/ services/rule-engine/tests/ services/evidence-builder/tests/ services/review-ui/tests/ services/security/tests/ ai-workers/cv-oss-worker/tests/ ai-workers/vlm-worker/tests/ ai-workers/embedding-worker/tests/ ai-workers/vss-eval-worker/tests/ benchmarks/tests/ benchmarks/bakeoff/tests/ observability/tests/
+TESTDIRS := tests/ ingestion/tests/ services/api/tests/ services/digital-twin/tests/ services/rule-engine/tests/ services/evidence-builder/tests/ services/review-ui/tests/ services/console/tests/ services/security/tests/ ai-workers/cv-oss-worker/tests/ ai-workers/vlm-worker/tests/ ai-workers/embedding-worker/tests/ ai-workers/vss-eval-worker/tests/ benchmarks/tests/ benchmarks/bakeoff/tests/ observability/tests/
 # Per-component (isolated) runs: the hyphenated worker dirs aren't packages and share
 # module basenames (plugin.py/worker.py), so collecting them together clashes. The
 # tests/ deselect skips a live-Grafana integration test (env-dependent, not platform code).

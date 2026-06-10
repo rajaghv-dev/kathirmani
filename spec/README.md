@@ -2,7 +2,10 @@
 
 This spec/ directory is the reorganized, structured documentation for the Kathirmani Marlin video-intelligence pipeline. It is derived from learning.md (kept at repo root as the original working notes).
 
-> **Note:** [06-hardware-portability.md](06-hardware-portability.md) and [09-repo-structure.md](09-repo-structure.md) cover the runtime device-detection design and the `src/` package layout introduced in the refactor.
+> **Note:** docs `01`–`08` describe the legacy Marlin research cascade; `09`–`14`
+> describe the **platform** the repo became. Start at
+> [09-repo-structure.md](09-repo-structure.md) (repo map) and
+> [14-console-and-deployment.md](14-console-and-deployment.md) (the front door + one-command launch).
 
 ## Contents
 
@@ -21,3 +24,4 @@ This spec/ directory is the reorganized, structured documentation for the Kathir
 | [11-model-plugin-policy.md](11-model-plugin-policy.md) | **Forward-looking.** The NVIDIA-only model policy + the `ModelPlugin` layer, registry/profiles/catalog, `model_runs` audit, additive `model_*` metrics, and why Qwen is comparison-only. |
 | [12-frameworks.md](12-frameworks.md) | Frameworks per component (the `requirements/` split) + how each is set up (`scripts/setup/`) and validated (`scripts/validate/` + `make validate`/`doctor`). |
 | [13-models.md](13-models.md) | Consolidated model map: current cascade + the free NVIDIA lineup (real IDs), provenance pinning, the config-driven runtimes, and per-inference tracking. |
+| [14-console-and-deployment.md](14-console-and-deployment.md) | **The front door.** The Console BFF/gateway (`services/console`, :8080) + one-command launch (`Dockerfile.app`, `docker-compose.platform.yml`, `make platform`); ports, env, auth, verification. |

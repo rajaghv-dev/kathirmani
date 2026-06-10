@@ -32,6 +32,7 @@ def test_process_window_no_db():
     summary = worker.process_window(w, p, q, conn=None)
     assert summary["detections"] >= 1
     assert summary["detections_written"] == 0          # no DB
+    assert summary["tracks_written"] == 0              # no DB
     assert summary["events"] >= 1                       # suspicious-item hypothesis
     q.close()
 

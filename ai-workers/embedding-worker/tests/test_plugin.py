@@ -34,6 +34,41 @@ def test_fake_infer_is_deterministic_and_content_sensitive():
     assert cos_diff < 0.5                           # near-orthogonal
 
 
+def test_projection_head_coerces_native_dim_and_is_unit_norm():
+    """RADIO emits a non-768 feature vector; the projection head maps it to a
+    unit-norm 768-d vector that fits the db column."""
+    p = NvidiaEmbeddingPlugin()
+    native = [float((i * 7) % 13) - 6.0 for i in range(1280)]   # ~RADIO summary dim
+    out = p._to_dim(native)
+    assert len(out) == 768
+    norm = math.sqrt(sum(v * v for v in out))
+    assert abs(norm - 1.0) < 1e-6
+
+
+def test_projection_head_is_deterministic():
+    """Same source vector -> same projected vector across calls and instances, so
+    cosine similarity is stable (the fake-path determinism contract relies on this)."""
+    a = NvidiaEmbeddingPlugin()._to_dim([float(i % 5) for i in range(1280)])
+    b = NvidiaEmbeddingPlugin()._to_dim([float(i % 5) for i in range(1280)])
+    assert a == b
+    cos = sum(x * y for x, y in zip(a, b))
+    assert cos > 0.999
+
+
+def test_projection_head_approximately_preserves_cosine():
+    """Johnson-Lindenstrauss: a near-duplicate source pair stays far more similar
+    after projection than an unrelated pair — what truncate/pad could not guarantee."""
+    p = NvidiaEmbeddingPlugin()
+    base = [math.sin(i * 0.013) for i in range(1280)]
+    near = [v + 0.01 * math.cos(i * 0.31) for i, v in enumerate(base)]   # tiny perturbation
+    far = [math.cos(i * 0.077) for i in range(1280)]
+    pb, pn, pf = p._to_dim(base), p._to_dim(near), p._to_dim(far)
+    cos_near = sum(x * y for x, y in zip(pb, pn))
+    cos_far = sum(x * y for x, y in zip(pb, pf))
+    assert cos_near > cos_far
+    assert cos_near > 0.9                            # near-duplicate stays close
+
+
 def test_infer_falls_back_to_fake_without_model():
     p = NvidiaEmbeddingPlugin()
     out = p.infer({"text": "anything"})             # no weights -> fake path
