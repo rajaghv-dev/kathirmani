@@ -31,7 +31,7 @@ search → digital twin → Grafana. The current `src/marlin` pipeline becomes t
 | Search | none | pgvector + multi-embedding fusion + Nemotron critic | — |
 | Digital twin | implicit (5 cameras, same area) | YAML store/camera/FOV/zone, event→twin mapping | camera roles |
 | Plugin layer | none — code is imported Python | `ModelPlugin` ABC + registry + profiles | `metrics.py` registry pattern |
-| Observability | 7 dashboards, `marlin_*` | +dashboards 01–18, `model_*` namespace, OTel, DCGM | the whole `04`/`08` stack |
+| Observability | 8 dashboards, `marlin_*` | +dashboards 01–18, `model_*` namespace, OTel, DCGM | the whole `04`/`08` stack |
 | Makefile / compose | none — `start_stack.sh` only | Makefile + 3 compose files, one-command stack | `start_stack.sh` logic |
 
 Strongest existing asset = observability ([04](04-observability-stack.md),
@@ -109,11 +109,11 @@ implementation.
 | **1 ✅** OSS ingestion | PyAV → 10-sec clips + 5-sec windows @2s stride → filesystem + JSONL + queue; camera health. **Files done; live RTSP (GStreamer `splitmuxsink`, Phase 1.5) now implemented** (`GStreamerSource` + `catalog_live_clips`). | 5-camera footage segmented, registered, queued; `ingest_*` metrics |
 | **2 ✅** DB + API | `db/migrations` + `schema.sql` (§6 + A6, 19 tables, partitioned events, job_queue); `PgQueue` (SKIP LOCKED); JSON→rows backfill; FastAPI (+ model-registry endpoints); seed kathirmani | workers/UI use stable API contracts; `make migrate && seed && backfill` idempotent |
 | **3 ✅** Observability | dashboards 01–18 (`observability/grafana/`, generator + 18 JSONs), `model_*`/`ingest_*` scrape, OTel + promtail configs, additive to `marlin_*` | dashboards generated + validated; scrape wiring documented (panels light up as producers expose /metrics) |
-| **4 ✅** CV worker | `ai-workers/cv-oss-worker` — YOLOE behind `DetectionPlugin` (fake-infer fallback), consumes `ai_window.ready`, writes detections/events/model_runs, zone-maps, emits `suspicious_item_interaction`. DeepStream worker later. | CV worker emits common event schema; 14 tests green |
-| **5 ✅** Rule engine | `services/rule-engine/` — deterministic per-track context windows over `event_rules.yaml`; consumes/republishes `event.created`, raises explainable events + `possible_loss` incidents; golden fixtures | suspicious-item events raised **without** a VLM; 22 tests green |
-| **6 ✅** VLM worker | `ai-workers/vlm-worker/` — plugin host (Nemotron-VL / Qwen baseline + fake_infer); prompt pack `retail_loss_v1`, JSON repair, writes `vlm_observations` + `model_runs`, updates event confidence | suspicious events get explanation; profile-selected; 22 tests green |
+| **4 ✅** CV worker | `ai-workers/cv-oss-worker` — YOLOE behind `DetectionPlugin` (fake-infer fallback), consumes `ai_window.ready`, writes detections/events/model_runs, zone-maps, emits `suspicious_item_interaction`. DeepStream worker later. | CV worker emits common event schema; 23 tests green |
+| **5 ✅** Rule engine | `services/rule-engine/` — deterministic per-track context windows over `event_rules.yaml`; consumes/republishes `event.created`, raises explainable events + `possible_loss` incidents; golden fixtures | suspicious-item events raised **without** a VLM; 24 tests green |
+| **6 ✅** VLM worker | `ai-workers/vlm-worker/` — plugin host (Nemotron-VL / Qwen baseline + fake_infer); prompt pack `retail_loss_v1`, JSON repair, writes `vlm_observations` + `model_runs`, updates event confidence | suspicious events get explanation; profile-selected; 23 tests green |
 | **7 ✅** Evidence + review | `services/evidence-builder/` (PyAV 20-sec stitch + sha256 + timeline, manifest-only fallback) + `services/review-ui/` (:8010 approve/reject, audit reviewer/ts/model_version) | reviewable incidents; 24 tests green |
-| **8 ✅** Search | `ai-workers/embedding-worker/` — C-RADIOv4-H embedding plugin (fake 768-d) + indexer + parse→metadata→pgvector→fuse→critic search | NL search returns ranked, time-stamped hits; 26 tests green (ran vs live pgvector). C-RADIO dim≠768 **resolved**: cosine-preserving random-projection head (`plugin._project`) maps to the `vector(768)` column, `vector_dim: 768` |
+| **8 ✅** Search | `ai-workers/embedding-worker/` — C-RADIOv4-H embedding plugin (fake 768-d) + indexer + parse→metadata→pgvector→fuse→critic search | NL search returns ranked, time-stamped hits; 29 tests green (ran vs live pgvector). C-RADIO dim≠768 **resolved**: cosine-preserving random-projection head (`plugin._project`) maps to the `vector(768)` column, `vector_dim: 768` |
 | **9 ✅** VSS-parity | `ai-workers/vss-eval-worker/` — `nvidia_summary` plugin + §A4.2 staged LVS (clip→5min→hour→report) + `parity.py`→`parity_report.json` (rt_cv/embedding/lvs/search/vios). VSS reference-only | parity report (honest measured/fake/pending); 24 tests green |
 | **10 ✅** Digital twin | `services/digital-twin/` — `StoreTwin` (load/validate/zones_for_point/map_event/summary); `configs/digital_twin/second_store.yaml` proves YAML-only onboarding | second store loads + validates with the same code; 5 tests green |
 | **11 ✅** Benchmark + TCO | `benchmarks/` harness (p50/p95, clips-min/GPU, tokens/sec) + `tco.py` (cost/1000-clips, /camera-month, /store-month) + 6 configs → `model_benchmark_runs`. Fake-mode default (synthetic until GPU run); real runner pluggable | harness + TCO; 28 tests green |
@@ -131,7 +131,8 @@ whole stack behind that URL. Design + ports + env: [14-console-and-deployment.md
 ## What's to be done (roadmap)
 
 The 14 phases + the code-doable real-hardware follow-ups + the entry-point Console are
-**done**. What remains:
+**done**. The full component suite is green — **299 passed, 1 deselected** across the 16
+`TESTDIRS` (verified 2026-06-11 via `make test`). What remains:
 
 **A. Blocked on infra / user action (cannot be coded here):**
 - `make setup-nvidia-docker` — needs **sudo** (not passwordless); registers the NVIDIA

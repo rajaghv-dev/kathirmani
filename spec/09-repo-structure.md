@@ -106,7 +106,8 @@ brings the whole stack up behind the Console on `:8080`. Design + ports + env:
 `make test` runs each component dir in isolation (the `TESTDIRS` list) because the
 hyphenated dirs share module basenames (`plugin.py`/`worker.py`) and can't be collected
 together. The legacy `tests/` (device/structure/setup) + `tests/conftest.py` put `src/`
-on `sys.path` so they import `marlin.*` without an editable install.
+on `sys.path` so they import `marlin.*` without an editable install. Full suite as of
+2026-06-11: **299 passed, 1 deselected** (the live-Grafana datasource check).
 
 ## Related
 

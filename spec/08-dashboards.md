@@ -10,7 +10,7 @@ There are 8 dashboards (7 originals + a model performance & usefulness view). Th
 - **Fused / dedup** — the same real event is seen by several cameras. Fusion collapses those into one "unique event". `raw events` = before dedup, `unique events` = after.
 - **Security signal** (Qwen dashboard) — a Qwen2.5-VL answer to a loss-prevention question that came back non-empty/affirmative (e.g. "is someone concealing an item?"). It's a *flag to review*, not a confirmed theft.
 
-## The 7 dashboards
+## The 8 dashboards
 
 ### Model & Runtime (`/d/marlin-model-runtime`) — "is the box healthy?"
 The hardware/infra view. DGX power (W), compute utilization %, temperature, unified-memory and CPU/RAM timelines (CPU/RAM come from Netdata). Use it to confirm the GB10 is actually working during a run and isn't thermal/memory constrained. The Videos/Events stats are just a sanity check that a run landed.

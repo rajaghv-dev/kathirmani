@@ -121,7 +121,8 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
 
 ## Phases status (parallel-agent build)
 - **ALL 14 PHASES (0–13) BUILT ✅** via 5 dependency-ordered waves of parallel agents.
-  `make test` = 264 component tests green (isolated per-dir). Phase 13 W5:
+  `make test` = **299 passed, 1 deselected** across 16 TESTDIRS (re-verified 2026-06-11;
+  was 264). Phase 13 W5:
   `benchmarks/bakeoff/` (runtime matrix + select_profiles production/fallback +
   rollback reusing API model_profiles.active; 20 tests). `make bakeoff`.
 - **Real Nemotron-VL WIRED (2026-06-04).** `ai-workers/vlm-worker/plugin.py` runs the
