@@ -133,7 +133,8 @@ def bargauge(title: str, expr: str, *, w: int = 24, h: int = 8, unit: str = "sho
 # Dashboard assembly. Each spec is (uid, title, tags, about, [panels]).
 # ---------------------------------------------------------------------------
 
-def build(uid: str, title: str, tags, about: str, panels: list[dict]) -> dict:
+def build(uid: str, title: str, tags, about: str, panels: list[dict],
+          annotations: list[dict] | None = None) -> dict:
     about_panel = _about(about)
     laid_out = [about_panel]
     # Auto-stack: lay panels left-to-right within a 24-col grid, wrapping rows.
@@ -156,7 +157,7 @@ def build(uid: str, title: str, tags, about: str, panels: list[dict]) -> dict:
         row_h = max(row_h, gp["h"])
         laid_out.append(p)
     about_panel["id"] = 1
-    return {
+    dash = {
         "title": title,
         "uid": uid,
         "schemaVersion": SCHEMA_VERSION,
@@ -166,6 +167,9 @@ def build(uid: str, title: str, tags, about: str, panels: list[dict]) -> dict:
         "tags": list(tags),
         "panels": laid_out,
     }
+    if annotations:
+        dash["annotations"] = {"list": annotations}
+    return dash
 
 
 def dashboards() -> list[dict]:
@@ -557,6 +561,127 @@ def dashboards() -> list[dict]:
     return out
 
 
+# ---------------------------------------------------------------------------
+# Per-model dashboards (one per model in the catalog + active profiles).
+# ---------------------------------------------------------------------------
+
+_REPO = Path(__file__).resolve().parents[2]
+
+
+def model_inventory() -> list[dict]:
+    """Every model the platform can run → [{id, family, tasks}], deduped.
+
+    Reads the catalog + the non-NVIDIA exceptions + whatever the profiles in
+    configs/models.yaml actually bind. Falls back to a static list if PyYAML or the
+    files are unavailable, so the generator never hard-fails."""
+    seen: dict[str, dict] = {}
+
+    def add(mid: str, family: str = "", tasks=None):
+        if not mid:
+            return
+        e = seen.setdefault(mid, {"id": mid, "family": family, "tasks": []})
+        if family and not e["family"]:
+            e["family"] = family
+        for t in (tasks or []):
+            if t not in e["tasks"]:
+                e["tasks"].append(t)
+
+    try:
+        import yaml
+        cat = yaml.safe_load((_REPO / "configs/model_catalog/nvidia_models.yaml").read_text())
+        for m in (cat.get("models") or []):
+            add(m.get("id"), m.get("family", ""), m.get("tasks"))
+        for m in (cat.get("non_nvidia_exceptions") or []):
+            add(m.get("id"), "non_nvidia_exception")
+        prof = yaml.safe_load((_REPO / "configs/models.yaml").read_text())
+        for pname, pcfg in (prof.get("profiles") or {}).items():
+            for task, tcfg in (pcfg.get("tasks") or {}).items():
+                if isinstance(tcfg, dict) and tcfg.get("model_id"):
+                    add(tcfg["model_id"], "", [task])
+    except Exception:
+        for mid in ["nvidia/Llama-3.1-Nemotron-Nano-VL-8B-V1",
+                    "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16",
+                    "nvidia/C-RADIOv4-H", "nvidia/Cosmos-Reason2-2B",
+                    "jameslahm/yoloe-11s-seg"]:
+            add(mid)
+    return sorted(seen.values(), key=lambda e: e["id"])
+
+
+def _slug(model_id: str) -> str:
+    return model_id.replace("/", "-").replace(".", "-").replace("_", "-").lower()
+
+
+def model_dashboard(model: dict) -> dict:
+    """One dashboard for a single model: its `model_*` traffic/latency/quality + the
+    Netdata-sourced `model_resource_*` runtime footprint (set by base/run_hooks when the
+    model is kicked off), with run-window annotations on every timeline."""
+    mid = model["id"]
+    sel = '{model_id="' + mid + '"}'           # PromQL selector for this model
+    selb = '{model_id="' + mid + '"}'           # for *_bucket series too (le added below)
+    fam = model.get("family") or "model"
+    tasks = ", ".join(model.get("tasks") or []) or "—"
+
+    # Grafana run-window annotations pushed by base/run_hooks (tags: model-run + model_id)
+    annos = [
+        {"builtIn": 1, "datasource": {"type": "grafana", "uid": "-- Grafana --"},
+         "enable": True, "name": "Annotations & Alerts", "type": "dashboard"},
+        {"name": "Model runs", "datasource": {"type": "grafana", "uid": "-- Grafana --"},
+         "enable": True, "iconColor": "purple", "type": "tags",
+         "tags": ["model-run", mid]},
+    ]
+
+    panels = [
+        # --- traffic / reliability ---
+        stat("Runs (total)", f"sum(model_runs_total{sel})", color="blue"),
+        stat("Requests (ok)", f'sum(model_requests_total{{model_id="{mid}",status="ok"}})', color="green"),
+        stat("Errors", f"sum(model_errors_total{sel})", color="red"),
+        stat("Last run (s)", f"max(model_resource_run_seconds{sel})", unit="s", color="purple"),
+        # --- latency ---
+        timeseries("Latency p50 / p95 / p99 (ms)",
+                   [(f"histogram_quantile(0.50, sum(rate(model_latency_ms_bucket{selb}[5m])) by (le))", "p50"),
+                    (f"histogram_quantile(0.95, sum(rate(model_latency_ms_bucket{selb}[5m])) by (le))", "p95"),
+                    (f"histogram_quantile(0.99, sum(rate(model_latency_ms_bucket{selb}[5m])) by (le))", "p99")],
+                   unit="ms"),
+        # --- RUNTIME RESOURCES (Netdata via run_hooks) ---
+        timeseries("Host CPU during this model's runs (%)",
+                   [(f"model_resource_cpu_percent{sel}", "{{task}}/{{runtime}}")], unit="percent"),
+        timeseries("Host RAM used during runs (MB)",
+                   [(f"model_resource_ram_used_mb{sel}", "{{task}}/{{runtime}}")], unit="decmbytes"),
+        timeseries("Disk I/O during runs (KiB/s)",
+                   [(f"model_resource_io_read_kbps{sel}", "read"),
+                    (f"model_resource_io_write_kbps{sel}", "write")], unit="KiBs"),
+        timeseries("GPU power during runs (W)",
+                   [(f"model_resource_gpu_power_watts{sel}", "{{runtime}}")], unit="watt"),
+        timeseries("GPU memory / utilization (per gpu)",
+                   [(f"model_gpu_memory_used_bytes{sel}", "mem {{gpu}}"),
+                    (f"model_gpu_utilization_ratio{sel}", "util {{gpu}}")]),
+        # --- throughput ---
+        timeseries("Throughput — clips/min & video-sec/sec",
+                   [(f"60 * sum(rate(model_clips_processed_total{sel}[5m]))", "clips/min"),
+                    (f"sum(rate(model_video_seconds_processed_total{sel}[5m]))", "video-sec/sec")]),
+        # --- generative-only (empty for non-generative models, harmless) ---
+        timeseries("TTFT p95 (ms) & decode tok/s (generative)",
+                   [(f"histogram_quantile(0.95, sum(rate(model_ttft_ms_bucket{selb}[5m])) by (le))", "ttft p95 (ms)"),
+                    (f"avg(model_tokens_per_second{sel})", "tok/s")]),
+        # --- quality ---
+        timeseries("Event precision / recall (by dataset)",
+                   [(f"model_event_precision{sel}", "precision {{dataset}}"),
+                    (f"model_event_recall{sel}", "recall {{dataset}}")], unit="percentunit"),
+        table("Run log (runtime / profile / latency)",
+              [f"sum(model_runs_total{sel}) by (runtime, profile)"]),
+    ]
+    return build(
+        f"kathir-model-{_slug(mid)}", f"Model — {mid}", ["kathir", "model", "per-model"],
+        f"### Model — `{mid}`\n"
+        f"Family **{fam}** · tasks: {tasks}. Per-model view: traffic, latency, quality "
+        f"(`model_*` filtered to this `model_id`) **plus its runtime footprint on the box** "
+        f"— host CPU/RAM/disk-I/O range-queried from **Netdata** and GPU power from "
+        f"nvidia-smi over each run window, attributed to this model by `base/run_hooks` "
+        f"whenever it is kicked off (spec/04 + spec/16). Purple markers on the timelines "
+        f"are this model's run windows.",
+        panels, annotations=annos)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Generate platform Grafana dashboards 01-18.")
     ap.add_argument("--out", default=str(Path(__file__).parent / "dashboards"),
@@ -574,8 +699,20 @@ def main() -> int:
         path.write_text(json.dumps(dash, indent=2, ensure_ascii=False) + "\n")
         written.append(path.name)
 
-    print(f"Wrote {len(written)} dashboards to {out_dir}:")
-    for n in written:
+    # One dashboard per model, under dashboards/models/.
+    models = model_inventory()
+    model_dir = out_dir / "models"
+    model_dir.mkdir(parents=True, exist_ok=True)
+    model_written = []
+    for m in models:
+        dash = model_dashboard(m)
+        path = model_dir / (dash["uid"].removeprefix("kathir-model-") + ".json")
+        path.write_text(json.dumps(dash, indent=2, ensure_ascii=False) + "\n")
+        model_written.append(f"models/{path.name}")
+
+    print(f"Wrote {len(written)} platform dashboards + {len(model_written)} per-model "
+          f"dashboards to {out_dir}:")
+    for n in written + model_written:
         print(f"  {n}")
     return 0
 

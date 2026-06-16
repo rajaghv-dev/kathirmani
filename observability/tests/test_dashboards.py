@@ -69,6 +69,28 @@ def test_each_has_panels_and_about(tmp_path):
         assert any(p.get("targets") for p in panels), f"{stem}: no metric targets"
 
 
+def test_per_model_dashboards(tmp_path):
+    """One dashboard per model under models/, each with a run-window annotation and a
+    Netdata-sourced `model_resource_*` runtime panel (the spec/16 per-model view)."""
+    out_dir = tmp_path / "dashboards"
+    _generate(out_dir)
+    model_files = sorted((out_dir / "models").glob("*.json"))
+    assert model_files, "no per-model dashboards generated"
+    uids = []
+    for f in model_files:
+        d = json.loads(f.read_text())
+        uids.append(d["uid"])
+        assert d["uid"].startswith("kathir-model-"), f.name
+        assert d.get("schemaVersion") == 39, f.name
+        ann = d.get("annotations", {}).get("list", [])
+        assert any(a.get("type") == "tags" and "model-run" in (a.get("tags") or [])
+                   for a in ann), f"{f.name}: missing model-run annotation"
+        blob = json.dumps(d)
+        assert "model_resource_" in blob, f"{f.name}: no Netdata runtime-resource panel"
+        assert "model_id=" in blob, f"{f.name}: panels not filtered by model_id"
+    assert len(set(uids)) == len(uids), f"duplicate per-model uids: {uids}"
+
+
 def test_datasource_and_metric_names(tmp_path):
     """Targets reference the documented metric families on the marlin-metrics DS."""
     dashes = _load_all(tmp_path)

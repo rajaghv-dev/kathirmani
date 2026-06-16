@@ -45,6 +45,26 @@ It reads the same `kathirmani_*` gauges as the others (so it persists between ru
 `serve_metrics.py`), and is the OSS, results-driven precursor to the platform's model
 dashboards 11–18 (`spec/11`, master plan A7). Same "No data" caveat below.
 
+## Per-model dashboards + the model-run hook
+
+Beyond the fixed 01–18 set, the generator emits **one dashboard per model** under
+`observability/grafana/dashboards/models/` (uid `kathir-model-<slug>`), enumerated from
+`configs/model_catalog/nvidia_models.yaml` + the active `configs/models.yaml` profiles.
+Each shows that model's `model_*` traffic/latency/quality (filtered `{model_id="…"}`)
+**plus its runtime footprint on the box** — host CPU/RAM/disk-I/O and GPU power.
+
+Those runtime numbers are linked via a **model-run hook** (`model-plugins/base/run_hooks.py`):
+the workers wrap every `plugin.infer()` (the kickoff choke-point) with
+`record_model_run(config, t0, t1, model_run)`, which (a) **range-queries Netdata** over
+`[t0, t1]` for CPU/RAM/IO + samples nvidia-smi for GPU power, publishing
+`model_resource_*` gauges labelled by `model_id`, and (b) pushes a **Grafana region
+annotation** (`tags: model-run, <model_id>`) so each per-model timeline shows exactly
+when that model ran. The hook is best-effort — on a CPU-only / no-stack box it no-ops
+without touching inference ([04](04-observability-stack.md) Netdata,
+[16](16-capability-hooks-profiles-router.md) per-model view). Regenerate + import:
+`make_dashboards.py` then the loop in `observability/README.md` (which now also globs
+`dashboards/models/`).
+
 ## Troubleshooting — if everything says "No data"
 
 The dashboards are only as alive as the stack behind them. Most "No data" is one of two things:

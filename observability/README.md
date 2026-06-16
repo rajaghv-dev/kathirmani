@@ -46,7 +46,8 @@ Grafana (admin/admin):
 
 ```bash
 GRAFANA_URL=http://localhost:3000
-for f in observability/grafana/dashboards/*.json; do
+# platform set (01-18) + the per-model dashboards under dashboards/models/
+for f in observability/grafana/dashboards/*.json observability/grafana/dashboards/models/*.json; do
   curl -sS -u admin:admin -X POST "$GRAFANA_URL/api/dashboards/db" \
     -H 'Content-Type: application/json' \
     -d "{\"dashboard\": $(cat "$f"), \"overwrite\": true, \"folderUid\": \"marlin\"}" \

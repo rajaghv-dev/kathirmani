@@ -187,7 +187,13 @@ def _file_jobs(out_dir: Path, limit: int) -> list[dict]:
 def process_window(window: dict, plugin: CvOssDetector, queue, conn) -> dict:
     """Run the plugin on one ai_window.ready message and persist outputs.
     Returns a small summary dict (counts) for logging/tests."""
+    _t0 = time.time()
     out = plugin.infer(window)
+    try:  # telemetry hook: per-model runtime resources + run annotation (never fatal)
+        from base.run_hooks import record_model_run
+        record_model_run(getattr(plugin, "config", None), _t0, time.time(), out.get("model_run"))
+    except Exception:
+        pass
     n_det = _write_detections(conn, window.get("window_id"), out["detections"])
     camera_id = window.get("camera_id", "")
     n_trk = _write_tracks(conn, camera_id, plugin.live_tracks(camera_id))

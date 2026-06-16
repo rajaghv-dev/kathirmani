@@ -47,6 +47,26 @@ model_video_seconds_processed_total = Counter(
 model_frames_processed_total = Counter(
     "model_frames_processed_total", "Frames processed", _COMMON)
 
+# ---- Per-run runtime resources (Netdata-sourced via run_hooks) --------------
+# Set by base/run_hooks.record_model_run() for the model's most recent run window.
+# Host-level CPU/RAM/IO come from Netdata range-queried over [start,end]; GPU power
+# from nvidia-smi. Attributed to the model via the _COMMON labels so a per-model
+# dashboard can show "what this model cost the box while it was running".
+model_resource_cpu_percent = Gauge(
+    "model_resource_cpu_percent", "Host CPU %% during the model's last run window", _COMMON)
+model_resource_ram_used_mb = Gauge(
+    "model_resource_ram_used_mb", "Host RAM used (MB) during the last run window", _COMMON)
+model_resource_io_read_kbps = Gauge(
+    "model_resource_io_read_kbps", "Disk read (KiB/s) during the last run window", _COMMON)
+model_resource_io_write_kbps = Gauge(
+    "model_resource_io_write_kbps", "Disk write (KiB/s) during the last run window", _COMMON)
+model_resource_gpu_power_watts = Gauge(
+    "model_resource_gpu_power_watts", "GPU power (W) during the last run window", _COMMON)
+model_resource_run_seconds = Gauge(
+    "model_resource_run_seconds", "Wall-clock duration of the last run (s)", _COMMON)
+model_runs_total = Counter(
+    "model_runs_total", "Model runs observed by the run hook", _COMMON)
+
 # ---- Quality (A8.4) ---------------------------------------------------------
 model_event_precision = Gauge(
     "model_event_precision", "Event precision on a dataset", _COMMON + ["dataset"])

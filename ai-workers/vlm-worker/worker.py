@@ -170,7 +170,13 @@ def process_event(ev: dict, plugin, queue, conn) -> dict:
         "event": ev,
         "event_id": ev.get("event_id"),
     }
+    _t0 = time.time()
     out = plugin.infer(request)
+    try:  # telemetry hook: per-model runtime resources + run annotation (never fatal)
+        from base.run_hooks import record_model_run
+        record_model_run(getattr(plugin, "config", None), _t0, time.time(), out.get("model_run"))
+    except Exception:
+        pass
     event_id = ev.get("event_id")
     obs_id = _write_vlm_observation(conn, out, event_id)
     confidence = float(out["verification"].get("confidence", 0.0))
