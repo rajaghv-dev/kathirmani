@@ -32,7 +32,14 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   `spec/02`, `spec/05`.
 - `inference/locate.py` (`--locate`) absent — optional lazy stub (`marlin.locate`).
 
-## Roadmap (future platform — not built yet) → `spec/10`, `spec/11`
+## Roadmap (future platform — not built yet) → `spec/10`, `spec/11`, `spec/15`–`17`
+- **v3 capability-hook layer (forward-looking, doc-only as of 2026-06-16).**
+  Plug-and-play QUALITY/WHEN/WHERE/WHAT hooks + POS + cost-tiered profiles
+  (economy/balanced/benchmark) + router + small-model parity. **v3 RELAXES the hard
+  NVIDIA-only default** (spec/11): selection = measured cost/quality parity on retail
+  KPIs, NVIDIA-only demoted to one optional/recommended profile. Not yet built — no
+  `ingestion/quality/` module, no POS adapter. → `spec/15` (quality gate), `spec/16`
+  (hooks/profiles/router/parity), `spec/17` (POS + wall-clock time alignment).
 - Target: OSS-ingestion-first, NVIDIA-model-first, plugin platform (master plan
   `oss_ingestion_nvidia_model_plugin_master_plan_v2.md` at root). Current
   `src/marlin` cascade = the AI-worker seed. 14 phases; start at Phase 0.

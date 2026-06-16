@@ -3,9 +3,20 @@
 This spec/ directory is the reorganized, structured documentation for the Kathirmani Marlin video-intelligence pipeline. It is derived from learning.md (kept at repo root as the original working notes).
 
 > **Note:** docs `01`–`08` describe the legacy Marlin research cascade; `09`–`14`
-> describe the **platform** the repo became. Start at
-> [09-repo-structure.md](09-repo-structure.md) (repo map) and
-> [14-console-and-deployment.md](14-console-and-deployment.md) (the front door + one-command launch).
+> describe the **platform** the repo became; `15`–`17` are the **v3 capability-hook
+> layer** (forward-looking — plug-and-play models + image-quality gate + POS). Start at
+> [09-repo-structure.md](09-repo-structure.md) (repo map),
+> [14-console-and-deployment.md](14-console-and-deployment.md) (the front door + one-command launch),
+> and [16-capability-hooks-profiles-router.md](16-capability-hooks-profiles-router.md)
+> (where the system is heading).
+>
+> **Design statement (master prompt v3).** Frontier models are not the product — the
+> product is a disciplined evidence pipeline. *Video AI detects visible candidate events ·
+> image-quality gates improve model reliability · POS checks transaction context · rules
+> prioritize review · humans decide · observability proves cost, speed, and quality.*
+> Better frames, atomic prompts, cheap-models-first, selective VLM routing, POS
+> correlation, rules, human review, and observability make **lower-cost models useful
+> enough for real retail operations**.
 
 ## Contents
 
@@ -25,3 +36,6 @@ This spec/ directory is the reorganized, structured documentation for the Kathir
 | [12-frameworks.md](12-frameworks.md) | Frameworks per component (the `requirements/` split) + how each is set up (`scripts/setup/`) and validated (`scripts/validate/` + `make validate`/`doctor`). |
 | [13-models.md](13-models.md) | Consolidated model map: current cascade + the free NVIDIA lineup (real IDs), provenance pinning, the config-driven runtimes, and per-inference tracking. |
 | [14-console-and-deployment.md](14-console-and-deployment.md) | **The front door.** The Console BFF/gateway (`services/console`, :8080) + one-command launch (`Dockerfile.app`, `docker-compose.platform.yml`, `make platform`); ports, env, auth, verification. |
+| [15-quality-gate.md](15-quality-gate.md) | **Forward-looking (v3).** The QUALITY hook — ingestion image/video quality scoring that gates the models; scores, schema, gate decisions, routing, metrics, file layout, tests. |
+| [16-capability-hooks-profiles-router.md](16-capability-hooks-profiles-router.md) | **Forward-looking (v3).** Plug-and-play WHEN/WHERE/WHAT/QUALITY capability hooks, the model registry/plugin schema, economy/balanced/benchmark profiles, the router, small-model parity + `model_performance` report, and the NVIDIA-only-policy relaxation. |
+| [17-pos-and-time-alignment.md](17-pos-and-time-alignment.md) | **Forward-looking (v3).** POS-aware reasoning (Store-POS read-only adapter, modes, config), wall-clock time alignment, POS context in evidence, the full QUALITY→WHEN→WHERE→WHAT→POS→RULES→HUMAN hook map, review UI/outcomes. |

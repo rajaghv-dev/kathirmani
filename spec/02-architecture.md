@@ -12,6 +12,31 @@ The pipeline combines three models along three orthogonal axes, cascade-gated:
 
 Full dataflow lives in `docs/ARCHITECTURE.md`.
 
+## The axes are capability hooks, not fixed models
+
+The three axes above are the **current defaults**, but the architecture treats each as
+a **plug-and-play capability hook** — the pipeline calls a *capability*
+(`temporal_find`, `spatial_grounding`, `semantic_vlm`), and a config profile binds the
+concrete model. So Marlin/YOLOE/Qwen can be swapped or A/B-compared without refactoring.
+A fourth hook, **QUALITY**, runs *before* all three to decide whether the input is even
+usable, and a **POS** hook runs *after* to settle the transaction question. Full hook
+map and selection rules:
+
+```text
+QUALITY → Is this visual input good enough?          (spec/15)
+WHEN    → When did a visible event happen?           (Marlin, spec/03)
+WHERE   → Where is the relevant person/object/zone?  (Locate/YOLOE + route_to_vlm)
+WHAT    → What does the keyframe/clip appear to show? (Qwen, routed-only)
+POS     → Was there a matching transaction?          (spec/17)
+RULES   → Should this become a review item?          (rule-engine, spec/10 Phase 5)
+HUMAN   → What is the final decision?                (review-ui, spec/10 Phase 7)
+```
+
+Hooks + cost-tiered model profiles + the router:
+[16-capability-hooks-profiles-router.md](16-capability-hooks-profiles-router.md). The
+QUALITY gate: [15-quality-gate.md](15-quality-gate.md). POS + wall-clock alignment:
+[17-pos-and-time-alignment.md](17-pos-and-time-alignment.md).
+
 ## The parallelism reality
 
 `run_all()` processes the 5 cameras through a `ThreadPoolExecutor` (`--max-workers`, default one worker per video).
@@ -37,4 +62,4 @@ Each parallel worker inserts to Loki + sets Prometheus gauges + pushes Grafana a
 
 ## Related
 
-[01-overview.md](01-overview.md) · [04-observability-stack.md](04-observability-stack.md) · [05-performance-and-optimizations.md](05-performance-and-optimizations.md) · [06-hardware-portability.md](06-hardware-portability.md)
+[01-overview.md](01-overview.md) · [04-observability-stack.md](04-observability-stack.md) · [05-performance-and-optimizations.md](05-performance-and-optimizations.md) · [06-hardware-portability.md](06-hardware-portability.md) · [15-quality-gate.md](15-quality-gate.md) · [16-capability-hooks-profiles-router.md](16-capability-hooks-profiles-router.md) · [17-pos-and-time-alignment.md](17-pos-and-time-alignment.md)

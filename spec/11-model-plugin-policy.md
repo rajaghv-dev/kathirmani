@@ -4,6 +4,18 @@
 > [Addendum A](../oss_ingestion_nvidia_model_plugin_master_plan_v2.md) (A1–A13). This
 > is the *durable model map* for the target platform; the roadmap is the build order.
 
+> **⚠️ Superseded default (v3, 2026-06-16).** The master prompt v3 **relaxes the hard
+> NVIDIA-only-default rule below.** Model selection is now governed by **measured
+> cost/quality parity on the retail KPIs**, not vendor — NVIDIA-only becomes one
+> *optional* (still-valid, recommended-for-trust) profile rather than the mandated
+> default; `economy`/`balanced` may run Marlin/YOLOE/Qwen as first-class defaults. The
+> trust/supply-chain rationale in this doc stands as the reason to *prefer* a narrow
+> vendor scope, now weighed rather than enforced. The governing rule + the relaxed
+> `validate-model-config` contract:
+> [16-capability-hooks-profiles-router.md](16-capability-hooks-profiles-router.md)
+> §"Policy reconciliation". Read this doc as the trust argument; read spec/16 for what
+> actually gates a default model.
+
 ## Why a plugin layer at all
 
 The master plan's core thesis is **stable contracts ⇒ no refactor later**. Models
