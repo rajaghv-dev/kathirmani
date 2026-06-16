@@ -152,7 +152,10 @@ selection criterion becomes **measured cost/quality parity on the retail KPIs**
   "require a declared `cost_profile` + `quality_profile` + a parity result (or explicit
   `parity: pending`) for every default model". Vendor scope becomes an *advisory* check,
   not a hard gate. (This changes the spec/11 A5.2 contract — update spec/11 when the
-  validator changes.)
+  validator changes.) **`parity: pending` is only temporary:** the validator **warns** on
+  a `pending` older than a set window (N runs / days), and a model stuck on `pending`
+  must be marked `non_default`/`experimental` — it cannot silently serve as a production
+  default forever (otherwise the parity gate is toothless).
 - Frontier / closed models stay **teacher/auditor-only** (§teacher below) — relaxing
   the *vendor* rule does not make a paid frontier model a production default.
 
@@ -215,6 +218,15 @@ narrow retail task* through system design:
    default.
 6. **Measure task-level parity** (next section).
 
+> **⚠️ Frontier-as-teacher on real footage is a PII-egress event.** A frontier/closed
+> reference model is typically a **cloud API**, and store CCTV frames are PII/biometric
+> data ([10](10-platform-roadmap.md) §Security). Sending real footage to it violates the
+> "no cloud dependency" scope ([01](01-overview.md)) and the trust posture. **Rule:** the
+> frontier reference runs **only on synthetic or explicitly consented/redacted data**,
+> never on raw store footage, and every such call is logged; it stays `enabled: false`
+> by default (routing policy `frontier_reference`). Relaxing the *vendor* policy (below)
+> does **not** relax this.
+
 ## Small-model parity report
 
 A low-cost model is "good enough" only when it **matches the reference model on
@@ -254,13 +266,13 @@ positives? which rules create useful review items? cost per useful evidence bund
 
 ## Metrics
 
-Additive (master prompt `retail_video_ai_*`; in-repo follows the `model_*` convention,
-[11](11-model-plugin-policy.md) §metrics):
+Additive under the existing **`model_*`** convention ([11](11-model-plugin-policy.md)
+§metrics) — the master prompt's `retail_video_ai_*` names are **not** used:
 
 ```text
-retail_video_ai_model_selected_total / _skipped_total / _escalations_total
-retail_video_ai_model_inference_seconds / _model_cost_units_total
-retail_video_ai_route_to_vlm_total · _qwen_runs_total · _qwen_skips_total
+model_selected_total / model_skipped_total / model_escalations_total
+model_inference_seconds / model_cost_units_total
+model_route_to_vlm_total · model_qwen_runs_total · model_qwen_skips_total
 ```
 
 Stable labels: `capability, model_id, model_profile, device, precision, query_id,

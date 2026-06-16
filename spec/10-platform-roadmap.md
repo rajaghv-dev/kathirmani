@@ -187,8 +187,12 @@ The 14 phases + the code-doable real-hardware follow-ups + the entry-point Conso
 4. Don't optimize tokens/sec alone — measure video-sec/sec/GPU, clips/min/GPU,
    precision/recall, p95, cost/store.
 5. Don't delay observability — Grafana from Phase 1.
-6. Don't make a non-NVIDIA model the production/benchmark default — Qwen is
-   comparison-only ([11-model-plugin-policy.md](11-model-plugin-policy.md)).
+6. ~~Don't make a non-NVIDIA model the production/benchmark default — Qwen is
+   comparison-only.~~ **Relaxed by v3 (2026-06-16):** model selection is governed by
+   measured cost/quality parity, not vendor; NVIDIA-only is one *recommended* profile,
+   not mandated ([16-capability-hooks-profiles-router.md](16-capability-hooks-profiles-router.md)
+   §Policy reconciliation). Provenance pinning + the parity gate replace it as the trust
+   control ([11-model-plugin-policy.md](11-model-plugin-policy.md)).
 
 ## Security & trust (cross-cutting — utmost priority, not just Phase 12)
 
@@ -206,7 +210,7 @@ the data, the models, and the verdicts *is* the product.
 | **PII & retention** | minimize/redact where possible; enforce `configs/retention.yaml` limits; privacy-by-design on footage | Phase 1, 12 |
 | **Tenant isolation** | all data store-scoped; one store cannot read another's clips/incidents | Phase 2, 10 |
 | **Evidence integrity** | `video_segments.checksum`; immutable/locked evidence; full chain-of-custody audit (reviewer + timestamp + **model version**) | Phase 7 |
-| **Model trust** | pin provenance (`model_registry.source_url`/`license_notes`); NVIDIA-only policy; safety/guard models + output validation (A1.1) | Phase 0, 6 |
+| **Model trust** | pin provenance (`model_registry.source_url`/`license_notes`); **vendor scope advisory + measured cost/quality parity gate** (v3 relaxed the hard NVIDIA-only default — [16](16-capability-hooks-profiles-router.md) §Policy reconciliation); safety/guard models + output validation (A1.1) | Phase 0, 6 |
 | **Auditability** | `model_runs` + incident audit logs make every decision traceable — trust through legibility | Phase 3, 6, 12 |
 
 **Gate:** no phase is "done" until its relevant security/trust control above is in

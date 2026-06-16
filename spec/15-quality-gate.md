@@ -36,26 +36,35 @@ This is the same cascade-gating thesis the cascade already embodies for the VLM
 [11-model-plugin-policy.md](11-model-plugin-policy.md) §"Don't use the VLM for
 everything") — extended one stage earlier, to the pixels themselves.
 
-## Where it lives
+## Where it lives — extends the existing `ingestion/health.py`
 
-The master prompt names `src/retail_video_ai/quality/`. In this repo the platform
-ingestion package is **`ingestion/`** (spec/12), so the quality gate lands there
-alongside the segmenter/windows/health it depends on:
+**The camera-health half already exists — do not rebuild it.**
+`ingestion/health.py:health_scores()` already computes `black_frame_score`,
+`blur_score`, `freeze_score`, `fps_actual`, and a composite `health_score` ∈ [0,1]
+(1 = healthy), **numpy-only with no OpenCV dependency** — a deliberate portability
+choice ([06](06-hardware-portability.md)). Those are exported as the live
+`ingest_camera_*` metrics, and the rule engine already raises `camera_health_issue`
+when `health_score <= 0.5` (`configs/event_rules.yaml`, [10](10-platform-roadmap.md)
+Phase 5). The QUALITY hook **extends this module; it does not replace it.**
+
+The master prompt names a fresh `src/retail_video_ai/quality/` package; in this repo
+the work lands **in/next to `ingestion/health.py`** (the ingestion package, spec/12),
+adding the per-chunk *usability summary*, the zone-visibility proxies, and the routing
+decision **on top of** the existing health scores:
 
 ```text
-ingestion/quality/
-  __init__.py
-  image_quality.py      # per-frame no-reference scores (OpenCV/heuristics default)
-  video_quality.py      # per-chunk aggregation + duplicate/motion across frames
-  roi_quality.py        # zone-aware crop scoring (shelf / counter / entry-exit)
-  quality_schema.py     # QualityResult / QualityDecision dataclasses
-  quality_router.py     # quality → use_for_{when,where,what} routing hints
+ingestion/
+  health.py             # EXISTING — black/blur/freeze + composite health_score (numpy)
+  quality.py     (new)  # usable_frame_score, zone-visibility proxies, per-chunk decision
+  quality_schema.py (new)# QualityResult / QualityDecision dataclasses
+  quality_router.py (new)# quality → use_for_{when,where,what} routing hints
 ```
 
 It is a **capability hook** behind the `ImageQualityModel` contract
-([16](16-capability-hooks-profiles-router.md)) — default `opencv_quality_v1`
-(OpenCV + lightweight heuristics), swappable for a no-reference IQA model, a small
-classifier, or a learned camera-health model without touching the pipeline.
+([16](16-capability-hooks-profiles-router.md)). **The default is the existing numpy
+heuristics** (`health.py`); a no-reference IQA model, a small classifier, or an OpenCV
+backend are *optional* swaps, never required — keeping the ingestion tier
+dependency-light and CPU-portable ([06](06-hardware-portability.md)).
 
 ## What it scores
 
@@ -71,9 +80,11 @@ usable_frame_score (summary)  billing_counter_visibility_score
 camera_health_score           entry_exit_visibility_score
 ```
 
-`usable_frame_score` is the headline summary the router keys off; the
-`*_visibility_score`s are **zone-aware** (computed against the camera's role/zone from
-`configs/cameras.yaml` + the digital twin, [10](10-platform-roadmap.md)).
+`black_frame_score`, `blur_score`, `freeze_score`, and `health_score`
+(= `camera_health_score`) are **already produced** by `ingestion/health.py`; the rest are
+the QUALITY-hook additions. `usable_frame_score` is the headline summary the router keys
+off; the `*_visibility_score`s are **zone-aware** (computed against the camera's
+role/zone from `configs/cameras.yaml` + the digital twin, [10](10-platform-roadmap.md)).
 
 ### Output schema (`QualityResult`)
 
@@ -121,18 +132,32 @@ The decision is **advisory routing**, consumed by the model router
 the routing policy (`skip_if_quality_below`, `usable_frame_score < …`), so a poor frame
 cannot produce an overconfident conclusion.
 
+**Thresholds are per-camera/zone, not global.** A chronically dim or soft camera (e.g.
+the entry door at night) must **not** be silently gated off by an absolute floor — that
+would drop real events on that camera, the opposite of the loss-prevention goal.
+Thresholds are **relative to each camera/zone's rolling baseline** (or explicitly
+calibrated in `configs/cameras.yaml`); the absolute `usable_frame_score` is only a
+last-resort floor.
+
+**Gating trades recall for cost/precision — so the poor-quality path must never silently
+drop a high-risk candidate.** "Very poor quality" sends a high-risk candidate to
+**needs-review** (a human still looks, flagged "low quality"); it does not suppress it.
+Only **low-risk** low-quality chunks are dropped. This is the ingestion-side mirror of
+the "Poor video quality, cannot decide" review outcome ([17](17-pos-and-time-alignment.md)).
+
 ## Metrics
 
-Additive to the existing `marlin_*` / `model_*` / `ingest_*` namespaces
-([04](04-observability-stack.md), [11](11-model-plugin-policy.md) §metrics). The master
-prompt names a `retail_video_ai_*` namespace; in-repo these follow the established
-`ingest_*` convention for ingestion-stage signals:
+Additive under the existing **`ingest_*`** namespace ([04](04-observability-stack.md)) —
+the camera-health gauges `ingest_camera_blur_score` / `_black_frame_score` /
+`_freeze_score` / `_health_score` **already exist**. The QUALITY hook adds the usability
++ rejection counters under the same convention; the master prompt's `retail_video_ai_*`
+names are **not** used (one namespace, no fragmentation):
 
 ```text
-retail_video_ai_quality_score              (gauge, by camera/zone)
-retail_video_ai_usable_frames_total
-retail_video_ai_rejected_frames_total      (by reason: blur/low_light/duplicate/occlusion)
-retail_video_ai_camera_quality_warnings_total
+ingest_quality_usable_frame_score      (gauge, by camera/zone)
+ingest_quality_usable_frames_total
+ingest_quality_rejected_frames_total   (by reason: blur/low_light/duplicate/occlusion)
+# chronically-poor cameras already surface via the rule engine's camera_health_issue
 ```
 
 Stable labels only — `camera_id`, `zone`, `reason`, `run_id` (never raw paths or

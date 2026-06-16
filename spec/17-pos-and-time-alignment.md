@@ -58,6 +58,22 @@ Suggested location: `services/pos-adapter/` (a service alongside `rule-engine` /
 `evidence-builder`, [09](09-repo-structure.md)), or an `ai-workers` consumer if it runs
 off the queue.
 
+## What the lookup window is anchored on
+
+The window is anchored on the **billing / exit event**, not the shelf-pick. Normal
+shopping has a long, variable gap between picking an item and paying (pick at 10:00, pay
+at 10:25) — anchoring on the *pick* with any reasonable window would falsely report "no
+paid transaction" for ordinary customers and flood review with false positives. So POS
+correlation keys off the **exit-after-item / billing-counter** events
+([03](03-models-and-query-modes.md) atomic queries `exit_after_item_pick`,
+`item_on_billing_counter`): *did a paid transaction exist around the time this person
+billed or left with goods?*
+
+The asymmetric default (`before 180s` / `after 240s`) brackets that **billing moment**,
+not the pick. Window size is a precision/recall dial: **wider** absorbs clock drift
+(§time alignment) but pulls in more unrelated transactions → more `ambiguous`;
+**narrower** is precise but misses under drift. Tune per store and record the choice.
+
 ## POS context on every candidate
 
 Every candidate event carries its POS lookup result (included in the evidence bundle,
@@ -134,11 +150,12 @@ prioritize; humans decide.
 
 ## POS in observability
 
-Metrics (additive; master prompt `retail_video_ai_pos_*`):
+Metrics under a `pos_*` namespace (sibling to the existing `ingest_*` / `model_*`); the
+master prompt's `retail_video_ai_pos_*` names are not used:
 
 ```text
-retail_video_ai_pos_transactions_checked_total
-retail_video_ai_pos_matches_total · _pos_misses_total
+pos_transactions_checked_total
+pos_matches_total · pos_misses_total
 ```
 
 OTel spans `retail.pos.healthcheck`, `retail.pos.transaction_lookup` join the tree
