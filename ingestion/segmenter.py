@@ -2,7 +2,7 @@
 
 Re-encodes (libx264 ultrafast) into N-second clips and, in the same pass, collects
 the first frame (thumbnail) + a few sampled frames (health) so we don't decode twice.
-Mirrors `src/marlin/pipeline.py:trim_video`. GStreamer would replace this for the
+Mirrors `src/kathirmani/pipeline.py:trim_video`. GStreamer would replace this for the
 HW-accelerated/at-scale path (see sources.py); the rest of ingestion is unchanged.
 """
 from __future__ import annotations
@@ -16,7 +16,7 @@ import av
 import numpy as np
 
 try:                                   # use the repo's bundled-FFmpeg preload if present
-    from marlin.ffmpeg_preload import preload_av_ffmpeg
+    from kathirmani.ffmpeg_preload import preload_av_ffmpeg
 except Exception:                      # pragma: no cover
     def preload_av_ffmpeg(*_a, **_k): ...
 

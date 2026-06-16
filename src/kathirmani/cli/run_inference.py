@@ -13,13 +13,13 @@ import sys
 from pathlib import Path
 
 # Make the package importable whether launched via the root shim, `python -m
-# marlin.cli.run_inference`, or directly. src = parents[2] of this file.
+# kathirmani.cli.run_inference`, or directly. src = parents[2] of this file.
 _SRC = Path(__file__).resolve().parents[2]
 if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
-from marlin import PROJECT_ROOT, MODELS_DIR
-from marlin.ffmpeg_preload import preload_av_ffmpeg
+from kathirmani import PROJECT_ROOT, MODELS_DIR
+from kathirmani.ffmpeg_preload import preload_av_ffmpeg
 
 # Pre-load PyAV's bundled FFmpeg libs (Linux) before ANY torch/transformers
 # import. No-op on macOS, where torchcodec resolves its own ffmpeg.
@@ -76,11 +76,11 @@ def main():
 
     _check_telemetry()
 
-    from marlin.metrics import start_metrics_server
-    from marlin.loki import log_inference_start, log_run_complete
+    from kathirmani.metrics import start_metrics_server
+    from kathirmani.loki import log_inference_start, log_run_complete
     start_metrics_server(args.metrics_port)
 
-    from marlin.pipeline import load_model, run_all, process_video, LOCAL_MODEL_PATH
+    from kathirmani.pipeline import load_model, run_all, process_video, LOCAL_MODEL_PATH
 
     model_path = Path(args.model_path) if args.model_path else LOCAL_MODEL_PATH
 
@@ -111,10 +111,10 @@ def main():
 
     elapsed = time.time() - t0
     log_run_complete(len(results), sum(len(r.get("events",[])) for r in results), elapsed)
-    from marlin.annotations import annotate_run_complete
+    from kathirmani.annotations import annotate_run_complete
     annotate_run_complete(len(results), sum(len(r.get("events",[])) for r in results), elapsed)
 
-    from marlin.metrics import compute_economy
+    from kathirmani.metrics import compute_economy
     economy = compute_economy(
         total_events=sum(len(r.get("events", [])) for r in results),
         wall_time_sec=elapsed,
@@ -129,8 +129,8 @@ def main():
     # worth sending to the VLM. Results merged into each <camera>.json.
     if args.locate:
         try:
-            from marlin.locate import load_detector, analyze_video as locate_video
-            from marlin.pipeline import _GPU_LOCK
+            from kathirmani.locate import load_detector, analyze_video as locate_video
+            from kathirmani.pipeline import _GPU_LOCK
             detector = load_detector(args.locate_backend)
             results_dir = Path(args.results_dir)
             for result in results:
@@ -153,8 +153,8 @@ def main():
     # --- Qwen2.5-VL spatial analysis (optional, runs after Marlin) ---
     qwen_path = HERE / "models" / "Qwen2.5-VL-7B-Instruct"
     if qwen_path.exists() and not args.skip_qwen:
-        from marlin.qwen_vl import load_qwen_model, analyze_video, QWEN_QUERIES
-        from marlin.pipeline import _GPU_LOCK
+        from kathirmani.qwen_vl import load_qwen_model, analyze_video, QWEN_QUERIES
+        from kathirmani.pipeline import _GPU_LOCK
         print("[main] Loading Qwen2.5-VL-7B for spatial analysis ...")
         qwen_model, qwen_processor = load_qwen_model(qwen_path)
 
@@ -184,7 +184,7 @@ def main():
                 qwen_result = analyze_video(qwen_model, qwen_processor, video_file, label, _GPU_LOCK,
                                             frame_times=frame_times)
                 # Log each Qwen answer to Loki
-                from marlin.loki import log_qwen_answer
+                from kathirmani.loki import log_qwen_answer
                 for query, res in qwen_result.get("queries", {}).items():
                     if res.get("ok") and res.get("answer"):
                         log_qwen_answer(label, query, res["answer"])

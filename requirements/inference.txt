@@ -1,4 +1,4 @@
-# Core model inference (the src/marlin cascade). Heavy; GPU box only.
+# Core model inference (the src/kathirmani cascade). Heavy; GPU box only.
 torch>=2.11.0
 transformers>=5.7.0
 accelerate

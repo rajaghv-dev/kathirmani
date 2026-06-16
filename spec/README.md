@@ -1,6 +1,6 @@
-# Kathirmani Marlin — Spec Documentation
+# Kathirmani — Spec Documentation
 
-This spec/ directory is the reorganized, structured documentation for the Kathirmani Marlin video-intelligence pipeline. It is derived from learning.md (kept at repo root as the original working notes).
+This spec/ directory is the reorganized, structured documentation for the Kathirmani video-intelligence pipeline. It is derived from learning.md (kept at repo root as the original working notes).
 
 > **Note:** docs `01`–`08` describe the legacy Marlin research cascade; `09`–`14`
 > describe the **platform** the repo became; `15`–`17` are the **v3 capability-hook
@@ -30,7 +30,7 @@ This spec/ directory is the reorganized, structured documentation for the Kathir
 | [06-hardware-portability.md](06-hardware-portability.md) | Runtime accelerator detection — one checkout across NVIDIA DGX (CUDA), Apple Mac Studio (MPS), and CPU; how the loaders, metrics, and scripts adapt. |
 | [07-runbook.md](07-runbook.md) | How to run and view — setup, run_inference.py flags, outputs, and the Streamlit viewer. |
 | [08-dashboards.md](08-dashboards.md) | What each of the 8 Grafana dashboards means, the shared vocabulary, and the telemetry-preflight troubleshooting note. |
-| [09-repo-structure.md](09-repo-structure.md) | The `src/marlin` package layout, the root entry-point shims, path anchoring, and how every command stays unchanged. |
+| [09-repo-structure.md](09-repo-structure.md) | The `src/kathirmani` package layout, the root entry-point shims, path anchoring, and how every command stays unchanged. |
 | [10-platform-roadmap.md](10-platform-roadmap.md) | **Forward-looking.** The OSS-ingestion + NVIDIA-model platform the repo is heading toward (master plan v2): current-vs-target gap, the 14-phase build, critical path, anti-goals, acceptance. |
 | [11-model-plugin-policy.md](11-model-plugin-policy.md) | **Forward-looking.** The NVIDIA-only model policy + the `ModelPlugin` layer, registry/profiles/catalog, `model_runs` audit, additive `model_*` metrics, and why Qwen is comparison-only. |
 | [12-frameworks.md](12-frameworks.md) | Frameworks per component (the `requirements/` split) + how each is set up (`scripts/setup/`) and validated (`scripts/validate/` + `make validate`/`doctor`). |

@@ -1,7 +1,7 @@
 # 09 · Repository Structure
 
 The repo has two layers: the **platform** (services, AI workers, ingestion, DB, the
-Console front door) and the **legacy Marlin research cascade** (`src/marlin/` + root
+Console front door) and the **legacy Marlin research cascade** (`src/kathirmani/` + root
 shims), kept as the non-default comparison baseline. Both share one checkout; the
 legacy layer is *not* a hard dependency of the platform (only lazy/optional imports —
 `ffmpeg_preload`, the Qwen baseline plugin).
@@ -48,12 +48,12 @@ kathirmani/
 ├── spec/                   # this documentation set
 ├── agents-memory/          # AI-agent session notes + durable memory
 │
-└── src/marlin/             # LEGACY research cascade (see below)
+└── src/kathirmani/             # LEGACY research cascade (see below)
     ├── __init__.py         #   PROJECT_ROOT / MODELS_DIR / RESULTS_DIR anchors
     ├── pipeline.py qwen_vl.py device.py ffmpeg_preload.py metrics.py loki.py …
     ├── cli/{run_inference,download_model}.py
     └── viz/app.py          #   Streamlit viewer
-   root shims → src/marlin:  run_inference.py · download_model.py · serve_metrics.py
+   root shims → src/kathirmani:  run_inference.py · download_model.py · serve_metrics.py
                              · viz_app.py · run.sh · setup.sh · start_stack.sh · cleanup.sh
    learning.md (original working notes, kept verbatim)
 ```
@@ -79,19 +79,19 @@ kathirmani/
 
 ## Path anchoring (legacy)
 
-Videos, `models/`, and `results/` live at the **repo root**. `src/marlin/__init__.py`
+Videos, `models/`, and `results/` live at the **repo root**. `src/kathirmani/__init__.py`
 exposes the anchors so nothing depends on the cwd:
 
 ```python
-PROJECT_ROOT = Path(__file__).resolve().parents[2]   # src/marlin → repo root
+PROJECT_ROOT = Path(__file__).resolve().parents[2]   # src/kathirmani → repo root
 MODELS_DIR   = PROJECT_ROOT / "models"
 RESULTS_DIR  = PROJECT_ROOT / "results"
 ```
 
-`serve_metrics.py` re-derives the root locally (no `marlin` import) so the slim metrics
+`serve_metrics.py` re-derives the root locally (no `kathirmani` import) so the slim metrics
 container can run standalone. `ingestion/config.py` and `scripts/fetch_models.py`
 likewise re-derive the root locally — the platform never imports the anchors from
-`marlin`. **Invariant:** keep the root shims + path anchors working and `learning.md`
+`kathirmani`. **Invariant:** keep the root shims + path anchors working and `learning.md`
 verbatim (these are the legacy commands' contract).
 
 ## Deployment & the front door
@@ -106,7 +106,7 @@ brings the whole stack up behind the Console on `:8080`. Design + ports + env:
 `make test` runs each component dir in isolation (the `TESTDIRS` list) because the
 hyphenated dirs share module basenames (`plugin.py`/`worker.py`) and can't be collected
 together. The legacy `tests/` (device/structure/setup) + `tests/conftest.py` put `src/`
-on `sys.path` so they import `marlin.*` without an editable install. Full suite as of
+on `sys.path` so they import `kathirmani.*` without an editable install. Full suite as of
 2026-06-11: **299 passed, 1 deselected** (the live-Grafana datasource check).
 
 ## Related

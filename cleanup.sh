@@ -15,7 +15,7 @@ log()  { echo "[cleanup] $*"; }
 run()  { $DRY_RUN && echo "  DRY: $*" || eval "$*"; }
 
 echo "=================================================="
-echo "  Kathirmani Marlin — Data Cleanup"
+echo "  Kathirmani — Data Cleanup"
 $DRY_RUN && echo "  (DRY RUN — nothing will be changed)"
 echo "=================================================="
 

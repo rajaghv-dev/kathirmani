@@ -22,7 +22,7 @@ NETDATA_URL = os.environ.get("NETDATA_URL", "http://localhost:19999")
 
 # Inference timing
 INFERENCE_DURATION = Histogram(
-    "marlin_inference_duration_seconds",
+    "kathirmani_inference_duration_seconds",
     "Time to run Marlin inference on a video",
     ["video", "mode"],
     buckets=[1, 5, 10, 30, 60, 120, 300, 600]
@@ -30,133 +30,133 @@ INFERENCE_DURATION = Histogram(
 
 # Counts
 EVENTS_DETECTED = Gauge(
-    "marlin_events_detected_total",
+    "kathirmani_events_detected_total",
     "Number of events detected per video",
     ["video"]
 )
 
 VIDEOS_PROCESSED = Counter(
-    "marlin_videos_processed_total",
+    "kathirmani_videos_processed_total",
     "Total videos processed",
     ["status"]
 )
 
 FIND_SPAN_START = Gauge(
-    "marlin_find_span_start_seconds",
+    "kathirmani_find_span_start_seconds",
     "Start of found event span in video",
     ["video", "query"]
 )
 
 FIND_SPAN_END = Gauge(
-    "marlin_find_span_end_seconds",
+    "kathirmani_find_span_end_seconds",
     "End of found event span in video",
     ["video", "query"]
 )
 
 FIND_PARSE_OK = Gauge(
-    "marlin_find_parse_success",
+    "kathirmani_find_parse_success",
     "Whether find result was parsed cleanly",
     ["video", "query"]
 )
 
 # DGX / compute metrics (GB10 Grace Blackwell unified-memory system)
 DGX_COMPUTE_UTIL = Gauge(
-    "marlin_dgx_compute_utilization_percent",
+    "kathirmani_dgx_compute_utilization_percent",
     "Compute utilization during inference (%)"
 )
 
 DGX_TEMPERATURE = Gauge(
-    "marlin_dgx_temperature_celsius",
+    "kathirmani_dgx_temperature_celsius",
     "System temperature (°C)"
 )
 
 DGX_POWER_WATTS = Gauge(
-    "marlin_dgx_power_watts",
+    "kathirmani_dgx_power_watts",
     "Power draw (W)"
 )
 
 DGX_CPU_UTIL_USER = Gauge(
-    "marlin_dgx_cpu_utilization_user_percent",
+    "kathirmani_dgx_cpu_utilization_user_percent",
     "ARM CPU user utilization %"
 )
 
 DGX_CPU_UTIL_SYS = Gauge(
-    "marlin_dgx_cpu_utilization_system_percent",
+    "kathirmani_dgx_cpu_utilization_system_percent",
     "ARM CPU system utilization %"
 )
 
 DGX_UNIFIED_MEM_USED_GB = Gauge(
-    "marlin_dgx_unified_mem_used_gb",
+    "kathirmani_dgx_unified_mem_used_gb",
     "Unified memory used (GB)"
 )
 
 DGX_UNIFIED_MEM_TOTAL_GB = Gauge(
-    "marlin_dgx_unified_mem_total_gb",
+    "kathirmani_dgx_unified_mem_total_gb",
     "Unified memory total (GB)"
 )
 
 DGX_CPU_TEMP_CELSIUS = Gauge(
-    "marlin_dgx_cpu_temperature_celsius",
+    "kathirmani_dgx_cpu_temperature_celsius",
     "ARM CPU temperature from ACPI (°C)"
 )
 
 # Disk runtime (root filesystem + IO throughput), sourced from Netdata
-DGX_DISK_USED_GB = Gauge("marlin_dgx_disk_used_gb", "Root filesystem used (GB)")
-DGX_DISK_FREE_GB = Gauge("marlin_dgx_disk_free_gb", "Root filesystem available (GB)")
-DGX_DISK_READ_KBS = Gauge("marlin_dgx_disk_read_kbps", "Disk read throughput (KiB/s)")
-DGX_DISK_WRITE_KBS = Gauge("marlin_dgx_disk_write_kbps", "Disk write throughput (KiB/s)")
+DGX_DISK_USED_GB = Gauge("kathirmani_dgx_disk_used_gb", "Root filesystem used (GB)")
+DGX_DISK_FREE_GB = Gauge("kathirmani_dgx_disk_free_gb", "Root filesystem available (GB)")
+DGX_DISK_READ_KBS = Gauge("kathirmani_dgx_disk_read_kbps", "Disk read throughput (KiB/s)")
+DGX_DISK_WRITE_KBS = Gauge("kathirmani_dgx_disk_write_kbps", "Disk write throughput (KiB/s)")
 
 # Token economy / cost metrics
-ENERGY_WH = Gauge("marlin_energy_consumed_wh", "Estimated energy used this run (Wh)")
-COST_INR  = Gauge("marlin_cost_inr", "Estimated inference cost in INR (₹)")
-COST_PER_EVENT = Gauge("marlin_cost_per_event_inr", "INR per event detected")
-EVENTS_PER_WH  = Gauge("marlin_events_per_wh", "Events detected per watt-hour (efficiency)")
-INFERENCE_TOTAL_SEC = Gauge("marlin_total_inference_seconds", "Total wall time of last run (s)")
-AVG_POWER_DURING_RUN = Gauge("marlin_avg_dgx_power_during_run_watts", "Average power during last inference run (W)")
+ENERGY_WH = Gauge("kathirmani_energy_consumed_wh", "Estimated energy used this run (Wh)")
+COST_INR  = Gauge("kathirmani_cost_inr", "Estimated inference cost in INR (₹)")
+COST_PER_EVENT = Gauge("kathirmani_cost_per_event_inr", "INR per event detected")
+EVENTS_PER_WH  = Gauge("kathirmani_events_per_wh", "Events detected per watt-hour (efficiency)")
+INFERENCE_TOTAL_SEC = Gauge("kathirmani_total_inference_seconds", "Total wall time of last run (s)")
+AVG_POWER_DURING_RUN = Gauge("kathirmani_avg_dgx_power_during_run_watts", "Average power during last inference run (W)")
 
 # Decode-once compute savings (vs the naive 1-decode-per-prompt path).
 # Each camera now decodes ONCE and reuses the frames for all (1 caption + N find)
 # prompts, so we avoid (prompts_per_cam - 1) redundant decodes per camera.
-DECODE_SECONDS_ACTUAL = Gauge("marlin_decode_seconds_actual",
+DECODE_SECONDS_ACTUAL = Gauge("kathirmani_decode_seconds_actual",
                               "Video-decode seconds actually spent this run (decode-once)")
-DECODE_SECONDS_SAVED = Gauge("marlin_decode_seconds_saved",
+DECODE_SECONDS_SAVED = Gauge("kathirmani_decode_seconds_saved",
                              "Video-decode seconds saved this run by reusing frames across prompts")
-DECODES_DONE = Gauge("marlin_video_decodes_done",
+DECODES_DONE = Gauge("kathirmani_video_decodes_done",
                      "Video decodes actually performed this run (= cameras processed)")
-DECODES_AVOIDED = Gauge("marlin_video_decodes_avoided",
+DECODES_AVOIDED = Gauge("kathirmani_video_decodes_avoided",
                         "Redundant video decodes eliminated this run by decode-once")
 
 # Power samples accumulated during an inference run
 _dgx_power_samples: list[float] = []
 
 # Model info
-MODEL_INFO = Info("marlin_model", "Model metadata")
+MODEL_INFO = Info("kathirmani_model", "Model metadata")
 
 # Fused / multi-view metrics
 FUSED_EVENTS = Gauge(
-    "marlin_fused_unique_events",
+    "kathirmani_fused_unique_events",
     "Unique events after multi-view dedup"
 )
 
 FUSED_TOTAL_RAW = Gauge(
-    "marlin_fused_raw_events_total",
+    "kathirmani_fused_raw_events_total",
     "Total raw events before dedup"
 )
 
 FUSED_FIND_START = Gauge(
-    "marlin_fused_find_span_start_seconds",
+    "kathirmani_fused_find_span_start_seconds",
     "Fused find span start",
     ["query"]
 )
 
 FUSED_FIND_END = Gauge(
-    "marlin_fused_find_span_end_seconds",
+    "kathirmani_fused_find_span_end_seconds",
     "Fused find span end",
     ["query"]
 )
 
 FUSED_FIND_CAM = Gauge(
-    "marlin_fused_find_best_camera",
+    "kathirmani_fused_find_best_camera",
     "Which camera had the best detection (index 0-4)",
     ["query"]
 )
@@ -387,27 +387,27 @@ def compute_economy(total_events: int, wall_time_sec: float, electricity_rate_in
     }
 
 
-QWEN_QUERIES_DONE = Gauge("marlin_qwen_queries_completed", "Qwen2.5-VL queries completed", ["video"])
-QWEN_ANSWERS_OK   = Gauge("marlin_qwen_answers_ok_total",  "Qwen2.5-VL answers that returned text", ["video"])
+QWEN_QUERIES_DONE = Gauge("kathirmani_qwen_queries_completed", "Qwen2.5-VL queries completed", ["video"])
+QWEN_ANSWERS_OK   = Gauge("kathirmani_qwen_answers_ok_total",  "Qwen2.5-VL answers that returned text", ["video"])
 
 # --- LocateAnything (open-vocabulary localization) stage metrics ---
 LOCATE_OBJECTS = Gauge(
-    "marlin_locate_objects_total",
+    "kathirmani_locate_objects_total",
     "Open-vocab object instances detected per camera, summed over sampled frames",
     ["video", "object"],
 )
 LOCATE_MAX_PEOPLE = Gauge(
-    "marlin_locate_max_people",
+    "kathirmani_locate_max_people",
     "Peak simultaneous people in any sampled frame (queue / crowd signal)",
     ["video"],
 )
 LOCATE_FRAMES = Gauge(
-    "marlin_locate_frames_sampled",
+    "kathirmani_locate_frames_sampled",
     "Frames sampled and run through the detector",
     ["video"],
 )
 LOCATE_ROUTED = Gauge(
-    "marlin_locate_frames_routed_to_vlm",
+    "kathirmani_locate_frames_routed_to_vlm",
     "Frames flagged as interesting and routed to the VLM (cascade gate)",
     ["video"],
 )

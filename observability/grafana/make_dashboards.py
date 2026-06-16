@@ -8,7 +8,7 @@ generation time — this just writes JSON, mirroring the structure of the existi
 "About this dashboard" text panel convention from spec/08).
 
 The platform set (01-10) references the documented ``ingest_*`` family
-(``ingestion/metrics.py``) and ``marlin_*`` where relevant; the model-benchmark set
+(``ingestion/metrics.py``) and ``kathirmani_*`` where relevant; the model-benchmark set
 (11-18) references the ``model_*`` namespace (``model-plugins/base/metrics.py``,
 spec/11 + master plan A8). Every dashboard gets a unique ``uid`` (``kathir-NN-...``)
 and an About panel — that intro panel is a durable user preference (explain meaning).
@@ -377,7 +377,7 @@ def dashboards() -> list[dict]:
         "Cost / efficiency of the running platform. Anti-goal #4 (spec/10): measure "
         "video-sec/sec/GPU and clips/min/GPU, not tokens/sec alone. Here: video seconds "
         "processed, clips/min/GPU throughput, and request volume as a cost proxy. Money "
-        "deltas across GPU profiles live in dashboard 15. Metrics: `model_*`, `marlin_*`.",
+        "deltas across GPU profiles live in dashboard 15. Metrics: `model_*`, `kathirmani_*`.",
         [
             stat("Video seconds processed", "sum(model_video_seconds_processed_total)", unit="s", color="green"),
             stat("Clips processed", "sum(model_clips_processed_total)", color="blue"),

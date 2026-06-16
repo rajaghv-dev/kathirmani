@@ -22,7 +22,7 @@ _SRC = Path(__file__).resolve().parents[2]
 if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
-from marlin import PROJECT_ROOT
+from kathirmani import PROJECT_ROOT
 
 HERE = PROJECT_ROOT             # videos + results live at the repo root
 RESULTS = PROJECT_ROOT / "results"
@@ -301,7 +301,7 @@ def tab_compare(label):
         st.error("Could not extract that frame.")
         return
     img, scale = entry
-    from marlin.locate import LOCATE_VOCAB
+    from kathirmani.locate import LOCATE_VOCAB
     cols = st.columns(len(backends))
     for col, backend in zip(cols, backends):
         with col:
@@ -321,7 +321,7 @@ def tab_compare(label):
 
 @st.cache_resource(show_spinner=True)
 def _get_detector(backend: str):
-    from marlin.locate import load_detector
+    from kathirmani.locate import load_detector
     return load_detector(backend)
 
 
@@ -374,7 +374,7 @@ def tab_optimizations(cams):
 
     # Real numbers from the running config.
     try:
-        from marlin.pipeline import FIND_QUERIES
+        from kathirmani.pipeline import FIND_QUERIES
         prompts_per_cam = 1 + len(FIND_QUERIES)  # 1 caption + N finds
     except Exception:
         prompts_per_cam = 21

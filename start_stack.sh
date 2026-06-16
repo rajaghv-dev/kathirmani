@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Start the full observability stack for Kathirmani Marlin inference.
+# Start the full observability stack for Kathirmani inference.
 # All services run as Docker containers on the monitoring_default network.
 # Run from the project root:  bash start_stack.sh
 
@@ -7,7 +7,7 @@ set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 NETWORK="monitoring_default"
 
-echo "=== Kathirmani Marlin Observability Stack ==="
+echo "=== Kathirmani Observability Stack ==="
 
 # ── 1. serve_metrics ─────────────────────────────────────────────────────────
 echo "[serve_metrics] restarting ..."
@@ -66,7 +66,7 @@ echo "  Grafana    →  http://${HOST_IP}:3000  (admin / admin)"
 echo "  Prometheus →  http://${HOST_IP}:9090"
 echo "  Metrics    →  http://${HOST_IP}:8900/metrics"
 echo ""
-echo "Datasource: MarlinMetrics → http://prometheus:9090 (proxy, Docker DNS)"
+echo "Datasource: KathirmaniMetrics → http://prometheus:9090 (proxy, Docker DNS)"
 echo ""
 echo "To run inference:"
 echo "  source .venv/bin/activate"

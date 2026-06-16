@@ -1,5 +1,5 @@
 """
-test_setup.py — pytest test suite for the Kathirmani Marlin-2B inference pipeline.
+test_setup.py — pytest test suite for the Kathirmani-2B inference pipeline.
 
 Tests cover:
   - Model file existence
@@ -115,7 +115,7 @@ def test_find_results_parsed():
 # 5. Metrics server (skip if not running)
 # ---------------------------------------------------------------------------
 def test_metrics_server_up():
-    """GET /metrics must return 200 and include marlin_events_detected_total."""
+    """GET /metrics must return 200 and include kathirmani_events_detected_total."""
     requests = pytest.importorskip("requests")
     try:
         resp = requests.get(METRICS_URL, timeout=3)
@@ -125,8 +125,8 @@ def test_metrics_server_up():
     assert resp.status_code == 200, (
         f"Expected 200 from {METRICS_URL}, got {resp.status_code}"
     )
-    assert "marlin_events_detected_total" in resp.text, (
-        "marlin_events_detected_total metric not found in /metrics response"
+    assert "kathirmani_events_detected_total" in resp.text, (
+        "kathirmani_events_detected_total metric not found in /metrics response"
     )
 
 
@@ -208,7 +208,7 @@ def test_trim_video():
     pytest.importorskip("torch")
     pytest.importorskip("av")
 
-    from marlin.pipeline import trim_video
+    from kathirmani.pipeline import trim_video
 
     out = trim_video(VIDEO_FILE, 5.0)
     try:

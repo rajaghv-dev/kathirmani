@@ -87,7 +87,7 @@
       },
       "targets": [
         {
-          "expr": "sum(marlin_events_detected_total)",
+          "expr": "sum(kathirmani_events_detected_total)",
           "legendFormat": "Events"
         }
       ]
@@ -133,7 +133,7 @@
       },
       "targets": [
         {
-          "expr": "count(marlin_find_parse_success == 1)",
+          "expr": "count(kathirmani_find_parse_success == 1)",
           "legendFormat": "Hits"
         }
       ]
@@ -179,7 +179,7 @@
       },
       "targets": [
         {
-          "expr": "count(marlin_find_parse_success == 0)",
+          "expr": "count(kathirmani_find_parse_success == 0)",
           "legendFormat": "Misses"
         }
       ]
@@ -225,7 +225,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_videos_processed_total",
+          "expr": "kathirmani_videos_processed_total",
           "legendFormat": "Cameras"
         }
       ]
@@ -257,7 +257,7 @@
       },
       "targets": [
         {
-          "expr": "{app=\"marlin\",store=\"kathirmani\"}",
+          "expr": "{app=\"kathirmani\",store=\"kathirmani\"}",
           "legendFormat": "",
           "refId": "A"
         }
@@ -300,7 +300,7 @@
       },
       "targets": [
         {
-          "expr": "{app=\"marlin\",camera=\"Kathirmani Bill Counter\",event_type=\"caption_complete\"}",
+          "expr": "{app=\"kathirmani\",camera=\"Kathirmani Bill Counter\",event_type=\"caption_complete\"}",
           "refId": "A"
         }
       ]
@@ -330,7 +330,7 @@
       },
       "targets": [
         {
-          "expr": "{app=\"marlin\",camera=\"Kathirmani Center Camera\",event_type=\"caption_complete\"}",
+          "expr": "{app=\"kathirmani\",camera=\"Kathirmani Center Camera\",event_type=\"caption_complete\"}",
           "refId": "A"
         }
       ]
@@ -360,7 +360,7 @@
       },
       "targets": [
         {
-          "expr": "{app=\"marlin\",camera=\"Kathirmani Near Entry Door Camera\",event_type=\"caption_complete\"}",
+          "expr": "{app=\"kathirmani\",camera=\"Kathirmani Near Entry Door Camera\",event_type=\"caption_complete\"}",
           "refId": "A"
         }
       ]
@@ -390,7 +390,7 @@
       },
       "targets": [
         {
-          "expr": "{app=\"marlin\",camera=~\"Kathirmani Left.*|Kathirmani Right.*\",event_type=\"caption_complete\"}",
+          "expr": "{app=\"kathirmani\",camera=~\"Kathirmani Left.*|Kathirmani Right.*\",event_type=\"caption_complete\"}",
           "refId": "A"
         }
       ]
@@ -433,7 +433,7 @@
       },
       "targets": [
         {
-          "expr": "{app=\"marlin\",store=\"kathirmani\",event_type=\"find_hit\"}",
+          "expr": "{app=\"kathirmani\",store=\"kathirmani\",event_type=\"find_hit\"}",
           "refId": "A"
         }
       ]
@@ -464,7 +464,7 @@
       },
       "targets": [
         {
-          "expr": "{app=\"marlin\",store=\"kathirmani\",event_type=\"find_miss\"}",
+          "expr": "{app=\"kathirmani\",store=\"kathirmani\",event_type=\"find_miss\"}",
           "refId": "A"
         }
       ]
@@ -495,7 +495,7 @@
       },
       "targets": [
         {
-          "expr": "{app=\"marlin\",store=\"kathirmani\",event_type=\"error\"}",
+          "expr": "{app=\"kathirmani\",store=\"kathirmani\",event_type=\"error\"}",
           "refId": "A"
         }
       ]
@@ -538,7 +538,7 @@
       },
       "targets": [
         {
-          "expr": "{app=\"marlin\",store=\"kathirmani\",event_type=~\"run_start|run_complete|fusion_complete\"}",
+          "expr": "{app=\"kathirmani\",store=\"kathirmani\",event_type=~\"run_start|run_complete|fusion_complete\"}",
           "refId": "A"
         }
       ]

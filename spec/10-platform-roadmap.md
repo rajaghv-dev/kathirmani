@@ -13,25 +13,25 @@ From an **offline research cascade** (one process reads 5 `.mkv` → `results/*.
 to an **OSS-ingestion-first, NVIDIA-model-first, plugin-driven video intelligence
 platform**: durable 10-sec clips → 5-sec AI windows → queue → plugin-host AI workers
 → deterministic rule engine → VLM verification → evidence package → human review →
-search → digital twin → Grafana. The current `src/marlin` pipeline becomes the
+search → digital twin → Grafana. The current `src/kathirmani` pipeline becomes the
 **AI-worker seed**; nothing is thrown away.
 
 ## What exists today vs. what the platform needs
 
-| Layer | Today (`src/marlin`) | Target | Reuse |
+| Layer | Today (`src/kathirmani`) | Target | Reuse |
 |-------|----------------------|--------|-------|
 | Ingestion | none — `cli/run_inference.py` reads `.mkv` directly | FFmpeg/GStreamer service: 10-sec clips, 5-sec windows, RTSP reconnect, camera health | PyAV preload (`ffmpeg_preload.py`) |
 | Object store | raw `.mkv` + `results/*.json` on disk | MinIO / NVMe abstraction, evidence clips | `RESULTS_DIR` anchor |
 | Queue | none — synchronous in-process | Redis Streams (`video_segment.ready`, `ai_window.ready`) | — |
 | Metadata DB | **none, by design** (file-first) | Postgres + pgvector (master plan §6 + A6) | JSON→rows backfill adapter |
-| CV worker | `marlin.locate` (YOLOE, optional stub) | DeepStream+TensorRT **and** OSS YOLOE worker, one plugin contract | `pipeline.py` locate/route logic |
+| CV worker | `kathirmani.locate` (YOLOE, optional stub) | DeepStream+TensorRT **and** OSS YOLOE worker, one plugin contract | `pipeline.py` locate/route logic |
 | Rule engine | none | deterministic zone/dwell/interaction/bypass/health rules + incidents | — |
 | VLM worker | `qwen_vl.py`, hardcoded | **plugin host**, NVIDIA Nemotron-VL default, every run tracked | `qwen_vl.py` → baseline plugin |
 | Evidence + review | none (Streamlit = viz only) | pre/during/post stitching, timeline, audited verdicts | — |
 | Search | none | pgvector + multi-embedding fusion + Nemotron critic | — |
 | Digital twin | implicit (5 cameras, same area) | YAML store/camera/FOV/zone, event→twin mapping | camera roles |
 | Plugin layer | none — code is imported Python | `ModelPlugin` ABC + registry + profiles | `metrics.py` registry pattern |
-| Observability | 8 dashboards, `marlin_*` | +dashboards 01–18, `model_*` namespace, OTel, DCGM | the whole `04`/`08` stack |
+| Observability | 8 dashboards, `kathirmani_*` | +dashboards 01–18, `model_*` namespace, OTel, DCGM | the whole `04`/`08` stack |
 | Makefile / compose | none — `start_stack.sh` only | Makefile + 3 compose files, one-command stack | `start_stack.sh` logic |
 
 Strongest existing asset = observability ([04](04-observability-stack.md),
@@ -108,7 +108,7 @@ implementation.
 | **0 ✅** Skeleton | Makefile, 3 compose files (base/gpu/observability — wrap the existing stack), `configs/` (cameras/stores/zones/models/rules/retention), `ModelPlugin` interface, NVIDIA model policy + `validate-model-config` | `make up` green; policy validator passes NVIDIA / fails non-NVIDIA default |
 | **1 ✅** OSS ingestion | PyAV → 10-sec clips + 5-sec windows @2s stride → filesystem + JSONL + queue; camera health. **Files done; live RTSP (GStreamer `splitmuxsink`, Phase 1.5) now implemented** (`GStreamerSource` + `catalog_live_clips`). | 5-camera footage segmented, registered, queued; `ingest_*` metrics |
 | **2 ✅** DB + API | `db/migrations` + `schema.sql` (§6 + A6, 19 tables, partitioned events, job_queue); `PgQueue` (SKIP LOCKED); JSON→rows backfill; FastAPI (+ model-registry endpoints); seed kathirmani | workers/UI use stable API contracts; `make migrate && seed && backfill` idempotent |
-| **3 ✅** Observability | dashboards 01–18 (`observability/grafana/`, generator + 18 JSONs), `model_*`/`ingest_*` scrape, OTel + promtail configs, additive to `marlin_*` | dashboards generated + validated; scrape wiring documented (panels light up as producers expose /metrics) |
+| **3 ✅** Observability | dashboards 01–18 (`observability/grafana/`, generator + 18 JSONs), `model_*`/`ingest_*` scrape, OTel + promtail configs, additive to `kathirmani_*` | dashboards generated + validated; scrape wiring documented (panels light up as producers expose /metrics) |
 | **4 ✅** CV worker | `ai-workers/cv-oss-worker` — YOLOE behind `DetectionPlugin` (fake-infer fallback), consumes `ai_window.ready`, writes detections/events/model_runs, zone-maps, emits `suspicious_item_interaction`. DeepStream worker later. | CV worker emits common event schema; 23 tests green |
 | **5 ✅** Rule engine | `services/rule-engine/` — deterministic per-track context windows over `event_rules.yaml`; consumes/republishes `event.created`, raises explainable events + `possible_loss` incidents; golden fixtures | suspicious-item events raised **without** a VLM; 24 tests green |
 | **6 ✅** VLM worker | `ai-workers/vlm-worker/` — plugin host (Nemotron-VL / Qwen baseline + fake_infer); prompt pack `retail_loss_v1`, JSON repair, writes `vlm_observations` + `model_runs`, updates event confidence | suspicious events get explanation; profile-selected; 23 tests green |
@@ -150,7 +150,7 @@ The 14 phases + the code-doable real-hardware follow-ups + the entry-point Conso
   worker/service dirs become real importable packages, removing the ~27 `sys.path`
   shims + 8 `conftest.py`/`pytest.ini` hacks (also touches Makefile + compose
   `working_dir`). Mechanical but broad (~40 files); do it as one isolated PR.
-- Possible relocation of the legacy `src/marlin` layer — currently **invariant-protected**
+- Possible relocation of the legacy `src/kathirmani` layer — currently **invariant-protected**
   (keep root shims + path anchors + `learning.md`); only after the baseline is no longer
   needed as a live comparison arm.
 

@@ -80,7 +80,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_energy_consumed_wh",
+          "expr": "kathirmani_energy_consumed_wh",
           "legendFormat": "Energy (Wh)",
           "datasource": {
             "uid": "marlin-metrics",
@@ -139,7 +139,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_cost_inr",
+          "expr": "kathirmani_cost_inr",
           "legendFormat": "Cost (INR)",
           "datasource": {
             "uid": "marlin-metrics",
@@ -198,7 +198,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_cost_per_event_inr",
+          "expr": "kathirmani_cost_per_event_inr",
           "legendFormat": "Cost/Event (INR)",
           "datasource": {
             "uid": "marlin-metrics",
@@ -257,7 +257,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_events_per_wh",
+          "expr": "kathirmani_events_per_wh",
           "legendFormat": "Events/Wh",
           "datasource": {
             "uid": "marlin-metrics",
@@ -316,7 +316,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_avg_dgx_power_during_run_watts",
+          "expr": "kathirmani_avg_dgx_power_during_run_watts",
           "legendFormat": "Avg Power (W)",
           "datasource": {
             "uid": "marlin-metrics",
@@ -375,7 +375,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_total_inference_seconds",
+          "expr": "kathirmani_total_inference_seconds",
           "legendFormat": "Wall Time (s)",
           "datasource": {
             "uid": "marlin-metrics",
@@ -417,7 +417,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_dgx_power_watts",
+          "expr": "kathirmani_dgx_power_watts",
           "legendFormat": "DGX Power (W)",
           "datasource": {
             "uid": "marlin-metrics",
@@ -459,7 +459,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_dgx_temperature_celsius",
+          "expr": "kathirmani_dgx_temperature_celsius",
           "legendFormat": "System Temp (\u00b0C)",
           "datasource": {
             "uid": "marlin-metrics",
@@ -519,7 +519,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_events_detected_total",
+          "expr": "kathirmani_events_detected_total",
           "legendFormat": "{{video}}",
           "datasource": {
             "uid": "marlin-metrics",
@@ -570,7 +570,7 @@
       },
       "targets": [
         {
-          "expr": "sum(marlin_events_detected_total)",
+          "expr": "sum(kathirmani_events_detected_total)",
           "legendFormat": "Total Events",
           "datasource": {
             "uid": "marlin-metrics",
@@ -621,7 +621,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_fused_unique_events",
+          "expr": "kathirmani_fused_unique_events",
           "legendFormat": "Unique Events",
           "datasource": {
             "uid": "marlin-metrics",
@@ -680,7 +680,7 @@
       },
       "targets": [
         {
-          "expr": "count(marlin_find_parse_success == 1)",
+          "expr": "count(kathirmani_find_parse_success == 1)",
           "legendFormat": "Resolved Queries",
           "datasource": {
             "uid": "marlin-metrics",
@@ -739,7 +739,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_dgx_compute_utilization_percent",
+          "expr": "kathirmani_dgx_compute_utilization_percent",
           "legendFormat": "Compute Util %",
           "datasource": {
             "uid": "marlin-metrics",
@@ -806,7 +806,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_decode_seconds_saved",
+          "expr": "kathirmani_decode_seconds_saved",
           "legendFormat": "Decode saved (s)",
           "datasource": {
             "uid": "marlin-metrics",
@@ -858,7 +858,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_decode_seconds_actual",
+          "expr": "kathirmani_decode_seconds_actual",
           "legendFormat": "Decode actual (s)",
           "datasource": {
             "uid": "marlin-metrics",
@@ -910,7 +910,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_video_decodes_avoided",
+          "expr": "kathirmani_video_decodes_avoided",
           "legendFormat": "Decodes avoided",
           "datasource": {
             "uid": "marlin-metrics",
@@ -966,7 +966,7 @@
       },
       "targets": [
         {
-          "expr": "100 * marlin_video_decodes_avoided / (marlin_video_decodes_done + marlin_video_decodes_avoided)",
+          "expr": "100 * kathirmani_video_decodes_avoided / (kathirmani_video_decodes_done + kathirmani_video_decodes_avoided)",
           "legendFormat": "Reduction %",
           "datasource": {
             "uid": "marlin-metrics",

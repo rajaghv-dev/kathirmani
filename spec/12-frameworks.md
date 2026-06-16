@@ -11,7 +11,7 @@ by `scripts/setup/<component>.sh`, and verified by `scripts/validate/<component>
 | Component | Frameworks (why) | requirements | setup | validate |
 |-----------|------------------|--------------|-------|----------|
 | **base / env** | Python ≥3.12; `prometheus_client`, `requests`, `pyyaml`, `numpy`, `pillow` — shared everywhere | `base.txt` | `setup/env.sh` | `validate/env.py` |
-| **inference** | `torch`, `transformers`, `accelerate`, `qwen-vl-utils`, `torchcodec`, **PyAV** — the `src/marlin` cascade (heavy, GPU box) | `inference.txt` | `setup-inference` (`setup.sh`, machine-aware torch) | (marlin `tests/`) |
+| **inference** | `torch`, `transformers`, `accelerate`, `qwen-vl-utils`, `torchcodec`, **PyAV** — the `src/kathirmani` cascade (heavy, GPU box) | `inference.txt` | `setup-inference` (`setup.sh`, machine-aware torch) | (kathirmani `tests/`) |
 | **ingestion** | **PyAV** (libav, bundled FFmpeg) for file segmentation; **GStreamer** for live RTSP (`splitmuxsink`) + frame-gating | `ingestion.txt` | `setup/ingestion.sh` | `validate/ingestion.py` |
 | **db** | **Postgres 16 + pgvector** (the single structured store: metadata, events, vectors, model_runs, queue); **psycopg v3** | `db.txt` | `setup/db.sh` (migrate + seed) | `validate/db.py` |
 | **queue** | **Postgres `job_queue`** (`SKIP LOCKED`); **Redis** optional (high-fanout) | `db.txt` / `optional.txt` | (db) | (db) |

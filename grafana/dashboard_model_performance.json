@@ -65,7 +65,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_total_events",
+          "expr": "kathirmani_total_events",
           "legendFormat": "events",
           "refId": "A",
           "datasource": {
@@ -110,7 +110,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_fused_unique_events",
+          "expr": "kathirmani_fused_unique_events",
           "legendFormat": "unique",
           "refId": "A",
           "datasource": {
@@ -156,7 +156,7 @@
       },
       "targets": [
         {
-          "expr": "avg(marlin_find_parse_success)*100",
+          "expr": "avg(kathirmani_find_parse_success)*100",
           "legendFormat": "%",
           "refId": "A",
           "datasource": {
@@ -201,7 +201,7 @@
       },
       "targets": [
         {
-          "expr": "sum(marlin_qwen_security_signals_total)",
+          "expr": "sum(kathirmani_qwen_security_signals_total)",
           "legendFormat": "signals",
           "refId": "A",
           "datasource": {
@@ -247,7 +247,7 @@
       },
       "targets": [
         {
-          "expr": "(1 - marlin_fused_unique_events / clamp_min(marlin_fused_raw_events_total,1))*100",
+          "expr": "(1 - kathirmani_fused_unique_events / clamp_min(kathirmani_fused_raw_events_total,1))*100",
           "legendFormat": "collapsed",
           "refId": "A",
           "datasource": {
@@ -293,7 +293,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_events_per_wh",
+          "expr": "kathirmani_events_per_wh",
           "legendFormat": "events/Wh",
           "refId": "A",
           "datasource": {
@@ -338,7 +338,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_events_detected_total",
+          "expr": "kathirmani_events_detected_total",
           "legendFormat": "{{video}}",
           "refId": "A",
           "datasource": {
@@ -375,7 +375,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_find_parse_success",
+          "expr": "kathirmani_find_parse_success",
           "format": "table",
           "instant": true,
           "refId": "A",
@@ -422,7 +422,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_total_inference_seconds",
+          "expr": "kathirmani_total_inference_seconds",
           "legendFormat": "s",
           "refId": "A",
           "datasource": {
@@ -468,7 +468,7 @@
       },
       "targets": [
         {
-          "expr": "avg(marlin_dgx_compute_utilization_percent)",
+          "expr": "avg(kathirmani_dgx_compute_utilization_percent)",
           "legendFormat": "",
           "refId": "A",
           "datasource": {
@@ -514,7 +514,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_avg_dgx_power_during_run_watts",
+          "expr": "kathirmani_avg_dgx_power_during_run_watts",
           "legendFormat": "",
           "refId": "A",
           "datasource": {
@@ -560,7 +560,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_dgx_unified_mem_used_gb",
+          "expr": "kathirmani_dgx_unified_mem_used_gb",
           "legendFormat": "",
           "refId": "A",
           "datasource": {
@@ -606,7 +606,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_dgx_temperature_celsius",
+          "expr": "kathirmani_dgx_temperature_celsius",
           "legendFormat": "",
           "refId": "A",
           "datasource": {
@@ -651,7 +651,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_videos_processed_total",
+          "expr": "kathirmani_videos_processed_total",
           "legendFormat": "videos",
           "refId": "A",
           "datasource": {
@@ -702,7 +702,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_caption_duration_seconds",
+          "expr": "kathirmani_caption_duration_seconds",
           "legendFormat": "{{video}}",
           "refId": "A",
           "datasource": {
@@ -753,7 +753,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_dgx_compute_utilization_percent",
+          "expr": "kathirmani_dgx_compute_utilization_percent",
           "legendFormat": "compute %",
           "refId": "A",
           "datasource": {
@@ -762,7 +762,7 @@
           }
         },
         {
-          "expr": "marlin_dgx_power_watts",
+          "expr": "kathirmani_dgx_power_watts",
           "legendFormat": "power W",
           "refId": "B",
           "datasource": {
@@ -808,7 +808,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_energy_consumed_wh",
+          "expr": "kathirmani_energy_consumed_wh",
           "legendFormat": "Wh",
           "refId": "A",
           "datasource": {
@@ -854,7 +854,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_cost_inr",
+          "expr": "kathirmani_cost_inr",
           "legendFormat": "INR",
           "refId": "A",
           "datasource": {
@@ -900,7 +900,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_cost_per_event_inr",
+          "expr": "kathirmani_cost_per_event_inr",
           "legendFormat": "INR/event",
           "refId": "A",
           "datasource": {
@@ -946,7 +946,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_events_per_wh",
+          "expr": "kathirmani_events_per_wh",
           "legendFormat": "events/Wh",
           "refId": "A",
           "datasource": {

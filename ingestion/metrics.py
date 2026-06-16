@@ -1,7 +1,7 @@
 """Ingestion Prometheus metrics (master plan §13.1 ingestion + camera-health).
 
 Exposed on METRICS_PORT during a run; Prometheus scrape wiring is Phase 3. Names are
-the `ingest_*` family (sibling to the `marlin_*` model metrics).
+the `ingest_*` family (sibling to the `kathirmani_*` model metrics).
 """
 from __future__ import annotations
 

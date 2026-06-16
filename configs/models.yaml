@@ -94,7 +94,7 @@ profiles:
   # ---- Comparison-only baseline: the current Qwen/Marlin/YOLOE cascade.
   # NEVER the production default (master plan A1.2). Runnable today for the bake-off.
   research_qwen_baseline:
-    description: "The existing src/marlin cascade as a comparison arm. Non-default."
+    description: "The existing src/kathirmani cascade as a comparison arm. Non-default."
     non_default: true
     tasks:
       detection:

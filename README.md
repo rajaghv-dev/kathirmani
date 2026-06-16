@@ -58,11 +58,11 @@ remaining work is tracked in [spec/10-platform-roadmap.md](spec/10-platform-road
 The platform grew out of an offline research cascade that runs
 [NemoStation/Marlin-2B](https://huggingface.co/NemoStation/Marlin-2B) (a 2B-param video
 VLM) + Qwen2.5-VL across the 5 cameras to produce dense captions, timestamps, and event
-detections in `results/*.json`. That code lives in the **`src/marlin`** package and is
+detections in `results/*.json`. That code lives in the **`src/kathirmani`** package and is
 preserved as the non-default `research_qwen_baseline` comparison arm (spec/11). The
 original working notes are kept verbatim in [`learning.md`](learning.md). It still runs
 unchanged via thin root shims (auto-detects CUDA / Apple-MPS / CPU; override with
-`MARLIN_DEVICE`):
+`KATHIRMANI_DEVICE`):
 
 ```bash
 bash setup.sh && source .venv/bin/activate

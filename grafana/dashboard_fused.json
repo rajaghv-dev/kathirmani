@@ -77,7 +77,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_fused_unique_events",
+          "expr": "kathirmani_fused_unique_events",
           "legendFormat": "Unique Events"
         }
       ]
@@ -129,7 +129,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_fused_raw_events_total",
+          "expr": "kathirmani_fused_raw_events_total",
           "legendFormat": "Raw Events"
         }
       ]
@@ -185,7 +185,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_videos_processed_total",
+          "expr": "kathirmani_videos_processed_total",
           "legendFormat": "Videos"
         }
       ]
@@ -237,7 +237,7 @@
       },
       "targets": [
         {
-          "expr": "count(marlin_find_parse_success == 1)",
+          "expr": "count(kathirmani_find_parse_success == 1)",
           "legendFormat": "Resolved"
         }
       ]
@@ -246,7 +246,7 @@
       "id": 10,
       "type": "bargauge",
       "title": "Fused Find Spans \u2014 Best Camera Duration per Query",
-      "description": "For each query, the longest span seen across all cameras (proxy for best-camera fused answer). Uses marlin_fused_find_span_* when available, falls back to max across cameras.",
+      "description": "For each query, the longest span seen across all cameras (proxy for best-camera fused answer). Uses kathirmani_fused_find_span_* when available, falls back to max across cameras.",
       "gridPos": {
         "x": 0,
         "y": 8,
@@ -286,12 +286,12 @@
       },
       "targets": [
         {
-          "expr": "marlin_fused_find_span_end_seconds - marlin_fused_find_span_start_seconds",
+          "expr": "kathirmani_fused_find_span_end_seconds - kathirmani_fused_find_span_start_seconds",
           "legendFormat": "{{query}} (fused)",
           "refId": "A"
         },
         {
-          "expr": "max by (query) (marlin_find_span_duration_seconds)",
+          "expr": "max by (query) (kathirmani_find_span_duration_seconds)",
           "legendFormat": "{{query}} (best cam)",
           "refId": "B"
         }
@@ -374,7 +374,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_find_span_duration_seconds",
+          "expr": "kathirmani_find_span_duration_seconds",
           "legendFormat": "",
           "instant": true,
           "refId": "A",
@@ -447,7 +447,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_events_detected_total",
+          "expr": "kathirmani_events_detected_total",
           "legendFormat": "{{video}}",
           "refId": "A"
         }
@@ -497,7 +497,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_events_detected_total",
+          "expr": "kathirmani_events_detected_total",
           "legendFormat": "{{video}}",
           "refId": "A"
         }
@@ -554,7 +554,7 @@
       },
       "targets": [
         {
-          "expr": "avg(marlin_find_parse_success)",
+          "expr": "avg(kathirmani_find_parse_success)",
           "legendFormat": "Parse OK"
         }
       ]
@@ -606,7 +606,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_total_events",
+          "expr": "kathirmani_total_events",
           "legendFormat": "Total Events"
         }
       ]

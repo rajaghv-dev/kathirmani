@@ -6,20 +6,20 @@ Terse edit/run context. *What/why* lives in `spec/` — follow the links.
 Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
 
 ## Repo map → `spec/09`
-- Code in `src/marlin/`; root `*.py` are thin shims (don't add logic there).
+- Code in `src/kathirmani/`; root `*.py` are thin shims (don't add logic there).
 - Entry points: `run_inference.py`, `serve_metrics.py`, `download_model.py`,
   `viz_app.py`, `start_stack.sh`. Commands unchanged post-refactor.
-- Paths anchor on `marlin.PROJECT_ROOT/MODELS_DIR/RESULTS_DIR` (not cwd).
+- Paths anchor on `kathirmani.PROJECT_ROOT/MODELS_DIR/RESULTS_DIR` (not cwd).
 
 ## Invariants — don't break
-- Device is runtime-detected; load via `marlin.device.detect_device()`, place
+- Device is runtime-detected; load via `kathirmani.device.detect_device()`, place
   tensors with `.to(model.device)`. Never hardcode `"cuda"`/dtype. → `spec/06`.
 - Keep root shims + path anchors working; keep `learning.md` as-is.
 - Guard NVIDIA/Linux-only calls (nvidia-smi, NVML, `/sys`,`/proc`, `hostname -I`).
 
 ## Run / test (dev box = CPU, no model)
 - `bash setup.sh` (picks torch per machine), `bash run.sh`. Override:
-  `MARLIN_DEVICE=cuda|mps|cpu`.
+  `KATHIRMANI_DEVICE=cuda|mps|cpu`.
 - `pytest -q tests/` → expect ~18 passed, ~7 skipped (torch/model/server absent).
   `test_device.py` + `test_structure.py` are torch-free.
 
@@ -30,7 +30,7 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   break. → `spec/05`.
 - One GPU; `_GPU_LOCK` serializes forward passes (only decode/IO overlap). →
   `spec/02`, `spec/05`.
-- `inference/locate.py` (`--locate`) absent — optional lazy stub (`marlin.locate`).
+- `inference/locate.py` (`--locate`) absent — optional lazy stub (`kathirmani.locate`).
 
 ## Roadmap (future platform — not built yet) → `spec/10`, `spec/11`, `spec/15`–`17`
 - **v3 capability-hook layer (forward-looking, doc-only as of 2026-06-16).**
@@ -42,7 +42,7 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   (hooks/profiles/router/parity), `spec/17` (POS + wall-clock time alignment).
 - Target: OSS-ingestion-first, NVIDIA-model-first, plugin platform (master plan
   `oss_ingestion_nvidia_model_plugin_master_plan_v2.md` at root). Current
-  `src/marlin` cascade = the AI-worker seed. 14 phases; start at Phase 0.
+  `src/kathirmani` cascade = the AI-worker seed. 14 phases; start at Phase 0.
 - **Invariant — security & trust are utmost (it's a platform).** PII CCTV +
   tamper-evident loss/theft evidence + multi-store isolation. Treat security
   **cross-cutting every phase**, not just Phase 12: API auth/RBAC, secrets never
@@ -113,14 +113,14 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   no cohesive UX. Sections: Overview/Incidents(approve-reject)/Events/Search/Segments/
   Cameras/Models/Observability; offline-degrading. `GET /search?q=` added to
   services/api (wraps embedding-worker query_run). **PLATFORM.md** = the start-here
-  guide (README is still the old src/marlin doc).
+  guide (README is still the old src/kathirmani doc).
 
 ## Real-hardware follow-ups CLEARED (2026-06-10, code-doable ones) → sessions/2026-06-10
 - C-RADIO: random-projection head (`plugin._project`, cosine-preserving) replaces
   truncate/pad; vector_dim tbd→768 (kept the pgvector index). TrackingPlugin
   (`cv-oss-worker/tracking.py`) → real per-camera track_ids into events + `tracks`.
   GStreamerSource live-RTSP splitmuxsink recorder implemented. Migration **0003**
-  audit_log append-only GRANTs (role `marlin_app`); **0004** tstzrange + btree_gist
+  audit_log append-only GRANTs (role `kathirmani_app`); **0004** tstzrange + btree_gist
   overlap indexes (segments/incidents generated, ai_windows trigger-maintained).
 - STILL blocked on user/infra: `setup-nvidia-docker` (sudo), NGC key (DeepStream/
   NIM/TAO), real-GPU benchmark numbers + real VSS summary (weights+GPU), and applying
@@ -198,7 +198,7 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
 - **B. Deferred refactor (planned, NOT done — keeps suite green + invariants):**
   hyphen→underscore package rename (`cv-oss-worker`→`cv_oss_worker` …; ~27 sys.path +
   8 conftest/pytest.ini + Makefile/compose `working_dir`; ~40 files, do as 1 isolated
-  PR) · legacy `src/marlin` relocation (invariant-protected until baseline not needed).
+  PR) · legacy `src/kathirmani` relocation (invariant-protected until baseline not needed).
 - **C. Open code follow-ups:** cross-camera track handoff (Tracker = per-camera ids
   only) · Nemotron-VL prod edge cases (long/multilingual, batching) · serve_stream
   parallel-GPU batching (design-only, spec/02).

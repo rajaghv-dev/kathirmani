@@ -10,7 +10,7 @@ Two concrete plugins ship here; the active profile picks one (host.py):
     on any box.
   * ``QwenBaselinePlugin`` (plugin name ``vlm_qwen_baseline``) — the comparison-arm
     baseline (configs/models.yaml `research_qwen_baseline`); thin wrapper that may
-    import ``src/marlin/qwen_vl.py`` lazily, else falls back to fake.
+    import ``src/kathirmani/qwen_vl.py`` lazily, else falls back to fake.
 
 Task: ``vlm_clip_reasoning`` (contract: clip_path + prompt + hypothesis ->
 structured JSON). ``infer(request)`` input ``{clip_path, prompt, event|hypothesis}``
@@ -312,7 +312,7 @@ class NvidiaVlmPlugin(_VlmPluginBase):
         if clip_path.lower().endswith((".jpg", ".jpeg", ".png", ".webp", ".bmp")):
             return [Image.open(clip_path).convert("RGB")]
         try:
-            from marlin.ffmpeg_preload import preload_av_ffmpeg
+            from kathirmani.ffmpeg_preload import preload_av_ffmpeg
             preload_av_ffmpeg()
         except Exception:
             pass
@@ -375,7 +375,7 @@ def qwen_default_config(profile: str = "research_qwen_baseline") -> PluginConfig
 
 
 class QwenBaselinePlugin(_VlmPluginBase):
-    """`vlm_qwen_baseline` — wraps src/marlin/qwen_vl.py (lazy); fake fallback."""
+    """`vlm_qwen_baseline` — wraps src/kathirmani/qwen_vl.py (lazy); fake fallback."""
 
     def __init__(self, config: PluginConfig | None = None) -> None:
         super().__init__(config or qwen_default_config())
@@ -384,7 +384,7 @@ class QwenBaselinePlugin(_VlmPluginBase):
         if self._loaded or self._model is not None:
             return
         try:
-            from marlin.qwen_vl import load_qwen_model      # heavy/lazy import
+            from kathirmani.qwen_vl import load_qwen_model      # heavy/lazy import
             self._model, self._processor = load_qwen_model()
             self._loaded = True
             self._load_error = ""
@@ -397,7 +397,7 @@ class QwenBaselinePlugin(_VlmPluginBase):
     def _run_model(self, clip_path: str, prompt: str) -> tuple[str, float, int]:
         """Run one query via the existing Qwen path. Single-prompt verification
         (not the full QWEN_QUERIES battery — that is the analysis pipeline)."""
-        from marlin.qwen_vl import run_qwen_query
+        from kathirmani.qwen_vl import run_qwen_query
         t0 = time.perf_counter()
         text = run_qwen_query(self._model, self._processor, clip_path, prompt)
         ttft_ms = (time.perf_counter() - t0) * 1000.0

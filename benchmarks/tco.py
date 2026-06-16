@@ -1,7 +1,7 @@
 """TCO cost model — pure functions, extending the existing energy(Wh)→₹ model.
 
 Reuses the repo's electricity-cost concept from `results/economy.json` /
-`src/marlin/metrics.compute_economy`:
+`src/kathirmani/metrics.compute_economy`:
 
     energy_wh = avg_power_w * (seconds / 3600)
     cost_inr  = energy_wh / 1000 * electricity_rate_inr_per_kwh
@@ -31,7 +31,7 @@ SECONDS_PER_HOUR: float = 3600.0
 def energy_wh(avg_power_w: float, seconds: float) -> float:
     """Energy (watt-hours) drawn at `avg_power_w` over `seconds`.
 
-    Same formula as src/marlin/metrics.compute_economy.
+    Same formula as src/kathirmani/metrics.compute_economy.
     """
     return avg_power_w * (seconds / SECONDS_PER_HOUR)
 

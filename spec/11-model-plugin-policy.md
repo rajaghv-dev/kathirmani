@@ -80,7 +80,7 @@ Every plugin implements `ModelPlugin` — `load(config)`, `infer(request)`,
 
 Folder layout (A10): `model-plugins/{base,deepstream_detector,deepstream_tracker,
 nvidia_openai_compatible_vlm,nvidia_embedding,nvidia_summary,nvidia_search_critic,
-nvidia_cosmos}/`. The `metrics.py` gauge-registry pattern already in `src/marlin`
+nvidia_cosmos}/`. The `metrics.py` gauge-registry pattern already in `src/kathirmani`
 seeds `model-plugins/base/metrics.py`.
 
 ## Registry, profiles, catalog (A2.3, A3, A5)
@@ -141,7 +141,7 @@ bake-off reproducible.
 The plugin layer adds the `model_*` Prometheus namespace (`model_requests_total`,
 `model_latency_ms_bucket`, `model_ttft_ms_bucket`, `model_tokens_per_second`,
 `model_clips_per_min_gpu`, `model_event_precision`, …) **alongside** the existing
-`marlin_*` ([04-observability-stack.md](04-observability-stack.md)). Deprecate old
+`kathirmani_*` ([04-observability-stack.md](04-observability-stack.md)). Deprecate old
 panels only after the new ones validate — a rename orphans Prometheus/Loki series and
 Grafana regexes ([03-models-and-query-modes.md](03-models-and-query-modes.md) coupling
 warning). New model-benchmark dashboards 11–18 (registry, throughput, latency,
@@ -156,7 +156,7 @@ health, **fake inference**, real-sample inference, metrics emission, timeout, GP
 bad-output, golden regression, benchmark-harness compat. The fake-inference + timeout
 + OOM + bad-output checks mean a plugin is testable **without** a GPU or real
 weights — critical while NVIDIA Nemotron/Cosmos weights are absent. The
-`research_qwen_baseline` plugin (wrapping `src/marlin/qwen_vl.py`) is the first to
+`research_qwen_baseline` plugin (wrapping `src/kathirmani/qwen_vl.py`) is the first to
 pass all 10.
 
 ## Don't use the VLM for everything (master plan §9.2)

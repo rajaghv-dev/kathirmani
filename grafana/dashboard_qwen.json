@@ -73,7 +73,7 @@
       },
       "targets": [
         {
-          "expr": "sum(marlin_qwen_queries_ok_total)",
+          "expr": "sum(kathirmani_qwen_queries_ok_total)",
           "legendFormat": "Queries OK"
         }
       ]
@@ -128,7 +128,7 @@
       },
       "targets": [
         {
-          "expr": "sum(marlin_qwen_security_signals_total)",
+          "expr": "sum(kathirmani_qwen_security_signals_total)",
           "legendFormat": "Signals"
         }
       ]
@@ -175,7 +175,7 @@
       },
       "targets": [
         {
-          "expr": "count(marlin_qwen_queries_ok_total > 0)",
+          "expr": "count(kathirmani_qwen_queries_ok_total > 0)",
           "legendFormat": "Cameras"
         }
       ]
@@ -222,7 +222,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_total_events",
+          "expr": "kathirmani_total_events",
           "legendFormat": "Events"
         }
       ]
@@ -269,7 +269,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_fused_unique_events",
+          "expr": "kathirmani_fused_unique_events",
           "legendFormat": "Unique Events"
         }
       ]
@@ -316,7 +316,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_total_inference_seconds",
+          "expr": "kathirmani_total_inference_seconds",
           "legendFormat": "Wall Time"
         }
       ]
@@ -364,7 +364,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_qwen_queries_ok_total",
+          "expr": "kathirmani_qwen_queries_ok_total",
           "legendFormat": "{{video}}"
         }
       ]
@@ -420,7 +420,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_qwen_security_signals_total",
+          "expr": "kathirmani_qwen_security_signals_total",
           "legendFormat": "{{video}}"
         }
       ]
@@ -469,7 +469,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_find_span_duration_seconds{query=~\"a person puts a product.*|a person conceals.*|a person carries a large bag.*|a person walks toward the exit.*|a person lingers near the exit.*|a person opens or tears.*|a bag or object is left unattended.*\"}",
+          "expr": "kathirmani_find_span_duration_seconds{query=~\"a person puts a product.*|a person conceals.*|a person carries a large bag.*|a person walks toward the exit.*|a person lingers near the exit.*|a person opens or tears.*|a bag or object is left unattended.*\"}",
           "legendFormat": "{{query}}",
           "refId": "A"
         }
@@ -549,19 +549,19 @@
       },
       "targets": [
         {
-          "expr": "marlin_find_span_start_seconds{video=\"Kathirmani Bill Counter\"}",
+          "expr": "kathirmani_find_span_start_seconds{video=\"Kathirmani Bill Counter\"}",
           "legendFormat": "",
           "instant": true,
           "refId": "A"
         },
         {
-          "expr": "marlin_find_span_end_seconds{video=\"Kathirmani Bill Counter\"}",
+          "expr": "kathirmani_find_span_end_seconds{video=\"Kathirmani Bill Counter\"}",
           "legendFormat": "",
           "instant": true,
           "refId": "B"
         },
         {
-          "expr": "marlin_find_span_duration_seconds{video=\"Kathirmani Bill Counter\"}",
+          "expr": "kathirmani_find_span_duration_seconds{video=\"Kathirmani Bill Counter\"}",
           "legendFormat": "",
           "instant": true,
           "refId": "C"

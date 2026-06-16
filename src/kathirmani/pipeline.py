@@ -57,7 +57,7 @@ class _Progress:
 
 
 # Kathirmani store-specific surveillance queries
-# Each maps to a Prometheus metric label: marlin_find_span_*{query="..."}
+# Each maps to a Prometheus metric label: kathirmani_find_span_*{query="..."}
 FIND_QUERIES = [
     # Entry / exit
     "a person walks in through the entrance door",
@@ -163,7 +163,7 @@ def load_model(model_path: Path | None = None, compile: bool = True) -> object:
     return model
 
 
-def _marlin_module(model):
+def _kathirmani_module(model):
     """The dynamically-loaded modeling_marlin module backing this model.
 
     Gives us CAPTION_PROMPT / GROUNDING_PROMPT_TEMPLATE / parse_caption /
@@ -239,7 +239,7 @@ def _generate_cached(model, decoded, prompt: str, max_tokens: int) -> str:
 
 
 def _run_caption(model, decoded, label: str) -> dict:
-    mod = _marlin_module(model)
+    mod = _kathirmani_module(model)
     with INFERENCE_DURATION.labels(video=label, mode="caption").time():
         raw = _generate_cached(model, decoded, mod.CAPTION_PROMPT, max_tokens=2048)
     cleaned, scene, events = mod.parse_caption(raw)
@@ -247,7 +247,7 @@ def _run_caption(model, decoded, label: str) -> dict:
 
 
 def _run_find(model, decoded, label: str, query: str) -> dict:
-    mod = _marlin_module(model)
+    mod = _kathirmani_module(model)
     prompt = mod.GROUNDING_PROMPT_TEMPLATE.format(event=query.strip())
     with INFERENCE_DURATION.labels(video=label, mode="find").time():
         raw = _generate_cached(model, decoded, prompt, max_tokens=64)

@@ -7,7 +7,7 @@ import ast
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / "src" / "marlin"
+SRC = ROOT / "src" / "kathirmani"
 
 
 def test_package_modules_present():
@@ -16,23 +16,23 @@ def test_package_modules_present():
         "qwen_vl.py", "metrics.py", "loki.py", "annotations.py", "serve_metrics.py",
         "cli/run_inference.py", "cli/download_model.py", "viz/app.py",
     ]:
-        assert (SRC / rel).exists(), f"missing package module: src/marlin/{rel}"
+        assert (SRC / rel).exists(), f"missing package module: src/kathirmani/{rel}"
 
 
 def test_root_shims_point_at_package():
     for shim in ["run_inference.py", "download_model.py", "serve_metrics.py", "viz_app.py"]:
         text = (ROOT / shim).read_text()
-        assert "from marlin" in text, f"{shim} should import from the marlin package"
+        assert "from kathirmani" in text, f"{shim} should import from the kathirmani package"
 
 
 def test_no_hardcoded_cuda_in_loaders():
-    """Model loaders must go through marlin.device, not hardcode 'cuda'."""
+    """Model loaders must go through kathirmani.device, not hardcode 'cuda'."""
     for mod in ["pipeline.py", "qwen_vl.py"]:
         text = (SRC / mod).read_text()
         assert '"": "cuda"' not in text and ".to(\"cuda\")" not in text, (
             f"{mod} still hardcodes a CUDA device string"
         )
-        assert "detect_device" in text, f"{mod} should use marlin.device.detect_device"
+        assert "detect_device" in text, f"{mod} should use kathirmani.device.detect_device"
 
 
 def test_old_inference_package_removed():

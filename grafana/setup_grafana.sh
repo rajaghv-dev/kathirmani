@@ -42,7 +42,7 @@ echo "==> Adding Marlin inference Prometheus data source ..."
 ${CURL} -X POST "${GRAFANA_URL}/api/datasources" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "MarlinMetrics",
+    "name": "KathirmaniMetrics",
     "uid": "marlin-metrics",
     "type": "prometheus",
     "url": "'"${MARLIN_METRICS_URL}"'",

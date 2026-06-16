@@ -1,7 +1,7 @@
 """
 conftest.py — shared pytest fixtures and session-wide setup.
 
-Puts src/ on sys.path so `import marlin` works without an editable install,
+Puts src/ on sys.path so `import kathirmani` works without an editable install,
 sets the env vars qwen-vl-utils / torchcodec expect, and pre-loads PyAV's
 bundled FFmpeg libs (Linux) via the package's portable preloader.
 """
@@ -27,7 +27,7 @@ os.environ.setdefault("FPS_MIN_FRAMES", "4")
 # Pre-load PyAV's bundled FFmpeg libs (no-op off Linux / if torch absent).
 # ---------------------------------------------------------------------------
 try:
-    from marlin.ffmpeg_preload import preload_av_ffmpeg
+    from kathirmani.ffmpeg_preload import preload_av_ffmpeg
 
     preload_av_ffmpeg(_ROOT)
 except Exception:

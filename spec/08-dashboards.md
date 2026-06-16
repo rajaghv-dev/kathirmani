@@ -41,7 +41,7 @@ Splits the cascade's results across the 5 tested-camera scenarios into two quest
   produce signal worth acting on.
 - **Performance** — total inference time, per-camera caption latency, GPU compute % /
   power / temp / unified-memory, energy (Wh), **₹ run cost**, and **cost per event**.
-It reads the same `marlin_*` gauges as the others (so it persists between runs via
+It reads the same `kathirmani_*` gauges as the others (so it persists between runs via
 `serve_metrics.py`), and is the OSS, results-driven precursor to the platform's model
 dashboards 11–18 (`spec/11`, master plan A7). Same "No data" caveat below.
 

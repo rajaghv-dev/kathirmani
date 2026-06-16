@@ -79,7 +79,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_dgx_power_watts",
+          "expr": "kathirmani_dgx_power_watts",
           "legendFormat": "Power W"
         }
       ]
@@ -135,7 +135,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_dgx_compute_utilization_percent",
+          "expr": "kathirmani_dgx_compute_utilization_percent",
           "legendFormat": "Compute Util %"
         }
       ]
@@ -191,7 +191,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_dgx_temperature_celsius",
+          "expr": "kathirmani_dgx_temperature_celsius",
           "legendFormat": "Temp \u00b0C"
         }
       ]
@@ -237,7 +237,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_videos_processed_total",
+          "expr": "kathirmani_videos_processed_total",
           "legendFormat": "Processed"
         }
       ]
@@ -283,7 +283,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_total_events",
+          "expr": "kathirmani_total_events",
           "legendFormat": "Events"
         }
       ]
@@ -329,7 +329,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_events_detected_total{video=\"Kathirmani Bill Counter\"}",
+          "expr": "kathirmani_events_detected_total{video=\"Kathirmani Bill Counter\"}",
           "legendFormat": "Bill Counter events"
         }
       ]
@@ -360,7 +360,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_dgx_unified_mem_used_gb",
+          "expr": "kathirmani_dgx_unified_mem_used_gb",
           "legendFormat": "Unified Mem Used (GB)"
         }
       ]
@@ -429,11 +429,11 @@
       },
       "targets": [
         {
-          "expr": "marlin_dgx_compute_utilization_percent",
+          "expr": "kathirmani_dgx_compute_utilization_percent",
           "legendFormat": "Compute Util %"
         },
         {
-          "expr": "marlin_dgx_temperature_celsius",
+          "expr": "kathirmani_dgx_temperature_celsius",
           "legendFormat": "System Temp \u00b0C"
         }
       ]

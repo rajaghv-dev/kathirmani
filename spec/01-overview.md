@@ -2,7 +2,7 @@
 
 ## What the system is
 
-The Kathirmani Marlin pipeline runs [NemoStation/Marlin-2B](https://huggingface.co/NemoStation/Marlin-2B), a 2B-parameter video VLM, across **5 store security camera feeds** to extract dense captions, second-precise timestamps, and event detections. Metrics are exposed to Grafana via Prometheus.
+The Kathirmani pipeline runs [NemoStation/Marlin-2B](https://huggingface.co/NemoStation/Marlin-2B), a 2B-parameter video VLM, across **5 store security camera feeds** to extract dense captions, second-precise timestamps, and event detections. Metrics are exposed to Grafana via Prometheus.
 
 Marlin-2B is a fine-tune of Qwen3.5-2B, trained on *atomic, temporally-grounded events* with explicit `<start-end>` boundaries (HC-STVG, VidSTG, TimeLens). That training shape dictates how the model should be queried (see [03-models-and-query-modes.md](03-models-and-query-modes.md)).
 

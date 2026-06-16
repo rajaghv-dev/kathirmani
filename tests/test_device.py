@@ -1,10 +1,10 @@
-"""Unit tests for the accelerator-selection logic (marlin.device).
+"""Unit tests for the accelerator-selection logic (kathirmani.device).
 
 These exercise the pure `select_kind` decision function, so they run on any box
 (no torch / GPU required) — which is the whole point: this is the code that
 makes the repo portable across NVIDIA DGX (CUDA) and Apple Mac Studio (MPS).
 """
-from marlin.device import select_kind, detect_device, DeviceConfig, VALID_KINDS
+from kathirmani.device import select_kind, detect_device, DeviceConfig, VALID_KINDS
 
 
 def _kind(prefer, has_cuda, has_mps, system="Linux", arch="x86_64", cuda_name=None):

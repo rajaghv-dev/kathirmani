@@ -1,8 +1,8 @@
 """The `model_*` Prometheus namespace (master plan A8).
 
-Additive to the existing `marlin_*` gauges (src/marlin/metrics.py) — the plugin
+Additive to the existing `kathirmani_*` gauges (src/kathirmani/metrics.py) — the plugin
 layer emits these; legacy panels keep working until the new dashboards (11–18)
-validate, then `marlin_*` is deprecated (spec/11 'additive migration').
+validate, then `kathirmani_*` is deprecated (spec/11 'additive migration').
 
 Mirrors the repo's prometheus_client idiom. Import the registry, set/observe in a
 plugin's `infer()`, and the worker's `/metrics` exposes them.

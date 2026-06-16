@@ -256,8 +256,8 @@ CREATE INDEX idx_audit_action_ts ON audit_log (action, ts DESC);
 -- full-schema view; the runner uses db/migrations/*, not this file).
 -- ----------------------------------------------------------------------------
 -- 0003_audit_grants — enforce audit_log's append-only posture at the privilege
--- layer: a NOLOGIN group role `marlin_app` with INSERT+SELECT only (no UPDATE/
--- DELETE/TRUNCATE). Prod app login roles join it: GRANT marlin_app TO <login>.
+-- layer: a NOLOGIN group role `kathirmani_app` with INSERT+SELECT only (no UPDATE/
+-- DELETE/TRUNCATE). Prod app login roles join it: GRANT kathirmani_app TO <login>.
 --
 -- 0004_temporal_overlap — absolute tstzrange spans + GiST overlap indexes for true
 -- cross-clip / cross-camera temporal joins (spec/10 Temporal correlation).

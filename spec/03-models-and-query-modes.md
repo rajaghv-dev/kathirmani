@@ -44,7 +44,7 @@ The original 20 mixed in negation ("leaving without approaching billing"), conju
 
 The new set is 20 **atomic, visible, present-tense** clauses grouped: entry/exit, billing, shopping floor, loss-prevention primitives, crowd/ops.
 
-> **COUPLING WARNING:** query strings are **Prometheus metric label values** (`marlin_find_span_*{query="…"}`), and appear in Loki (`log_find_hit`), the `SECURITY_QUERIES` set (`inference/annotations.py`), and a regex in `grafana/dashboard_qwen.json`. Renaming a query orphans its old time series and blanks any panel that hardcodes it. When you change `FIND_QUERIES`, also update those three places. (Most dashboard panels aggregate by `{video="…"}` and are query-agnostic — only the Qwen "Loss Prevention" panel hardcodes query names.)
+> **COUPLING WARNING:** query strings are **Prometheus metric label values** (`kathirmani_find_span_*{query="…"}`), and appear in Loki (`log_find_hit`), the `SECURITY_QUERIES` set (`inference/annotations.py`), and a regex in `grafana/dashboard_qwen.json`. Renaming a query orphans its old time series and blanks any panel that hardcodes it. When you change `FIND_QUERIES`, also update those three places. (Most dashboard panels aggregate by `{video="…"}` and are query-agnostic — only the Qwen "Loss Prevention" panel hardcodes query names.)
 
 ## Qwen2.5-VL — the "what" axis
 

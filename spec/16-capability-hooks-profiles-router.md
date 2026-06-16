@@ -60,7 +60,7 @@ task contracts are how a **plugin** declares what it can do.
 ```text
 src/retail_video_ai/models/      # repo mapping: model-plugins/ + ai-workers/*/plugin.py
   base.py registry.py profiles.py router.py evaluator.py cost_model.py
-  plugins/{marlin_plugin,yoloe_plugin,qwen_plugin,mock_plugin}.py
+  plugins/{kathirmani_plugin,yoloe_plugin,qwen_plugin,mock_plugin}.py
 ```
 
 Repo reality: the plugin ABC + schemas already live in `model-plugins/base/`, and each

@@ -37,7 +37,7 @@ def log(
 ) -> None:
     """Push one structured log line to Loki."""
     labels = {
-        "app": "marlin",
+        "app": "kathirmani",
         "store": "kathirmani",
         "event_type": event_type,
     }

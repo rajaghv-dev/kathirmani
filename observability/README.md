@@ -1,12 +1,12 @@
 # Platform Observability (Phase 3)
 
 Delivers the master-plan dashboard set **01–18** plus the scrape / trace / log
-configs that feed them. **Additive** to the existing `marlin_*` stack — it does not
+configs that feed them. **Additive** to the existing `kathirmani_*` stack — it does not
 modify `grafana/dashboard_*.json`, `prometheus/prometheus.yml`, or the compose files.
 
 | Layer | What | Source of truth |
 |-------|------|-----------------|
-| Dashboards 01–10 (platform) | ingestion / camera / queue / CV / VLM / GPU / event-quality / incidents / twin / TCO | `ingest_*` (`ingestion/metrics.py`), `model_*`, `marlin_*` |
+| Dashboards 01–10 (platform) | ingestion / camera / queue / CV / VLM / GPU / event-quality / incidents / twin / TCO | `ingest_*` (`ingestion/metrics.py`), `model_*`, `kathirmani_*` |
 | Dashboards 11–18 (model bake-off) | registry / throughput / latency / quality / TCO / VSS-parity / failure-drift / runtime-comparison | `model_*` (`model-plugins/base/metrics.py`, spec/11 A8) |
 | Scrape | `ingest_*` (:8901), `model_*` (:8902), DCGM (:9400) | `prometheus/platform_scrape.yml` |
 | Traces | segment→queue→worker→event (OTLP) | `otel-collector/config.yaml` |

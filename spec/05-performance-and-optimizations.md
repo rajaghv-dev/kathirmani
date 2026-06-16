@@ -50,7 +50,7 @@ Across 5 cameras:     105 questions → 5 video decodes (100 decodes avoided)
 
 **What this does *not* speed up.** The GPU still runs 21 forward passes per camera, serialized by the single-GPU `_GPU_LOCK`. Decode-once attacks the CPU-decode half of the cost, not the GPU half. Cutting GPU work needs the Tier-1/2/3 ideas below.
 
-**Where to see it.** Live in the run log (per-camera decode line) and in Grafana → Compute Economy → "Compute saved — decode-once" row (`marlin_decode_seconds_saved`, `marlin_video_decodes_avoided`, reduction %).
+**Where to see it.** Live in the run log (per-camera decode line) and in Grafana → Compute Economy → "Compute saved — decode-once" row (`kathirmani_decode_seconds_saved`, `kathirmani_video_decodes_avoided`, reduction %).
 
 ### Mechanics
 
@@ -66,7 +66,7 @@ Expected win: 21 decodes/camera → 1. The GPU math is unchanged (still 21 forwa
 
 ### Progress + savings visibility
 
-Because the single GPU serializes every forward, total work per run is a fixed count (`cameras × (1 + N)` GPU calls), so `_Progress` ticks once per completed call and every line reports `GPU x/y pct · elapsed · ETA` plus per-call seconds. Decode savings are measured live and exported to Prometheus: `marlin_decode_seconds_saved` / `marlin_decode_seconds_actual`, `marlin_video_decodes_avoided` / `marlin_video_decodes_done`. Saved decode-seconds per camera = (its decode time) × N (the reused find prompts). Surfaced on the **Compute Economy** Grafana dashboard.
+Because the single GPU serializes every forward, total work per run is a fixed count (`cameras × (1 + N)` GPU calls), so `_Progress` ticks once per completed call and every line reports `GPU x/y pct · elapsed · ETA` plus per-call seconds. Decode savings are measured live and exported to Prometheus: `kathirmani_decode_seconds_saved` / `kathirmani_decode_seconds_actual`, `kathirmani_video_decodes_avoided` / `kathirmani_video_decodes_done`. Saved decode-seconds per camera = (its decode time) × N (the reused find prompts). Surfaced on the **Compute Economy** Grafana dashboard.
 
 ---
 

@@ -24,7 +24,7 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "### 10 — TCO\nCost / efficiency of the running platform. Anti-goal #4 (spec/10): measure video-sec/sec/GPU and clips/min/GPU, not tokens/sec alone. Here: video seconds processed, clips/min/GPU throughput, and request volume as a cost proxy. Money deltas across GPU profiles live in dashboard 15. Metrics: `model_*`, `marlin_*`."
+        "content": "### 10 — TCO\nCost / efficiency of the running platform. Anti-goal #4 (spec/10): measure video-sec/sec/GPU and clips/min/GPU, not tokens/sec alone. Here: video seconds processed, clips/min/GPU throughput, and request volume as a cost proxy. Money deltas across GPU profiles live in dashboard 15. Metrics: `model_*`, `kathirmani_*`."
       },
       "id": 1
     },

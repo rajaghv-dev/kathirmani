@@ -11,7 +11,7 @@ so it can be unit-tested without torch installed. ``detect_device`` wraps it,
 queries torch for what is actually available, and attaches the matching dtype
 and loading policy.
 
-Override the auto-detection with the ``MARLIN_DEVICE`` env var
+Override the auto-detection with the ``KATHIRMANI_DEVICE`` env var
 (``cuda`` / ``mps`` / ``cpu`` / ``auto``) or the ``prefer`` argument.
 """
 from __future__ import annotations
@@ -64,7 +64,7 @@ def select_kind(
 ) -> tuple[str, str, list[str]]:
     """Pure accelerator-selection logic. Returns (kind, machine_label, warnings).
 
-    ``prefer`` (or MARLIN_DEVICE) forces a kind when available; if the forced
+    ``prefer`` (or KATHIRMANI_DEVICE) forces a kind when available; if the forced
     kind is unavailable we warn and fall through to auto-detection. Auto order
     is CUDA -> MPS -> CPU.
     """
@@ -74,7 +74,7 @@ def select_kind(
         pref = None
 
     if pref is not None and pref not in VALID_KINDS:
-        warnings.append(f"unknown MARLIN_DEVICE/prefer={pref!r}; auto-detecting")
+        warnings.append(f"unknown KATHIRMANI_DEVICE/prefer={pref!r}; auto-detecting")
         pref = None
 
     if pref == "cuda":
@@ -109,7 +109,7 @@ def detect_device(prefer: str | None = None, *, quiet: bool = False) -> DeviceCo
     Imports torch lazily so the rest of the package (and tests of
     ``select_kind``) work even where torch is not installed.
     """
-    prefer = prefer if prefer is not None else os.environ.get("MARLIN_DEVICE")
+    prefer = prefer if prefer is not None else os.environ.get("KATHIRMANI_DEVICE")
     system = platform.system()
     arch = platform.machine()
 

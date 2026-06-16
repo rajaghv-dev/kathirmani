@@ -45,3 +45,6 @@ backups/
 # AI-generated design assets (need API keys; regenerable via design/ai_images.py)
 design/figures/generated/*
 !design/figures/generated/.gitkeep
+
+# large local test capture (do not commit)
+test@zlabslen-d12-3

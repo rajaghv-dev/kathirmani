@@ -89,7 +89,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_events_detected_total{video=\"Kathirmani Bill Counter\"}",
+          "expr": "kathirmani_events_detected_total{video=\"Kathirmani Bill Counter\"}",
           "legendFormat": "Events"
         }
       ]
@@ -137,7 +137,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_find_span_duration_seconds{video=\"Kathirmani Bill Counter\"}",
+          "expr": "kathirmani_find_span_duration_seconds{video=\"Kathirmani Bill Counter\"}",
           "legendFormat": "{{query}}"
         }
       ]
@@ -192,7 +192,7 @@
       },
       "targets": [
         {
-          "expr": "avg(marlin_find_parse_success{video=\"Kathirmani Bill Counter\"})",
+          "expr": "avg(kathirmani_find_parse_success{video=\"Kathirmani Bill Counter\"})",
           "legendFormat": "Parse OK"
         }
       ]
@@ -256,7 +256,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_events_detected_total{video=\"Kathirmani Center Camera\"}",
+          "expr": "kathirmani_events_detected_total{video=\"Kathirmani Center Camera\"}",
           "legendFormat": "Events"
         }
       ]
@@ -304,7 +304,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_find_span_duration_seconds{video=\"Kathirmani Center Camera\"}",
+          "expr": "kathirmani_find_span_duration_seconds{video=\"Kathirmani Center Camera\"}",
           "legendFormat": "{{query}}"
         }
       ]
@@ -359,7 +359,7 @@
       },
       "targets": [
         {
-          "expr": "avg(marlin_find_parse_success{video=\"Kathirmani Center Camera\"})",
+          "expr": "avg(kathirmani_find_parse_success{video=\"Kathirmani Center Camera\"})",
           "legendFormat": "Parse OK"
         }
       ]
@@ -423,7 +423,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_events_detected_total{video=\"Kathirmani Left Side Camera\"}",
+          "expr": "kathirmani_events_detected_total{video=\"Kathirmani Left Side Camera\"}",
           "legendFormat": "Events"
         }
       ]
@@ -471,7 +471,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_find_span_duration_seconds{video=\"Kathirmani Left Side Camera\"}",
+          "expr": "kathirmani_find_span_duration_seconds{video=\"Kathirmani Left Side Camera\"}",
           "legendFormat": "{{query}}"
         }
       ]
@@ -526,7 +526,7 @@
       },
       "targets": [
         {
-          "expr": "avg(marlin_find_parse_success{video=\"Kathirmani Left Side Camera\"})",
+          "expr": "avg(kathirmani_find_parse_success{video=\"Kathirmani Left Side Camera\"})",
           "legendFormat": "Parse OK"
         }
       ]
@@ -590,7 +590,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_events_detected_total{video=\"Kathirmani Near Entry Door Camera\"}",
+          "expr": "kathirmani_events_detected_total{video=\"Kathirmani Near Entry Door Camera\"}",
           "legendFormat": "Events"
         }
       ]
@@ -638,7 +638,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_find_span_duration_seconds{video=\"Kathirmani Near Entry Door Camera\"}",
+          "expr": "kathirmani_find_span_duration_seconds{video=\"Kathirmani Near Entry Door Camera\"}",
           "legendFormat": "{{query}}"
         }
       ]
@@ -693,7 +693,7 @@
       },
       "targets": [
         {
-          "expr": "avg(marlin_find_parse_success{video=\"Kathirmani Near Entry Door Camera\"})",
+          "expr": "avg(kathirmani_find_parse_success{video=\"Kathirmani Near Entry Door Camera\"})",
           "legendFormat": "Parse OK"
         }
       ]
@@ -757,7 +757,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_events_detected_total{video=\"Kathirmani Right Side Cam\"}",
+          "expr": "kathirmani_events_detected_total{video=\"Kathirmani Right Side Cam\"}",
           "legendFormat": "Events"
         }
       ]
@@ -805,7 +805,7 @@
       },
       "targets": [
         {
-          "expr": "marlin_find_span_duration_seconds{video=\"Kathirmani Right Side Cam\"}",
+          "expr": "kathirmani_find_span_duration_seconds{video=\"Kathirmani Right Side Cam\"}",
           "legendFormat": "{{query}}"
         }
       ]
@@ -860,7 +860,7 @@
       },
       "targets": [
         {
-          "expr": "avg(marlin_find_parse_success{video=\"Kathirmani Right Side Cam\"})",
+          "expr": "avg(kathirmani_find_parse_success{video=\"Kathirmani Right Side Cam\"})",
           "legendFormat": "Parse OK"
         }
       ]

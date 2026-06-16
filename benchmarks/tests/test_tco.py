@@ -5,7 +5,7 @@ from benchmarks import tco
 
 
 def test_energy_and_cost_formula_matches_economy_model():
-    # Same formula as src/marlin/metrics.compute_economy:
+    # Same formula as src/kathirmani/metrics.compute_economy:
     #   energy_wh = power * sec/3600 ; cost_inr = energy/1000 * rate
     e = tco.energy_wh(100.0, 3600.0)          # 100W for 1h
     assert e == 100.0

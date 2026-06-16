@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "kathirmani-marlin"
+name = "kathirmani"
 version = "1.0.0"
 description = "Marlin-2B + Qwen2.5-VL video intelligence over Kathirmani store cameras, portable across NVIDIA DGX (CUDA) and Apple Mac Studio (MPS)."
 requires-python = ">=3.10"
@@ -21,9 +21,9 @@ dependencies = [
 ]
 
 [project.scripts]
-marlin-infer = "marlin.cli.run_inference:main"
-marlin-download = "marlin.cli.download_model:main"
-marlin-metrics = "marlin.serve_metrics:main"
+kathirmani-infer = "kathirmani.cli.run_inference:main"
+kathirmani-download = "kathirmani.cli.download_model:main"
+kathirmani-metrics = "kathirmani.serve_metrics:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

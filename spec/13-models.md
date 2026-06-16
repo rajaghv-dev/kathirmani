@@ -10,7 +10,7 @@ DB registry: `model_registry` (seeded by `make seed`).
 
 ## Two tiers
 
-**Current cascade (research baseline).** The runnable `src/marlin` pipeline —
+**Current cascade (research baseline).** The runnable `src/kathirmani` pipeline —
 Marlin-2B (WHEN) → Locate/YOLOE (WHERE) → Qwen2.5-VL (WHAT). All Qwen/YOLOE-based,
 so under the NVIDIA-only policy they live as the comparison-only
 `research_qwen_baseline` profile (never the production default). Detail: `spec/03`.

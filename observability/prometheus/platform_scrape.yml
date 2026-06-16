@@ -1,7 +1,7 @@
 # Platform scrape configs (Phase 3) — the NEW `ingest_*` and `model_*` targets.
 #
 # This file is ADDITIVE to the existing prometheus/prometheus.yml (which already
-# scrapes `marlin_inference` on serve_metrics:8900 and `netdata`). It does NOT
+# scrapes `kathirmani_inference` on serve_metrics:8900 and `netdata`). It does NOT
 # replace it — Prometheus has no native include directive, so wire it in one of:
 #
 #   (a) Append these scrape_configs blocks under the existing `scrape_configs:`

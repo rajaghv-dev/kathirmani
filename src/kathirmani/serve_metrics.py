@@ -22,63 +22,63 @@ from prometheus_client import (
 from prometheus_client.core import GaugeMetricFamily, CounterMetricFamily
 from prometheus_client.registry import Collector
 
-# Repo root: src/marlin/serve_metrics.py -> parents[2]. results/ lives there.
-# Computed locally (no marlin import) so the slim Docker container that only
+# Repo root: src/kathirmani/serve_metrics.py -> parents[2]. results/ lives there.
+# Computed locally (no kathirmani import) so the slim Docker container that only
 # `pip install prometheus_client` can still run this file.
 HERE = Path(__file__).resolve().parents[2]
 RESULTS_DIR = HERE / "results"
 
 # --- DGX Spark (Grace Blackwell) hardware metrics — live during inference ---
 # GB10 is integrated GPU with 119GB unified memory; no discrete VRAM
-DGX_COMPUTE = Gauge("marlin_dgx_compute_utilization_percent", "DGX compute utilization (%)")
-DGX_TEMP    = Gauge("marlin_dgx_temperature_celsius",         "DGX system temperature (°C)")
-DGX_POWER   = Gauge("marlin_dgx_power_watts",                 "DGX power draw (W)")
-DGX_CPU_U   = Gauge("marlin_dgx_cpu_utilization_user_percent","ARM CPU user utilization (%)")
-DGX_CPU_S   = Gauge("marlin_dgx_cpu_utilization_system_percent","ARM CPU system utilization (%)")
-DGX_MEM_U   = Gauge("marlin_dgx_unified_mem_used_gb",         "Unified memory used (GB)")
-DGX_MEM_T   = Gauge("marlin_dgx_unified_mem_total_gb",        "Unified memory total (GB)")
+DGX_COMPUTE = Gauge("kathirmani_dgx_compute_utilization_percent", "DGX compute utilization (%)")
+DGX_TEMP    = Gauge("kathirmani_dgx_temperature_celsius",         "DGX system temperature (°C)")
+DGX_POWER   = Gauge("kathirmani_dgx_power_watts",                 "DGX power draw (W)")
+DGX_CPU_U   = Gauge("kathirmani_dgx_cpu_utilization_user_percent","ARM CPU user utilization (%)")
+DGX_CPU_S   = Gauge("kathirmani_dgx_cpu_utilization_system_percent","ARM CPU system utilization (%)")
+DGX_MEM_U   = Gauge("kathirmani_dgx_unified_mem_used_gb",         "Unified memory used (GB)")
+DGX_MEM_T   = Gauge("kathirmani_dgx_unified_mem_total_gb",        "Unified memory total (GB)")
 
 # --- static metrics loaded from JSON results ---
-EVENTS    = Gauge("marlin_events_detected_total",   "Events detected per camera", ["video"])
-PROCESSED = Gauge("marlin_videos_processed_total",  "Videos with results on disk")
-TOTAL_EV  = Gauge("marlin_total_events",            "Sum of events across all cameras")
+EVENTS    = Gauge("kathirmani_events_detected_total",   "Events detected per camera", ["video"])
+PROCESSED = Gauge("kathirmani_videos_processed_total",  "Videos with results on disk")
+TOTAL_EV  = Gauge("kathirmani_total_events",            "Sum of events across all cameras")
 
-FIND_START  = Gauge("marlin_find_span_start_seconds", "Find result span start (s)", ["video", "query"])
-FIND_END    = Gauge("marlin_find_span_end_seconds",   "Find result span end (s)",   ["video", "query"])
-FIND_OK     = Gauge("marlin_find_parse_success",       "1 if find result parsed OK", ["video", "query"])
-FIND_DUR    = Gauge("marlin_find_span_duration_seconds","Find span duration (s)",    ["video", "query"])
+FIND_START  = Gauge("kathirmani_find_span_start_seconds", "Find result span start (s)", ["video", "query"])
+FIND_END    = Gauge("kathirmani_find_span_end_seconds",   "Find result span end (s)",   ["video", "query"])
+FIND_OK     = Gauge("kathirmani_find_parse_success",       "1 if find result parsed OK", ["video", "query"])
+FIND_DUR    = Gauge("kathirmani_find_span_duration_seconds","Find span duration (s)",    ["video", "query"])
 
-CAP_TIME    = Gauge("marlin_caption_duration_seconds", "Time to caption a video (s)", ["video"])
-FIND_TIME   = Gauge("marlin_find_duration_seconds",    "Avg find query time (s)",     ["video"])
+CAP_TIME    = Gauge("kathirmani_caption_duration_seconds", "Time to caption a video (s)", ["video"])
+FIND_TIME   = Gauge("kathirmani_find_duration_seconds",    "Avg find query time (s)",     ["video"])
 
-MODEL_INFO  = Info("marlin_model", "Model metadata")
+MODEL_INFO  = Info("kathirmani_model", "Model metadata")
 
 # --- fused / store-wide metrics (from results/fused.json) ---
-FUSED_EVENTS    = Gauge("marlin_fused_unique_events",         "Unique events after multi-view dedup")
-FUSED_RAW       = Gauge("marlin_fused_raw_events_total",      "Raw events before dedup across cameras")
-FUSED_FIND_START= Gauge("marlin_fused_find_span_start_seconds","Fused find span start (s)", ["query"])
-FUSED_FIND_END  = Gauge("marlin_fused_find_span_end_seconds",  "Fused find span end (s)",   ["query"])
-FUSED_FIND_DUR  = Gauge("marlin_fused_find_span_duration_seconds","Fused span duration (s)", ["query"])
+FUSED_EVENTS    = Gauge("kathirmani_fused_unique_events",         "Unique events after multi-view dedup")
+FUSED_RAW       = Gauge("kathirmani_fused_raw_events_total",      "Raw events before dedup across cameras")
+FUSED_FIND_START= Gauge("kathirmani_fused_find_span_start_seconds","Fused find span start (s)", ["query"])
+FUSED_FIND_END  = Gauge("kathirmani_fused_find_span_end_seconds",  "Fused find span end (s)",   ["query"])
+FUSED_FIND_DUR  = Gauge("kathirmani_fused_find_span_duration_seconds","Fused span duration (s)", ["query"])
 
 # --- Qwen2.5-VL visual analysis metrics ---
 QWEN_SECURITY_SIGNALS = Gauge(
-    "marlin_qwen_security_signals_total",
+    "kathirmani_qwen_security_signals_total",
     "Number of Qwen2.5-VL queries that indicated a security concern",
     ["video"]
 )
 QWEN_QUERIES_OK = Gauge(
-    "marlin_qwen_queries_ok_total",
+    "kathirmani_qwen_queries_ok_total",
     "Number of Qwen2.5-VL queries that returned a valid answer",
     ["video"]
 )
 
 # --- token economy / cost metrics (from results/economy.json) ---
-ECONOMY_ENERGY   = Gauge("marlin_energy_consumed_wh",            "Estimated GPU energy used this run (Wh)")
-ECONOMY_COST     = Gauge("marlin_cost_inr",                      "Estimated inference cost in INR (₹)")
-ECONOMY_CPE      = Gauge("marlin_cost_per_event_inr",            "INR per event detected")
-ECONOMY_EPW      = Gauge("marlin_events_per_wh",                 "Events detected per watt-hour (efficiency)")
-ECONOMY_WALLTIME = Gauge("marlin_total_inference_seconds",       "Total wall time of last run (s)")
-ECONOMY_AVGPOWER = Gauge("marlin_avg_dgx_power_during_run_watts","Average GPU power during last inference run (W)")
+ECONOMY_ENERGY   = Gauge("kathirmani_energy_consumed_wh",            "Estimated GPU energy used this run (Wh)")
+ECONOMY_COST     = Gauge("kathirmani_cost_inr",                      "Estimated inference cost in INR (₹)")
+ECONOMY_CPE      = Gauge("kathirmani_cost_per_event_inr",            "INR per event detected")
+ECONOMY_EPW      = Gauge("kathirmani_events_per_wh",                 "Events detected per watt-hour (efficiency)")
+ECONOMY_WALLTIME = Gauge("kathirmani_total_inference_seconds",       "Total wall time of last run (s)")
+ECONOMY_AVGPOWER = Gauge("kathirmani_avg_dgx_power_during_run_watts","Average GPU power during last inference run (W)")
 
 _loaded: set[str] = set()
 
