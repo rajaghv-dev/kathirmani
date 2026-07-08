@@ -42,12 +42,11 @@ services:
   review-ui:                             # human approve/reject of loss hypotheses
     image: kathirmani-app
     build: { context: ., dockerfile: Dockerfile.app }
-    command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8010"]
-    working_dir: /app/services/review-ui
+    command: ["uvicorn", "services.review_ui.app:app", "--host", "0.0.0.0", "--port", "8010"]
+    working_dir: /app
     volumes: ["./:/app"]
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-kathir}:${POSTGRES_PASSWORD:-change_me_in_env}@postgres:5432/${POSTGRES_DB:-kathirmani}
-      PYTHONPATH: /app
     ports: ["${REVIEW_PORT:-8010}:8010"]
     depends_on:
       postgres: { condition: service_healthy }
@@ -55,8 +54,8 @@ services:
   console:                               # ☜ THE FRONT DOOR — SPA + gateway on :8080
     image: kathirmani-app
     build: { context: ., dockerfile: Dockerfile.app }
-    command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
-    working_dir: /app/services/console
+    command: ["uvicorn", "services.console.app:app", "--host", "0.0.0.0", "--port", "8080"]
+    working_dir: /app
     volumes: ["./:/app"]
     environment:
       CONSOLE_API_URL: http://api:8000

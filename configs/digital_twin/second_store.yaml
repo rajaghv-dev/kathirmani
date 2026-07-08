@@ -1,6 +1,6 @@
 # DEMO second store (Phase 10 proof: a new store onboards by YAML, zero code).
 # Same schema as configs/stores/kathirmani.yaml — only ids/values differ. Loaded
-# by services/digital-twin/loader.load_twin; validated by the same StoreTwin code.
+# by services.digital_twin.loader.load_twin; validated by the same StoreTwin code.
 store:
   id: demo_store_02
   name: "Demo Store 02"

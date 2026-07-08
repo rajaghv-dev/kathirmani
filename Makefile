@@ -51,7 +51,7 @@ docker-config: ## Validate the compose stack parses
 fetch-models: ## Download + pin the NVIDIA model shortlist (writes models/PROVENANCE.json)
 	python3 scripts/fetch_models.py
 lint: ## Byte-compile python sources
-	@python3 -m py_compile scripts/*.py scripts/validate/*.py model-plugins/base/*.py ingestion/*.py db/*.py && echo "lint OK"
+	@python3 -m py_compile scripts/*.py scripts/validate/*.py model_plugins/base/*.py ingestion/*.py db/*.py && echo "lint OK"
 
 # ---- Stack lifecycle --------------------------------------------------------
 .PHONY: up down logs grafana observability platform platform-down platform-logs
@@ -95,25 +95,25 @@ backfill: ## Load ingestion JSONL (data/metadata) into Postgres
 api: ## Run the platform API (FastAPI/uvicorn on :8000)
 	.venv/bin/uvicorn services.api.app:app --host 0.0.0.0 --port 8000
 run-cv-worker: ## Phase 4: OSS CV worker — consume ai_window.ready, emit detections/events
-	cd ai-workers/cv-oss-worker && INGEST_QUEUE=pg ../../.venv/bin/python -m worker $(if $(ONCE),--once,) --limit $(or $(LIMIT),8)
+	INGEST_QUEUE=pg .venv/bin/python -m ai_workers.cv_oss_worker.worker $(if $(ONCE),--once,) --limit $(or $(LIMIT),8)
 run-rule-engine: ## Phase 5: rule engine — consume event.created, raise hypotheses + incidents
-	cd services/rule-engine && INGEST_QUEUE=pg ../../.venv/bin/python -m worker $(if $(ONCE),--once,) --limit $(or $(LIMIT),8)
+	INGEST_QUEUE=pg .venv/bin/python -m services.rule_engine.worker $(if $(ONCE),--once,) --limit $(or $(LIMIT),8)
 run-vlm-worker: ## Phase 6: VLM worker — verify needs_vlm events → vlm_observations
-	cd ai-workers/vlm-worker && INGEST_QUEUE=pg ../../.venv/bin/python -m worker $(if $(ONCE),--once,) --limit $(or $(LIMIT),8)
+	INGEST_QUEUE=pg .venv/bin/python -m ai_workers.vlm_worker.worker $(if $(ONCE),--once,) --limit $(or $(LIMIT),8)
 run-workers: run-cv-worker run-rule-engine run-vlm-worker ## Start the AI workers (cv + rules + vlm)
 index: ## Phase 8: embed + index events/observations into pgvector
-	.venv/bin/python ai-workers/embedding-worker/worker.py index
+	.venv/bin/python -m ai_workers.embedding_worker.worker index
 search: ## Phase 8: natural-language search (QUERY="...")
-	.venv/bin/python ai-workers/embedding-worker/worker.py query "$(QUERY)"
+	.venv/bin/python -m ai_workers.embedding_worker.worker query "$(QUERY)"
 run-review-ui: ## Phase 7: human review UI (FastAPI :8010)
-	cd services/review-ui && ../../.venv/bin/uvicorn app:app --host 0.0.0.0 --port 8010
+	.venv/bin/uvicorn services.review_ui.app:app --host 0.0.0.0 --port 8010
 console: ## THE FRONT DOOR — unified console gateway (SPA + proxy) on :8080
-	cd services/console && ../../.venv/bin/uvicorn app:app --host 0.0.0.0 --port 8080
+	.venv/bin/uvicorn services.console.app:app --host 0.0.0.0 --port 8080
 run-console: console ## alias for `make console`
 summarize: ## Phase 9: hierarchical long-video summary (REQUEST=path.json optional)
-	.venv/bin/python ai-workers/vss-eval-worker/worker.py summarize $(if $(REQUEST),--request $(REQUEST),)
+	.venv/bin/python -m ai_workers.vss_eval_worker.worker summarize $(if $(REQUEST),--request $(REQUEST),)
 parity: ## Phase 9: build the VSS-parity report → parity_report.json
-	.venv/bin/python ai-workers/vss-eval-worker/worker.py parity
+	.venv/bin/python -m ai_workers.vss_eval_worker.worker parity
 retention-dryrun: ## Phase 12: show what retention cleanup would delete (dry run)
 	.venv/bin/python -m services.security.retention
 retention-apply: ## Phase 12: apply retention cleanup (evidence-locked rows skipped)
@@ -132,16 +132,11 @@ gen-image: ## Design: AI image (PROVIDER=gemini|openai|both OUT=name PROMPT="...
 		$(if $(PROMPT_FILE),--prompt-file $(PROMPT_FILE),--prompt "$(PROMPT)") \
 		$(if $(REF),--ref $(REF),)
 twin-validate: ## Phase 10: validate a store digital twin (STORE=configs/stores/kathirmani.yaml)
-	.venv/bin/python -c "import sys; sys.path.insert(0,'services/digital-twin'); from loader import load_twin; t=load_twin('$(or $(STORE),configs/stores/kathirmani.yaml)'); p=t.validate(); print(t.summary()); print('problems:',p); sys.exit(1 if p else 0)"
-TESTDIRS := tests/ ingestion/tests/ services/api/tests/ services/digital-twin/tests/ services/rule-engine/tests/ services/evidence-builder/tests/ services/review-ui/tests/ services/console/tests/ services/security/tests/ ai-workers/cv-oss-worker/tests/ ai-workers/vlm-worker/tests/ ai-workers/embedding-worker/tests/ ai-workers/vss-eval-worker/tests/ benchmarks/tests/ benchmarks/bakeoff/tests/ observability/tests/
-# Per-component (isolated) runs: the hyphenated worker dirs aren't packages and share
-# module basenames (plugin.py/worker.py), so collecting them together clashes. The
-# tests/ deselect skips a live-Grafana integration test (env-dependent, not platform code).
-test: ## Run the full test suite (each component isolated)
-	@fail=0; for d in $(TESTDIRS); do echo "→ $$d"; \
-	  if [ "$$d" = "tests/" ]; then DS="--deselect tests/test_setup.py::test_grafana_datasource_marlin"; else DS=""; fi; \
-	  .venv/bin/pytest -q $$d $$DS || fail=1; \
-	done; [ $$fail -eq 0 ] && echo "ALL COMPONENT TESTS GREEN" || { echo "FAILURES above"; exit 1; }
+	.venv/bin/python -c "import sys; from services.digital_twin.loader import load_twin; t=load_twin('$(or $(STORE),configs/stores/kathirmani.yaml)'); p=t.validate(); print(t.summary()); print('problems:',p); sys.exit(1 if p else 0)"
+# One flat run — every tests/ dir is a real package (see pyproject testpaths). The
+# deselect skips a live-Grafana integration test (env-dependent, not platform code).
+test: ## Run the full test suite
+	.venv/bin/pytest -q --deselect tests/test_setup.py::test_grafana_datasource_marlin
 test-e2e: ## Full-scenario chain: ingest → backfill → cv → rules → vlm → evidence
 	@echo "e2e: make ingest-sample && make backfill && make run-workers ONCE=1 && make evidence-demo INCIDENT=<id>"
 bench: ## Phase 11: run all benchmarks (fake mode) → model_benchmark_runs + reports
@@ -149,7 +144,7 @@ bench: ## Phase 11: run all benchmarks (fake mode) → model_benchmark_runs + re
 bakeoff: ## Phase 13: NVIDIA runtime bake-off (fake) → ranked production/fallback profile
 	.venv/bin/python -m benchmarks.bakeoff.run --task vlm_clip_reasoning
 evidence-demo: ## Phase 7: build an evidence package (INCIDENT=<incident_id>)
-	cd services/evidence-builder && ../../.venv/bin/python -m builder $(INCIDENT)
+	.venv/bin/python -m services.evidence_builder.builder $(INCIDENT)
 
 # ---- Plugins ----------------------------------------------------------------
 .PHONY: test-plugin bench-plugin

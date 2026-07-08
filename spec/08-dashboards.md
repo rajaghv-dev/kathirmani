@@ -53,7 +53,7 @@ Beyond the fixed 01–18 set, the generator emits **one dashboard per model** un
 Each shows that model's `model_*` traffic/latency/quality (filtered `{model_id="…"}`)
 **plus its runtime footprint on the box** — host CPU/RAM/disk-I/O and GPU power.
 
-Those runtime numbers are linked via a **model-run hook** (`model-plugins/base/run_hooks.py`):
+Those runtime numbers are linked via a **model-run hook** (`model_plugins/base/run_hooks.py`):
 the workers wrap every `plugin.infer()` (the kickoff choke-point) with
 `record_model_run(config, t0, t1, model_run)`, which (a) **range-queries Netdata** over
 `[t0, t1]` for CPU/RAM/IO + samples nvidia-smi for GPU power, publishing

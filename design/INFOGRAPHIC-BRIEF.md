@@ -103,7 +103,7 @@ flowchart LR
 | Vision-language (verify) | `nvidia/Llama-3.1-Nemotron-Nano-VL-8B-V1` |
 | Reasoning / summaries | `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B` |
 | Visual embedding / search | `nvidia/C-RADIOv4-H` |
-| Physical / digital-twin reasoning | `nvidia/Cosmos-Reason2-2B` |
+| Physical / digital_twin reasoning | `nvidia/Cosmos-Reason2-2B` |
 | Detection (interim, free) | YOLOE / RT-DETR |
 
 ## 7. Style

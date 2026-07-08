@@ -7,7 +7,7 @@ modify `grafana/dashboard_*.json`, `prometheus/prometheus.yml`, or the compose f
 | Layer | What | Source of truth |
 |-------|------|-----------------|
 | Dashboards 01–10 (platform) | ingestion / camera / queue / CV / VLM / GPU / event-quality / incidents / twin / TCO | `ingest_*` (`ingestion/metrics.py`), `model_*`, `kathirmani_*` |
-| Dashboards 11–18 (model bake-off) | registry / throughput / latency / quality / TCO / VSS-parity / failure-drift / runtime-comparison | `model_*` (`model-plugins/base/metrics.py`, spec/11 A8) |
+| Dashboards 11–18 (model bake-off) | registry / throughput / latency / quality / TCO / VSS-parity / failure-drift / runtime-comparison | `model_*` (`model_plugins/base/metrics.py`, spec/11 A8) |
 | Scrape | `ingest_*` (:8901), `model_*` (:8902), DCGM (:9400) | `prometheus/platform_scrape.yml` |
 | Traces | segment→queue→worker→event (OTLP) | `otel-collector/config.yaml` |
 | Logs | per-service JSON → Loki, searchable by `trace_id` / `camera_id` / `segment_id` | `promtail/config.yml` |

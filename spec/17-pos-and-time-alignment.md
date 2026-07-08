@@ -54,8 +54,8 @@ pos:
 - **`read_only_http`** hits a running Store-POS; **`readonly_db_export`** reads a DB
   export. Both are strictly read-only — the platform never writes to POS.
 
-Suggested location: `services/pos-adapter/` (a service alongside `rule-engine` /
-`evidence-builder`, [09](09-repo-structure.md)), or an `ai-workers` consumer if it runs
+Suggested location: `services/pos-adapter/` (a service alongside `rule_engine` /
+`evidence_builder`, [09](09-repo-structure.md)), or an `ai_workers` consumer if it runs
 off the queue.
 
 ## What the lookup window is anchored on
@@ -139,8 +139,8 @@ WHEN    → When did a visible event happen?         (Marlin, spec/03)
 WHERE   → Where is the relevant person/object/zone? (Locate/YOLOE, route_to_vlm)
 WHAT    → What does the keyframe/clip appear to show? (Qwen, routed-only)
 POS     → Was there a matching transaction?         (this doc)
-RULES   → Should this become a review item?         (rule-engine, spec/10 Phase 5)
-HUMAN   → What is the final decision?               (review-ui, spec/10 Phase 7)
+RULES   → Should this become a review item?         (rule_engine, spec/10 Phase 5)
+HUMAN   → What is the final decision?               (review_ui, spec/10 Phase 7)
 ```
 
 Rules **never confirm theft** — they raise *candidate review items* by combining atomic

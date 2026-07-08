@@ -2,7 +2,7 @@
 
 **Version:** 1.0  
 **Target hardware:** NVIDIA DGX-class server and RTX A6000-class GPU box  
-**Primary use case:** Retail store video analytics, loss/theft detection, natural-language video search, event verification, and digital-twin-driven store intelligence  
+**Primary use case:** Retail store video analytics, loss/theft detection, natural-language video search, event verification, and digital_twin-driven store intelligence  
 **Core decision:** Keep the ingestion layer OSS and durable. Use NVIDIA DeepStream/VSS/TensorRT/NIM/Triton wherever acceleration, scale, or reference benchmarking gives clear value.
 
 ---
@@ -300,7 +300,7 @@ video-ai-platform/
 │   ├── 00-intent.md
 │   ├── 01-architecture.md
 │   ├── 02-dataflow.md
-│   ├── 03-digital-twin.md
+│   ├── 03-digital_twin.md
 │   ├── 04-models.md
 │   ├── 05-testing.md
 │   ├── 06-observability.md
@@ -324,39 +324,39 @@ video-ai-platform/
 │   │   ├── thumbnailer.py
 │   │   └── metadata_writer.py
 │   └── tests/
-├── ai-workers/
+├── ai_workers/
 │   ├── cv-deepstream-worker/
 │   │   ├── Dockerfile
 │   │   ├── configs/
 │   │   ├── src/
 │   │   └── tests/
-│   ├── cv-oss-worker/
+│   ├── cv_oss_worker/
 │   │   ├── Dockerfile
 │   │   ├── src/
 │   │   └── tests/
-│   ├── vlm-worker/
+│   ├── vlm_worker/
 │   │   ├── Dockerfile
 │   │   ├── prompts/
 │   │   ├── src/
 │   │   └── tests/
-│   ├── vss-eval-worker/
+│   ├── vss_eval_worker/
 │   │   ├── README.md
 │   │   └── experiments/
-│   └── embedding-worker/
+│   └── embedding_worker/
 ├── services/
 │   ├── api/
 │   │   ├── Dockerfile
 │   │   ├── src/
 │   │   └── tests/
-│   ├── rule-engine/
+│   ├── rule_engine/
 │   │   ├── Dockerfile
 │   │   ├── src/
 │   │   └── tests/
-│   ├── evidence-builder/
+│   ├── evidence_builder/
 │   │   ├── Dockerfile
 │   │   ├── src/
 │   │   └── tests/
-│   └── review-ui/
+│   └── review_ui/
 │       ├── Dockerfile
 │       ├── src/
 │       └── tests/
@@ -1281,30 +1281,30 @@ services:
   api:
     build: ./services/api
 
-  rule-engine:
-    build: ./services/rule-engine
+  rule_engine:
+    build: ./services/rule_engine
 
-  evidence-builder:
-    build: ./services/evidence-builder
+  evidence_builder:
+    build: ./services/evidence_builder
 
   cv-deepstream-worker:
-    build: ./ai-workers/cv-deepstream-worker
+    build: ./ai_workers/cv-deepstream-worker
     deploy:
       resources:
         reservations:
           devices:
             - capabilities: [gpu]
 
-  vlm-worker:
-    build: ./ai-workers/vlm-worker
+  vlm_worker:
+    build: ./ai_workers/vlm_worker
     deploy:
       resources:
         reservations:
           devices:
             - capabilities: [gpu]
 
-  review-ui:
-    build: ./services/review-ui
+  review_ui:
+    build: ./services/review_ui
 ```
 
 ---
@@ -2097,7 +2097,7 @@ The final platform should be described as:
 ```text
 An OSS-ingestion-first, NVIDIA-accelerated, clip-evidence-based video intelligence platform
 for retail store analytics, loss/theft detection, natural-language video search,
-incident verification, and digital-twin-driven multi-store deployment.
+incident verification, and digital_twin-driven multi-store deployment.
 ```
 
 The durable design is:
@@ -3344,7 +3344,7 @@ benchmark:
 Update repo structure:
 
 ```text
-model-plugins/
+model_plugins/
 ├── README.md
 ├── base/
 │   ├── plugin.py
@@ -3496,7 +3496,7 @@ The final architecture should now be described as:
 ```text
 An OSS-ingestion-first, NVIDIA-model-first, plugin-driven video intelligence platform
 that learns from VSS capabilities but implements its own OSS-controlled video search,
-summarization, embedding, alert verification, and digital-twin workflows.
+summarization, embedding, alert verification, and digital_twin workflows.
 ```
 
 The corrected direction is:

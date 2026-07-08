@@ -124,10 +124,7 @@ def search(q: str, k: int = 10):
     if not q or not q.strip():
         return {"query": q, "results": [], "error": "empty query"}
     try:
-        _ew = str(Path(__file__).resolve().parents[2] / "ai-workers" / "embedding-worker")
-        if _ew not in sys.path:
-            sys.path.insert(0, _ew)
-        from worker import query_run  # embedding-worker/worker.py (flat import)
+        from ai_workers.embedding_worker.worker import query_run
         return {"query": q, "results": query_run(q, k=k)}
     except Exception as e:
         return {"query": q, "results": [], "error": f"{type(e).__name__}: {e}"}

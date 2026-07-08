@@ -40,7 +40,7 @@ table, so every model on disk is auditable from the DB. Weights live under `mode
 
 ## Real Nemotron-VL wired (2026-06-04)
 
-The VLM plugin (`ai-workers/vlm-worker/plugin.py:NvidiaVlmPlugin`) now runs the **real**
+The VLM plugin (`ai_workers/vlm_worker/plugin.py:NvidiaVlmPlugin`) now runs the **real**
 `nvidia/Llama-3.1-Nemotron-Nano-VL-8B-V1` from local weights — verified end-to-end on a
 real clip (`faked=False`): frames sampled via PyAV → multi-image `model.chat(...)` →
 structured verification. Loads via the model's own `trust_remote_code` API

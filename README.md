@@ -27,7 +27,7 @@ make migrate && make seed
 make api              # platform read/query API + Swagger /docs        → :8000
 make run-review-ui    # human approve/reject service                   → :8010
 make console          # the Console (SPA + gateway)                    → :8080
-make run-workers      # cv + rule-engine + vlm workers (optional)
+make run-workers      # cv + rule_engine + vlm workers (optional)
 ```
 
 | Port | Service | Start |

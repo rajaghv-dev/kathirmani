@@ -5,7 +5,7 @@ from __future__ import annotations
 import httpx
 from fastapi.testclient import TestClient
 
-import app as console
+from services.console import app as console
 
 
 client = TestClient(console.app)

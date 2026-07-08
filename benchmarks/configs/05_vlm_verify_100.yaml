@@ -1,6 +1,6 @@
 # Phase 11 Benchmark 5 — 100 suspicious-event VLM verifications.
 # VLM-clip-reasoning shape (§A9.2): the cascade's gated VLM step (retail_loss_v1).
-# Drives the vlm-worker plugin host in real mode; fake timing model by default.
+# Drives the vlm_worker plugin host in real mode; fake timing model by default.
 name: vlm_verify_100
 task: clip_reasoning
 model_profile_name: nvidia_production_default

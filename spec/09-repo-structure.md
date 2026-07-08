@@ -15,25 +15,25 @@ kathirmani/
 ├── Makefile                # all entry points (make platform / api / console / test …)
 ├── docker-compose.yml                 # base: postgres (+ optional redis/minio)
 ├── docker-compose.observability.yml   # prometheus/grafana/loki/renderer/netdata/dcgm
-├── docker-compose.platform.yml        # app tier: migrate→api→review-ui→console
+├── docker-compose.platform.yml        # app tier: migrate→api→review_ui→console
 ├── docker-compose.gpu.yml             # GPU/worker overlay
-├── Dockerfile.app          # torch-free image for the api/review-ui/console tier
+├── Dockerfile.app          # torch-free image for the api/review_ui/console tier
 │
 ├── services/               # platform services (FastAPI)
 │   ├── console/            #  ☜ FRONT DOOR — BFF/gateway: SPA + proxy (:8080)  → spec/14
 │   ├── api/                #  read/query API + model-registry + /search (:8000)
-│   ├── review-ui/          #  human approve/reject of loss hypotheses (:8010)
-│   ├── rule-engine/        #  deterministic zone/dwell/interaction rules → incidents
-│   ├── evidence-builder/   #  clip stitch + sha256 + timeline (chain-of-custody)
-│   ├── digital-twin/       #  YAML store/camera/zone model; event→twin mapping
+│   ├── review_ui/          #  human approve/reject of loss hypotheses (:8010)
+│   ├── rule_engine/        #  deterministic zone/dwell/interaction rules → incidents
+│   ├── evidence_builder/   #  clip stitch + sha256 + timeline (chain-of-custody)
+│   ├── digital_twin/       #  YAML store/camera/zone model; event→twin mapping
 │   └── security/           #  auth + RBAC + audit + redaction + retention + backup
 │
-├── ai-workers/             # plugin-host inference workers (consume the queue)
-│   ├── cv-oss-worker/      #  YOLOE detection + Tracker (real track_ids) → events
-│   ├── vlm-worker/         #  Nemotron-VL (default) / Qwen baseline / fake_infer
-│   ├── embedding-worker/   #  C-RADIO embeddings (+ random-projection head) + search
-│   └── vss-eval-worker/    #  hierarchical summary + VSS-parity report
-├── model-plugins/base/     # the ModelPlugin ABC + common schemas (Detection, …)
+├── ai_workers/             # plugin-host inference workers (consume the queue)
+│   ├── cv_oss_worker/      #  YOLOE detection + Tracker (real track_ids) → events
+│   ├── vlm_worker/         #  Nemotron-VL (default) / Qwen baseline / fake_infer
+│   ├── embedding_worker/   #  C-RADIO embeddings (+ random-projection head) + search
+│   └── vss_eval_worker/    #  hierarchical summary + VSS-parity report
+├── model_plugins/base/     # the ModelPlugin ABC + common schemas (Detection, …)
 │
 ├── ingestion/              # PyAV File/Rtsp + GStreamerSource (live RTSP, Phase 1.5)
 │   │                       #   segmenter, windows, health, storage, PgQueue bus
@@ -60,22 +60,26 @@ kathirmani/
 
 ## Import conventions
 
-- **Platform services/workers run flat.** The worker/service dirs are **hyphenated**
-  (`ai-workers/cv-oss-worker`, `services/rule-engine`, …), which are *not* valid Python
-  package names. So each runs with its own dir on `sys.path` and imports flat
-  (`import worker`, `import plugin`), with a `try: from .x import … except ImportError:
-  from x import …` shim in `__init__.py`. Per-dir `conftest.py` + `pytest.ini` put the
-  package dir (and `model-plugins/`) on `sys.path` so tests collect in isolation.
-- **Shared contracts**: `from base.plugin import ModelPlugin, …` / `from base.schemas
-  import Detection, CommonEvent` (the `model-plugins/base` package).
+- **Everything is a real package** (2026-07-08 refactor: the formerly hyphenated
+  dirs are underscore packages). Workers/services import package-qualified —
+  siblings relatively (`from .plugin import CvOssDetector`), cross-package
+  absolutely (`from ai_workers.embedding_worker.worker import query_run`).
+- **Shared contracts**: `from model_plugins.base.plugin import ModelPlugin, …` /
+  `from model_plugins.base.schemas import Detection, CommonEvent`.
 - **Repo-root modules**: `from db import connect`, `from ingestion.bus import …`.
-- No code imports these dirs dotted (`services.review_ui`) — only `services.security`
-  and `services.api` are real (underscore/plain) packages.
+- **Entry points run from the repo root** — `python -m ai_workers.cv_oss_worker.worker`,
+  `uvicorn services.review_ui.app:app` (uvicorn's default `--app-dir` puts the cwd on
+  `sys.path`; the Makefile and compose files always run from the root / `/app`).
+  There are no per-package `sys.path` shims, `pytest.ini`s, or dual
+  package/flat-import `try/except` blocks anymore; the only path bootstrap left is
+  the repo-root `conftest.py` (adds root + `src/` for pytest) and the legacy root
+  shims (`run_inference.py` …) that anchor `src/`.
 
-> **Planned (deferred) refactor:** rename the hyphenated dirs to underscore packages
-> (`cv_oss_worker`, `rule_engine`, `review_ui`, …) so they become real importable
-> packages and the ~27 `sys.path` shims + 8 `conftest.py`/`pytest.ini` hacks can go.
-> Tracked in [10-platform-roadmap.md](10-platform-roadmap.md) → *What's to be done*.
+> The refactor previously deferred here (hyphenated dirs → underscore packages,
+> dropping the ~27 `sys.path` shims + per-dir `conftest.py`/`pytest.ini` hacks)
+> **landed 2026-07-08**. Compose *service names* (`review-ui`, `console`) and the
+> generated dashboard *filenames* (`05-vlm-worker.json`) keep their hyphens — they
+> are network/artifact identities, not Python paths.
 
 ## Path anchoring (legacy)
 
@@ -96,18 +100,19 @@ verbatim (these are the legacy commands' contract).
 
 ## Deployment & the front door
 
-The app tier (api / review-ui / console) is containerized by `Dockerfile.app` (a
+The app tier (api / review_ui / console) is containerized by `Dockerfile.app` (a
 torch-free image) and orchestrated by `docker-compose.platform.yml`; `make platform`
 brings the whole stack up behind the Console on `:8080`. Design + ports + env:
 **[14-console-and-deployment.md](14-console-and-deployment.md)**.
 
 ## Tests
 
-`make test` runs each component dir in isolation (the `TESTDIRS` list) because the
-hyphenated dirs share module basenames (`plugin.py`/`worker.py`) and can't be collected
-together. The legacy `tests/` (device/structure/setup) + `tests/conftest.py` put `src/`
-on `sys.path` so they import `kathirmani.*` without an editable install. Full suite as of
-2026-06-11: **299 passed, 1 deselected** (the live-Grafana datasource check).
+`make test` is a single flat `pytest` run — every component's `tests/` dir is a
+real package (unique module paths, no basename clashes), enumerated in
+`pyproject.toml` `[tool.pytest.ini_options] testpaths`. The repo-root `conftest.py`
+puts the root and `src/` on `sys.path`; `tests/conftest.py` additionally sets the
+video-reader env vars + PyAV FFmpeg preload for the legacy suite. One deselect
+remains (the live-Grafana datasource check, env-dependent).
 
 ## Related
 

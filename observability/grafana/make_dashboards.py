@@ -9,7 +9,7 @@ generation time — this just writes JSON, mirroring the structure of the existi
 
 The platform set (01-10) references the documented ``ingest_*`` family
 (``ingestion/metrics.py``) and ``kathirmani_*`` where relevant; the model-benchmark set
-(11-18) references the ``model_*`` namespace (``model-plugins/base/metrics.py``,
+(11-18) references the ``model_*`` namespace (``model_plugins/base/metrics.py``,
 spec/11 + master plan A8). Every dashboard gets a unique ``uid`` (``kathir-NN-...``)
 and an About panel — that intro panel is a durable user preference (explain meaning).
 

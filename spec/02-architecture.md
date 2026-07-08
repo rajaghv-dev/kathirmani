@@ -28,8 +28,8 @@ WHEN    → When did a visible event happen?           (Marlin, spec/03)
 WHERE   → Where is the relevant person/object/zone?  (Locate/YOLOE + route_to_vlm)
 WHAT    → What does the keyframe/clip appear to show? (Qwen, routed-only)
 POS     → Was there a matching transaction?          (spec/17)
-RULES   → Should this become a review item?          (rule-engine, spec/10 Phase 5)
-HUMAN   → What is the final decision?                (review-ui, spec/10 Phase 7)
+RULES   → Should this become a review item?          (rule_engine, spec/10 Phase 5)
+HUMAN   → What is the final decision?                (review_ui, spec/10 Phase 7)
 ```
 
 Hooks + cost-tiered model profiles + the router:

@@ -109,20 +109,20 @@ implementation.
 | **1 ✅** OSS ingestion | PyAV → 10-sec clips + 5-sec windows @2s stride → filesystem + JSONL + queue; camera health. **Files done; live RTSP (GStreamer `splitmuxsink`, Phase 1.5) now implemented** (`GStreamerSource` + `catalog_live_clips`). | 5-camera footage segmented, registered, queued; `ingest_*` metrics |
 | **2 ✅** DB + API | `db/migrations` + `schema.sql` (§6 + A6, 19 tables, partitioned events, job_queue); `PgQueue` (SKIP LOCKED); JSON→rows backfill; FastAPI (+ model-registry endpoints); seed kathirmani | workers/UI use stable API contracts; `make migrate && seed && backfill` idempotent |
 | **3 ✅** Observability | dashboards 01–18 (`observability/grafana/`, generator + 18 JSONs), `model_*`/`ingest_*` scrape, OTel + promtail configs, additive to `kathirmani_*` | dashboards generated + validated; scrape wiring documented (panels light up as producers expose /metrics) |
-| **4 ✅** CV worker | `ai-workers/cv-oss-worker` — YOLOE behind `DetectionPlugin` (fake-infer fallback), consumes `ai_window.ready`, writes detections/events/model_runs, zone-maps, emits `suspicious_item_interaction`. DeepStream worker later. | CV worker emits common event schema; 23 tests green |
-| **5 ✅** Rule engine | `services/rule-engine/` — deterministic per-track context windows over `event_rules.yaml`; consumes/republishes `event.created`, raises explainable events + `possible_loss` incidents; golden fixtures | suspicious-item events raised **without** a VLM; 24 tests green |
-| **6 ✅** VLM worker | `ai-workers/vlm-worker/` — plugin host (Nemotron-VL / Qwen baseline + fake_infer); prompt pack `retail_loss_v1`, JSON repair, writes `vlm_observations` + `model_runs`, updates event confidence | suspicious events get explanation; profile-selected; 23 tests green |
-| **7 ✅** Evidence + review | `services/evidence-builder/` (PyAV 20-sec stitch + sha256 + timeline, manifest-only fallback) + `services/review-ui/` (:8010 approve/reject, audit reviewer/ts/model_version) | reviewable incidents; 24 tests green |
-| **8 ✅** Search | `ai-workers/embedding-worker/` — C-RADIOv4-H embedding plugin (fake 768-d) + indexer + parse→metadata→pgvector→fuse→critic search | NL search returns ranked, time-stamped hits; 29 tests green (ran vs live pgvector). C-RADIO dim≠768 **resolved**: cosine-preserving random-projection head (`plugin._project`) maps to the `vector(768)` column, `vector_dim: 768` |
-| **9 ✅** VSS-parity | `ai-workers/vss-eval-worker/` — `nvidia_summary` plugin + §A4.2 staged LVS (clip→5min→hour→report) + `parity.py`→`parity_report.json` (rt_cv/embedding/lvs/search/vios). VSS reference-only | parity report (honest measured/fake/pending); 24 tests green |
-| **10 ✅** Digital twin | `services/digital-twin/` — `StoreTwin` (load/validate/zones_for_point/map_event/summary); `configs/digital_twin/second_store.yaml` proves YAML-only onboarding | second store loads + validates with the same code; 5 tests green |
+| **4 ✅** CV worker | `ai_workers/cv_oss_worker` — YOLOE behind `DetectionPlugin` (fake-infer fallback), consumes `ai_window.ready`, writes detections/events/model_runs, zone-maps, emits `suspicious_item_interaction`. DeepStream worker later. | CV worker emits common event schema; 23 tests green |
+| **5 ✅** Rule engine | `services/rule_engine/` — deterministic per-track context windows over `event_rules.yaml`; consumes/republishes `event.created`, raises explainable events + `possible_loss` incidents; golden fixtures | suspicious-item events raised **without** a VLM; 24 tests green |
+| **6 ✅** VLM worker | `ai_workers/vlm_worker/` — plugin host (Nemotron-VL / Qwen baseline + fake_infer); prompt pack `retail_loss_v1`, JSON repair, writes `vlm_observations` + `model_runs`, updates event confidence | suspicious events get explanation; profile-selected; 23 tests green |
+| **7 ✅** Evidence + review | `services/evidence_builder/` (PyAV 20-sec stitch + sha256 + timeline, manifest-only fallback) + `services/review_ui/` (:8010 approve/reject, audit reviewer/ts/model_version) | reviewable incidents; 24 tests green |
+| **8 ✅** Search | `ai_workers/embedding_worker/` — C-RADIOv4-H embedding plugin (fake 768-d) + indexer + parse→metadata→pgvector→fuse→critic search | NL search returns ranked, time-stamped hits; 29 tests green (ran vs live pgvector). C-RADIO dim≠768 **resolved**: cosine-preserving random-projection head (`plugin._project`) maps to the `vector(768)` column, `vector_dim: 768` |
+| **9 ✅** VSS-parity | `ai_workers/vss_eval_worker/` — `nvidia_summary` plugin + §A4.2 staged LVS (clip→5min→hour→report) + `parity.py`→`parity_report.json` (rt_cv/embedding/lvs/search/vios). VSS reference-only | parity report (honest measured/fake/pending); 24 tests green |
+| **10 ✅** Digital twin | `services/digital_twin/` — `StoreTwin` (load/validate/zones_for_point/map_event/summary); `configs/digital_twin/second_store.yaml` proves YAML-only onboarding | second store loads + validates with the same code; 5 tests green |
 | **11 ✅** Benchmark + TCO | `benchmarks/` harness (p50/p95, clips-min/GPU, tokens/sec) + `tco.py` (cost/1000-clips, /camera-month, /store-month) + 6 configs → `model_benchmark_runs`. Fake-mode default (synthetic until GPU run); real runner pluggable | harness + TCO; 28 tests green |
 | **12 ✅** Hardening | `services/security/` — auth (PLATFORM_API_KEY) + RBAC (viewer/reviewer/admin) wired into the API, audit log (`audit_log` table, migration 0002), secret redaction, retention CLI (evidence-lock, dry-run default), backup | building blocks + API auth/RBAC; 38 tests green |
 | **13 ✅** NVIDIA bake-off | `benchmarks/bakeoff/` — runtime matrix reusing the Phase-11 harness; `select_profiles()` → production+fallback by weighted score; `rollback.py` reuses the API's `model_profiles.active` switch; rows → `model_benchmark_runs` (dashboard 18) | config-only profile swap + rollback; 20 tests. Numbers synthetic until real runtimes on GPU |
 
 ## Entry point — the Console (2026-06-10)
 
-All 14 phases shipped many surfaces (api, review-ui, Grafana, search) but **no single
+All 14 phases shipped many surfaces (api, review_ui, Grafana, search) but **no single
 front door**. Added `services/console/` — a BFF/gateway on **:8080** that serves one
 unified SPA and proxies the upstreams server-side — plus `Dockerfile.app` +
 `docker-compose.platform.yml` + **`make platform`** for a one-command launch of the
@@ -131,8 +131,10 @@ whole stack behind that URL. Design + ports + env: [14-console-and-deployment.md
 ## What's to be done (roadmap)
 
 The 14 phases + the code-doable real-hardware follow-ups + the entry-point Console are
-**done**. The full component suite is green — **299 passed, 1 deselected** across the 16
-`TESTDIRS` (verified 2026-06-11 via `make test`). What remains:
+**done**. The full suite is green — **298 passed, 1 skipped, 1 deselected** in one flat
+`make test` run (verified 2026-07-08 post-refactor; the one remaining failure,
+`test_venv_packages`, is this box's torchcodec↔FFmpeg provisioning, not platform code).
+What remains:
 
 **A. Blocked on infra / user action (cannot be coded here):**
 - `make setup-nvidia-docker` — needs **sudo** (not passwordless); registers the NVIDIA
@@ -145,18 +147,22 @@ The 14 phases + the code-doable real-hardware follow-ups + the entry-point Conso
 - **Apply migrations on each deployment's Postgres** — `make migrate` (0001–0004).
   Verified applying cleanly on 2026-06-10; just needs running wherever PG lives.
 
-**B. Deferred refactor (planned, not done — chosen to keep the suite green + invariants):**
-- **Hyphen→underscore package rename** (`cv-oss-worker` → `cv_oss_worker`, etc.) so the
-  worker/service dirs become real importable packages, removing the ~27 `sys.path`
-  shims + 8 `conftest.py`/`pytest.ini` hacks (also touches Makefile + compose
-  `working_dir`). Mechanical but broad (~40 files); do it as one isolated PR.
+**B. Deferred refactor:**
+- ✅ **Hyphen→underscore package rename — DONE 2026-07-08.** The worker/service dirs
+  (`ai_workers/*`, `services/rule_engine|review_ui|evidence_builder|digital_twin`,
+  `model_plugins`) are real importable packages; the ~27 `sys.path` shims, the dual
+  package/flat-import `try/except` blocks, and all per-dir `conftest.py`/`pytest.ini`
+  hacks are gone. `make test` is one flat pytest run (see spec/09 → Tests). Makefile
+  targets run `python -m <package>` / dotted uvicorn app paths from the repo root;
+  compose services run from `working_dir: /app`. Compose *service names* and dashboard
+  *filenames* keep their hyphens (identities, not paths).
 - Possible relocation of the legacy `src/kathirmani` layer — currently **invariant-protected**
   (keep root shims + path anchors + `learning.md`); only after the baseline is no longer
   needed as a live comparison arm.
 
 **C. Open code follow-ups:**
 - **Cross-camera track handoff** — `Tracker` gives per-camera persistent `track_id`s;
-  linking a person across cameras (and the rule-engine consuming it) is the next step.
+  linking a person across cameras (and the rule_engine consuming it) is the next step.
 - **Nemotron-VL production edge cases** — very long / multi-language prompts, batching.
 - **`serve_stream.py` parallel-GPU frame batching** — design-only (spec/02), no code yet.
 

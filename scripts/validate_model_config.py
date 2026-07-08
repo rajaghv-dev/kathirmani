@@ -19,7 +19,7 @@ except ImportError:
 
 CONFIG = Path(__file__).resolve().parents[1] / "configs" / "models.yaml"
 
-# Source of truth: model-plugins/base/schemas.py KNOWN_TASKS + the shipped plugins.
+# Source of truth: model_plugins/base/schemas.py KNOWN_TASKS + the shipped plugins.
 KNOWN_TASKS = {
     "detection", "tracking", "embedding", "vlm_clip_reasoning",
     "summarization", "search_critic", "digital_twin_simulation",

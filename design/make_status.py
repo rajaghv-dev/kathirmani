@@ -24,10 +24,10 @@ PHASES = [
 ]
 # tests per component (from `make test`, isolated per-dir)
 COUNTS = [
-    ("marlin baseline", 24), ("ingestion", 9), ("api", 4), ("digital-twin", 5),
-    ("rule-engine", 22), ("evidence-builder", 12), ("review-ui", 12), ("security", 38),
-    ("cv-oss-worker", 14), ("vlm-worker", 23), ("embedding-worker", 26),
-    ("vss-eval-worker", 24), ("benchmarks", 28), ("bakeoff", 20), ("observability", 4),
+    ("marlin baseline", 24), ("ingestion", 9), ("api", 4), ("digital_twin", 5),
+    ("rule_engine", 22), ("evidence_builder", 12), ("review_ui", 12), ("security", 38),
+    ("cv_oss_worker", 14), ("vlm_worker", 23), ("embedding_worker", 26),
+    ("vss_eval_worker", 24), ("benchmarks", 28), ("bakeoff", 20), ("observability", 4),
 ]
 TOTAL = sum(c for _, c in COUNTS)
 

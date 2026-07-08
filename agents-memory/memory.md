@@ -112,13 +112,13 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   passthrough. `make console`. Was: scattered ports (8000/8010/3000/streamlit) with
   no cohesive UX. Sections: Overview/Incidents(approve-reject)/Events/Search/Segments/
   Cameras/Models/Observability; offline-degrading. `GET /search?q=` added to
-  services/api (wraps embedding-worker query_run). **PLATFORM.md** = the start-here
+  services/api (wraps embedding_worker query_run). **PLATFORM.md** = the start-here
   guide (README is still the old src/kathirmani doc).
 
 ## Real-hardware follow-ups CLEARED (2026-06-10, code-doable ones) → sessions/2026-06-10
 - C-RADIO: random-projection head (`plugin._project`, cosine-preserving) replaces
   truncate/pad; vector_dim tbd→768 (kept the pgvector index). TrackingPlugin
-  (`cv-oss-worker/tracking.py`) → real per-camera track_ids into events + `tracks`.
+  (`cv_oss_worker/tracking.py`) → real per-camera track_ids into events + `tracks`.
   GStreamerSource live-RTSP splitmuxsink recorder implemented. Migration **0003**
   audit_log append-only GRANTs (role `kathirmani_app`); **0004** tstzrange + btree_gist
   overlap indexes (segments/incidents generated, ai_windows trigger-maintained).
@@ -128,11 +128,11 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
 
 ## Phases status (parallel-agent build)
 - **ALL 14 PHASES (0–13) BUILT ✅** via 5 dependency-ordered waves of parallel agents.
-  `make test` = **299 passed, 1 deselected** across 16 TESTDIRS (re-verified 2026-06-11;
-  was 264). Phase 13 W5:
+  `make test` = **298 passed, 1 skipped, 1 deselected** in one flat run (re-verified
+  2026-07-08 post-refactor; was 299/16-dir isolated 2026-06-11, 264 before). Phase 13 W5:
   `benchmarks/bakeoff/` (runtime matrix + select_profiles production/fallback +
   rollback reusing API model_profiles.active; 20 tests). `make bakeoff`.
-- **Real Nemotron-VL WIRED (2026-06-04).** `ai-workers/vlm-worker/plugin.py` runs the
+- **Real Nemotron-VL WIRED (2026-06-04).** `ai_workers/vlm_worker/plugin.py` runs the
   real `nvidia/Llama-3.1-Nemotron-Nano-VL-8B-V1` from local weights (verified on a real
   clip, faked=False): PyAV frames → multi-image `model.chat`. Needed: `timm`/`einops`/
   `open_clip_torch` (vision tower); `attn_implementation="eager"` (no FA2); a transformers-5.9
@@ -145,9 +145,9 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   projection or dim migration; DeepStream/NIM/TAO need an NGC key; multi-object
   tracking (TrackingPlugin) for true track_ids; audit_log app-role GRANTs; live-RTSP
   GStreamer splitmuxsink (Phase 1.5).
-- **0–12 ✅ (13 next).** W4 (parallel): Phase 7 `services/evidence-builder/`
-  (PyAV 20s stitch + sha256 + timeline) + `services/review-ui/` (:8010 audited
-  approve/reject); Phase 9 `ai-workers/vss-eval-worker/` (nvidia_summary + §A4.2
+- **0–12 ✅ (13 next).** W4 (parallel): Phase 7 `services/evidence_builder/`
+  (PyAV 20s stitch + sha256 + timeline) + `services/review_ui/` (:8010 audited
+  approve/reject); Phase 9 `ai_workers/vss_eval_worker/` (nvidia_summary + §A4.2
   staged LVS + `parity_report.json`); Phase 11 `benchmarks/` (harness + TCO + 6
   configs → model_benchmark_runs, **fake-mode default**, real runner pluggable);
   Phase 12 `services/security/` (auth+RBAC **wired into services/api**:
@@ -156,27 +156,27 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   redaction; backup). `make` targets: run-review-ui/summarize/parity/bench/
   retention-dryrun/-apply/backup/evidence-demo. Benchmarks results gitignored.
 - **0✅1✅2✅3✅4✅5✅6✅8✅10✅.** W3 (parallel): Phase 6 VLM worker
-  `ai-workers/vlm-worker/` (plugin host: Nemotron-VL/Qwen baseline + fake_infer,
+  `ai_workers/vlm_worker/` (plugin host: Nemotron-VL/Qwen baseline + fake_infer,
   prompt pack, JSON repair, vlm_observations+model_runs; 22 tests; publishes
-  `vlm.verified`); Phase 8 `ai-workers/embedding-worker/` (C-RADIOv4-H plugin fake
+  `vlm.verified`); Phase 8 `ai_workers/embedding_worker/` (C-RADIOv4-H plugin fake
   768-d, indexer, A4.3 parse→metadata→pgvector→fuse→critic; 26 tests, ran vs live
   pgvector). FOLLOW-UPS: real Nemotron-VL chat-API shape unconfirmed; **C-RADIO native
   dim ≠ 768 → needs projection head or a dim migration** (configs vector_dim: tbd).
   Remaining: W4 (7 evidence/9 vss/11 bench/12 hardening) → W5 (13 bake-off).
-- **0✅1✅2✅3✅4✅5✅10✅.** W2: Phase 5 rule engine `services/rule-engine/`
+- **0✅1✅2✅3✅4✅5✅10✅.** W2: Phase 5 rule engine `services/rule_engine/`
   (deterministic per-track windows over event_rules.yaml; consumes/republishes
   `event.created`; raises events + `possible_loss` incidents; golden fixtures; 22
   tests). Integration gap: CV worker emits zone *ids* + no track_id/ts hints — engine
   has fallbacks (cam:<id>); true tracking = future TrackingPlugin.
 - Wave-1 (parallel agents): `observability/` (dashboard
-  generator + 18 JSONs + scrape/otel/promtail), `ai-workers/cv-oss-worker/` (YOLOE→
-  DetectionPlugin, fake fallback, consumes ai_window.ready), `services/digital-twin/`
+  generator + 18 JSONs + scrape/otel/promtail), `ai_workers/cv_oss_worker/` (YOLOE→
+  DetectionPlugin, fake fallback, consumes ai_window.ready), `services/digital_twin/`
   (StoreTwin + second-store demo). `make run-cv-worker`/`dashboards`/`twin-validate`.
-  `make test` runs all component test dirs (TESTDIRS). ultralytics added to
-  inference.txt (optional). NEXT: W2 Phase 5 rule-engine → W3 6 vlm + 8 search →
+  `make test` = one flat pytest run over all component test dirs. ultralytics added to
+  inference.txt (optional). NEXT: W2 Phase 5 rule_engine → W3 6 vlm + 8 search →
   W4 7 evidence/9 vss/11 bench/12 hardening → W5 13 bake-off.
-- Hyphenated dirs (`ai-workers/cv-oss-worker`, `services/digital-twin`) import flat
-  via per-dir conftest/pytest.ini (not valid package names).
+- All worker/service dirs are real underscore packages (2026-07-08 refactor) —
+  package-qualified imports, no per-dir conftest/pytest.ini, one flat `pytest` run.
 
 ## Design assets + AI image-gen (2026-06-05) → sessions/2026-06-05
 - Figures live in `design/figures/` via `design/make_figures.py` (`make figures`); NV green
@@ -195,10 +195,11 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
 - **A. Blocked on infra/user:** `make setup-nvidia-docker` (sudo) · NGC key (DeepStream/
   NIM/TAO) · real-GPU benchmark+bakeoff numbers + real VSS summary (fake now) · `make
   migrate` on each deploy's PG (0001–0004; verified applying clean 2026-06-10).
-- **B. Deferred refactor (planned, NOT done — keeps suite green + invariants):**
-  hyphen→underscore package rename (`cv-oss-worker`→`cv_oss_worker` …; ~27 sys.path +
-  8 conftest/pytest.ini + Makefile/compose `working_dir`; ~40 files, do as 1 isolated
-  PR) · legacy `src/kathirmani` relocation (invariant-protected until baseline not needed).
+- **B. Refactor status (→ sessions/2026-07-08):** hyphen→underscore package rename **DONE 2026-07-08**
+  (real packages, shims/conftest/pytest.ini hacks removed, Makefile `python -m` +
+  dotted uvicorn, compose `working_dir: /app`; compose service names + dashboard
+  filenames keep hyphens — identities, not paths) · legacy `src/kathirmani`
+  relocation still deferred (invariant-protected until baseline not needed).
 - **C. Open code follow-ups:** cross-camera track handoff (Tracker = per-camera ids
   only) · Nemotron-VL prod edge cases (long/multilingual, batching) · serve_stream
   parallel-GPU batching (design-only, spec/02).
@@ -227,4 +228,4 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   `make api` = FastAPI `services/api/app.py` (/health,/cameras,/segments,/events,
   /incidents + A2.5 model-registry endpoints). 12 tests pass. Verified: migrate→seed→
   ingest→backfill = 3 seg+10 win in PG. Next: Phase 3 (scrape `ingest_*`/`model_*`) ∥
-  Phase 4 (cv-oss-worker consuming PgQueue).
+  Phase 4 (cv_oss_worker consuming PgQueue).

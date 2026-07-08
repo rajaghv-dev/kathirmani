@@ -1,6 +1,6 @@
 # Phase 11 Benchmark 1 — 5 camera streams (the kathirmani pilot shape).
 # Detector-throughput shape per master plan §A9.1 (fps/streams/p95/gpu_mem).
-# Fake mode synthesizes timings; real mode drives the cv-oss-worker DetectionPlugin.
+# Fake mode synthesizes timings; real mode drives the cv_oss_worker DetectionPlugin.
 name: streams_5
 task: detection
 model_profile_name: nvidia_production_default   # A5 NVIDIA-default profile

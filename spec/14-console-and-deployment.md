@@ -13,7 +13,7 @@ passthrough, one URL to share).
 
 ```
 browser ──▶ console :8080 ──▶ /backend/*  ─▶ api :8000        (read/query + /search)
-                          └─▶ /review/*   ─▶ review-ui :8010  (incident detail + approve/reject)
+                          └─▶ /review/*   ─▶ review_ui :8010  (incident detail + approve/reject)
             (iframe)      └─▶ Grafana :3000 embedded for Observability
 ```
 
@@ -35,7 +35,7 @@ down, so the console always loads. A dead upstream surfaces as a structured `502
 (`{"error":"upstream_unreachable"}`), never an unhandled 500.
 
 The `/search` capability is an addition to the API (`GET /search?q=&k=`) that wraps the
-embedding-worker `query_run` and never 500s — so search is HTTP-queryable and proxied
+embedding_worker `query_run` and never 500s — so search is HTTP-queryable and proxied
 into the console.
 
 ## One-command launch
@@ -45,8 +45,8 @@ into the console.
   is bind-mounted at `/app`, so code edits need no rebuild — only a dependency change does.
 - **`docker-compose.platform.yml`** — layers the app tier on the base stack:
   - `migrate` (one-shot): `db_migrate.py up && db_seed.py` once Postgres is healthy, then exits.
-  - `api` → `review-ui` → `console`, started in dependency order (console waits for api healthy).
-  - All share the compose network; the console reaches `api`/`review-ui` by service name.
+  - `api` → `review_ui` → `console`, started in dependency order (console waits for api healthy).
+  - All share the compose network; the console reaches `api`/`review_ui` by service name.
 - **`make platform`** = `docker compose -f docker-compose.yml -f
   docker-compose.observability.yml -f docker-compose.platform.yml up -d --build`, then
   prints the URL map. `make platform-down` / `make platform-logs` to stop / tail.
@@ -57,7 +57,7 @@ into the console.
 |---|---|---|---|---|
 | 8080 | console | | `CONSOLE_API_URL` | `http://api:8000` |
 | 8000 | api (+ `/docs`, `/search`) | | `CONSOLE_REVIEW_URL` | `http://review-ui:8010` |
-| 8010 | review-ui | | `CONSOLE_GRAFANA_URL` | `http://localhost:3000` (browser-facing) |
+| 8010 | review_ui | | `CONSOLE_GRAFANA_URL` | `http://localhost:3000` (browser-facing) |
 | 3000 | grafana | | `PLATFORM_API_KEY` | unset → API open in dev |
 
 ## Auth

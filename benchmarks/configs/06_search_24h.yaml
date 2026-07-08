@@ -1,7 +1,7 @@
 # Phase 11 Benchmark 6 — natural-language search over 24 hours of footage.
 # Embedding/search shape (§A9.3): embeddings/sec, query/fusion/critic latency.
 # 24h × 5 cameras of 5-sec windows ≈ a large index; we benchmark a fixed N queries
-# against a pre-built index (the embedding-worker C-RADIO plugin in real mode).
+# against a pre-built index (the embedding_worker C-RADIO plugin in real mode).
 name: search_24h
 task: video_search
 model_profile_name: nvidia_production_default   # C-RADIO embed + critic (A5)

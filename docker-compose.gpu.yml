@@ -19,8 +19,8 @@ services:
     profiles: ["gpu"]
 
   # --- filled in later phases (kept declared so the topology is visible) ---
-  # vlm-worker:   build ./ai-workers/vlm-worker      (Phase 6, plugin host)
-  # cv-oss-worker: build ./ai-workers/cv-oss-worker  (Phase 4)
+  # vlm_worker:   build ./ai_workers/vlm_worker      (Phase 6, plugin host)
+  # cv_oss_worker: build ./ai_workers/cv_oss_worker  (Phase 4)
 
 volumes:
   ollamadata:

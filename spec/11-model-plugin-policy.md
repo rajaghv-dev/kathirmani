@@ -78,10 +78,10 @@ Every plugin implements `ModelPlugin` — `load(config)`, `infer(request)`,
 | `SummarizationPlugin` | clips/events/time-range → timestamped summary |
 | `SearchCriticPlugin` | query + candidates → reranked/critiqued results |
 
-Folder layout (A10): `model-plugins/{base,deepstream_detector,deepstream_tracker,
+Folder layout (A10): `model_plugins/{base,deepstream_detector,deepstream_tracker,
 nvidia_openai_compatible_vlm,nvidia_embedding,nvidia_summary,nvidia_search_critic,
 nvidia_cosmos}/`. The `metrics.py` gauge-registry pattern already in `src/kathirmani`
-seeds `model-plugins/base/metrics.py`.
+seeds `model_plugins/base/metrics.py`.
 
 ## Registry, profiles, catalog (A2.3, A3, A5)
 

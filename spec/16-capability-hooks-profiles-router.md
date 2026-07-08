@@ -58,12 +58,12 @@ task contracts are how a **plugin** declares what it can do.
 ## Plugin registry & layout
 
 ```text
-src/retail_video_ai/models/      # repo mapping: model-plugins/ + ai-workers/*/plugin.py
+src/retail_video_ai/models/      # repo mapping: model_plugins/ + ai_workers/*/plugin.py
   base.py registry.py profiles.py router.py evaluator.py cost_model.py
   plugins/{kathirmani_plugin,yoloe_plugin,qwen_plugin,mock_plugin}.py
 ```
 
-Repo reality: the plugin ABC + schemas already live in `model-plugins/base/`, and each
+Repo reality: the plugin ABC + schemas already live in `model_plugins/base/`, and each
 worker carries its `plugin.py` ([09](09-repo-structure.md)). The registry/router/
 evaluator/cost-model are the **new** pieces this doc specifies.
 

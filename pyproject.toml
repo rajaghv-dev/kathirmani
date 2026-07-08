@@ -29,4 +29,23 @@ kathirmani-metrics = "kathirmani.serve_metrics:main"
 where = ["src"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+# One flat run covers every component: each tests/ dir is a real package now,
+# so a single pytest invocation collects them all without sys.path shims.
+testpaths = [
+    "tests",
+    "ingestion/tests",
+    "services/api/tests",
+    "services/console/tests",
+    "services/digital_twin/tests",
+    "services/evidence_builder/tests",
+    "services/review_ui/tests",
+    "services/rule_engine/tests",
+    "services/security/tests",
+    "ai_workers/cv_oss_worker/tests",
+    "ai_workers/vlm_worker/tests",
+    "ai_workers/embedding_worker/tests",
+    "ai_workers/vss_eval_worker/tests",
+    "benchmarks/tests",
+    "benchmarks/bakeoff/tests",
+    "observability/tests",
+]

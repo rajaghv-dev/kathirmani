@@ -8,7 +8,7 @@ The platform is several cooperating services. **You only need one URL.**
 make up          # base stack: postgres (+ observability)   [needs docker]
 make api         # platform read/query API           → :8000   (terminal 1)
 make run-review-ui   # human review service           → :8010   (terminal 2)
-make run-workers     # cv + rule-engine + vlm workers          (terminal 3, optional)
+make run-workers     # cv + rule_engine + vlm workers          (terminal 3, optional)
 make console     # ☜ THE UNIFIED CONSOLE             → :8080   (terminal 4)
 
 open http://localhost:8080
@@ -27,7 +27,7 @@ but the console is the product surface.
 |---|---|---|
 | **Overview** | KPIs (cameras, segments, open incidents) + recent events | `GET /cameras /segments /incidents /events` |
 | **Incidents** | Loss hypotheses queue → click to review → **Approve / Reject** (audited) | review service `/incidents/{id}` + `/incidents/{id}/review` |
-| **Events** | Perception + rule-engine signal stream | `GET /events` |
+| **Events** | Perception + rule_engine signal stream | `GET /events` |
 | **Search** | Natural-language search over events/observations/embeddings | `GET /search?q=…` (Phase 8 pipeline) |
 | **Segments** | Ingested 10-second clips (path + checksum) | `GET /segments` |
 | **Cameras** | Store camera fleet | `GET /cameras` |
