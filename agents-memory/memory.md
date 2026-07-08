@@ -9,7 +9,12 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
 - Code in `src/kathirmani/`; root `*.py` are thin shims (don't add logic there).
 - Entry points: `run_inference.py`, `serve_metrics.py`, `download_model.py`,
   `viz_app.py`, `start_stack.sh`. Commands unchanged post-refactor.
-- Paths anchor on `kathirmani.PROJECT_ROOT/MODELS_DIR/RESULTS_DIR` (not cwd).
+- Paths anchor on `kathirmani.PROJECT_ROOT/MODELS_DIR/RESULTS_DIR/VIDEOS_DIR` (not cwd).
+- **Source footage = `store-videos/` at repo root** (gitignored; falls back to repo
+  root). `configs/cameras.yaml` `source_file` values match the files EXACTLY (incl.
+  the "Kathirmni Entry Cam.mkv" typo). Center-camera video not present (4 of 5).
+- The master plan moved: root `oss_ingestion_…_v2.md` → `spec/00-master-plan-v2.md`
+  (2026-07-08). `grafana/` + `prometheus/` stay at root — live-mounted by containers.
 
 ## Invariants — don't break
 - Device is runtime-detected; load via `kathirmani.device.detect_device()`, place
@@ -41,7 +46,7 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   `ingestion/quality/` module, no POS adapter. → `spec/15` (quality gate), `spec/16`
   (hooks/profiles/router/parity), `spec/17` (POS + wall-clock time alignment).
 - Target: OSS-ingestion-first, NVIDIA-model-first, plugin platform (master plan
-  `oss_ingestion_nvidia_model_plugin_master_plan_v2.md` at root). Current
+  `spec/00-master-plan-v2.md`). Current
   `src/kathirmani` cascade = the AI-worker seed. 14 phases; start at Phase 0.
 - **Invariant — security & trust are utmost (it's a platform).** PII CCTV +
   tamper-evident loss/theft evidence + multi-store isolation. Treat security
@@ -205,6 +210,7 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   parallel-GPU batching (design-only, spec/02).
 
 ## Spec index
+`00` master-plan-v2 (was at repo root) ·
 `01` overview · `02` architecture · `03` models/queries · `04` observability ·
 `05` performance · `06` hardware-portability · `07` runbook · `08` dashboards ·
 `09` repo-structure · `10` platform-roadmap (+ What's-to-be-done) · `11` model-plugin-policy ·

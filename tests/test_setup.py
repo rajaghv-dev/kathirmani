@@ -26,7 +26,12 @@ HERE = Path(__file__).parent.parent  # project root
 RESULTS_DIR = HERE / "results"
 RESULT_FILE = RESULTS_DIR / "Kathirmani Bill Counter.json"
 MODEL_DIR = HERE / "models" / "Marlin-2B"
-VIDEO_FILE = HERE / "Kathirmani Bill Counter.mkv"
+# Footage lives in store-videos/ (repo root is the legacy fallback location).
+VIDEO_FILE = next(
+    (p for p in (HERE / "store-videos" / "Kathirmani Store Near Bill Counter.mkv",
+                 HERE / "Kathirmani Bill Counter.mkv") if p.exists()),
+    HERE / "store-videos" / "Kathirmani Store Near Bill Counter.mkv",
+)
 
 METRICS_URL = "http://127.0.0.1:8900/metrics"
 GRAFANA_HEALTH_URL = "http://localhost:3000/api/health"

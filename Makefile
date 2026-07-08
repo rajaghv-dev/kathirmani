@@ -1,5 +1,8 @@
 # Kathirmani platform — single entrypoint (master plan §18 + Addendum A).
 # Targets marked [stub] print intent until their phase lands (see spec/10-platform-roadmap).
+# Project name pinned so the stack (and its pgdata volume) survives repo-dir renames
+# (the live containers/volume were created as `kathirmani-platform`).
+export COMPOSE_PROJECT_NAME ?= kathirmani-platform
 COMPOSE := docker compose -f docker-compose.yml -f docker-compose.observability.yml
 COMPOSE_GPU := $(COMPOSE) -f docker-compose.gpu.yml
 COMPOSE_PLATFORM := $(COMPOSE) -f docker-compose.platform.yml
@@ -88,7 +91,7 @@ migrate-status: ## Show applied migrations
 	python3 scripts/db_migrate.py status
 seed: ## Seed kathirmani store/cameras/zones + model profiles/registry
 	python3 scripts/db_seed.py
-ingest-sample: ## Segment the 5 .mkv into 10-sec clips + 5-sec windows (DURATION=secs)
+ingest-sample: ## Segment store-videos/*.mkv into 10-sec clips + 5-sec windows (DURATION=secs)
 	python3 -m ingestion $(if $(DURATION),--duration $(DURATION),--duration 30) $(if $(CAMERA),--camera $(CAMERA),)
 backfill: ## Load ingestion JSONL (data/metadata) into Postgres
 	python3 scripts/backfill_ingest.py

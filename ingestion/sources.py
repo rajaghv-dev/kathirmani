@@ -265,5 +265,10 @@ def source_for_camera(cam, project_root: Path) -> Source:
     if rtsp_url:
         return RtspSource(rtsp_url)
     if cam.source_file:
-        return FileSource(project_root / cam.source_file)
+        # Footage lives in store-videos/; fall back to the repo root, where the
+        # files sat before the dir existed (old checkouts / ad-hoc copies).
+        candidate = project_root / "store-videos" / cam.source_file
+        if not candidate.exists():
+            candidate = project_root / cam.source_file
+        return FileSource(candidate)
     raise ValueError(f"camera {cam.id}: no rtsp_url_env set and no source_file")

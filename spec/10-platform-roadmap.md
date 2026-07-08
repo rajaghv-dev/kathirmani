@@ -3,8 +3,8 @@
 > **Forward-looking.** Docs `01`–`09` describe the **current system** (the offline
 > Marlin/Qwen cascade). This doc and [11-model-plugin-policy.md](11-model-plugin-policy.md)
 > describe the **target platform** the repo is heading toward, per the master plan
-> [`oss_ingestion_nvidia_model_plugin_master_plan_v2.md`](../oss_ingestion_nvidia_model_plugin_master_plan_v2.md)
-> at repo root (full 3.5k-line detail). This is the **execution plan** an agent
+> [`00-master-plan-v2.md`](00-master-plan-v2.md)
+> (full 3.5k-line detail). This is the **execution plan** an agent
 > follows; the master plan is the *why*, this is the ordered *what-next*.
 
 ## The shift in one line

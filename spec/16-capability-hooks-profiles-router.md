@@ -1,7 +1,7 @@
 # 16 — Capability Hooks, Model Profiles, Router & Small-Model Parity
 
 > **Forward-looking.** Per the master prompt
-> [`oss_ingestion_nvidia_model_plugin_master_plan_v2.md`](../oss_ingestion_nvidia_model_plugin_master_plan_v2.md)
+> [`00-master-plan-v2.md`](00-master-plan-v2.md)
 > v3. Generalizes the existing `ModelPlugin` task contracts
 > ([11-model-plugin-policy.md](11-model-plugin-policy.md)) into **plug-and-play
 > capability hooks** and adds cost-tiered profiles, a model router, and a small-model

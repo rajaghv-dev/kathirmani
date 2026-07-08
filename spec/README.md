@@ -22,6 +22,7 @@ This spec/ directory is the reorganized, structured documentation for the Kathir
 
 | File | Description |
 |---|---|
+| [00-master-plan-v2.md](00-master-plan-v2.md) | **The master plan.** The full OSS-ingestion + NVIDIA-model-plugin platform plan (3.5k lines, 14 phases + Addendum A) that spec/10–17 execute. Lived at the repo root until 2026-07-08. |
 | [01-overview.md](01-overview.md) | What the system is — Marlin-2B across 5 store cameras, caption + find modes, what it extracts, where results land. |
 | [02-architecture.md](02-architecture.md) | The three perception axes (when/where/what), the ThreadPoolExecutor + single-GPU lock reality, and the "databases" (Prometheus, Loki, results JSON). |
 | [03-models-and-query-modes.md](03-models-and-query-modes.md) | Marlin caption vs find, temporal grounding, good-query rules, the redesigned atomic query set, the coupling warning, and Qwen2.5-VL's role. |

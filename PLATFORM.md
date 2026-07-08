@@ -21,6 +21,10 @@ so the browser talks to one origin and you never juggle ports.
 Everything still runs standalone (you can hit `:8000`, `:8010`, `:3000` directly),
 but the console is the product surface.
 
+**Source footage** lives in `store-videos/` at the repo root (gitignored;
+filenames must match `configs/cameras.yaml` → `source_file`). Populate the
+pipeline from it with `make ingest-sample` → `make backfill` → `make run-workers`.
+
 ## ② What's in the console (left sidebar)
 
 | Section | What it shows | Backed by |

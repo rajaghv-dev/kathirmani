@@ -14,6 +14,9 @@ docker compose up -d      # Prometheus, Loki, Grafana(:3000), Netdata(:19999)
 
 ## Run inference
 
+Source footage is read from **`store-videos/`** at the repo root (the default
+`--video-dir`; falls back to the repo root on old checkouts).
+
 ```bash
 python run_inference.py                                   # all 5 cameras, Marlin only, parallel
 python run_inference.py --locate                          # + YOLOE Locate gate → Qwen only on routed frames

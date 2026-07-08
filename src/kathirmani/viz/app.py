@@ -22,9 +22,9 @@ _SRC = Path(__file__).resolve().parents[2]
 if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
-from kathirmani import PROJECT_ROOT, VIDEO_EXTS
+from kathirmani import PROJECT_ROOT, VIDEO_EXTS, VIDEOS_DIR
 
-HERE = PROJECT_ROOT             # videos + results live at the repo root
+HERE = VIDEOS_DIR               # store-videos/ (repo-root fallback for old checkouts)
 RESULTS = PROJECT_ROOT / "results"
 SKIP_JSON = {"summary.json", "fused.json", "economy.json"}
 

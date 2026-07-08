@@ -60,9 +60,10 @@ The platform grew out of an offline research cascade that runs
 VLM) + Qwen2.5-VL across the 5 cameras to produce dense captions, timestamps, and event
 detections in `results/*.json`. That code lives in the **`src/kathirmani`** package and is
 preserved as the non-default `research_qwen_baseline` comparison arm (spec/11). The
-original working notes are kept verbatim in [`learning.md`](learning.md). It still runs
-unchanged via thin root shims (auto-detects CUDA / Apple-MPS / CPU; override with
-`KATHIRMANI_DEVICE`):
+original working notes are kept verbatim in [`learning.md`](learning.md). Source
+footage is read from `store-videos/` at the repo root (gitignored; repo-root fallback
+for old checkouts). It still runs unchanged via thin root shims (auto-detects
+CUDA / Apple-MPS / CPU; override with `KATHIRMANI_DEVICE`):
 
 ```bash
 bash setup.sh && source .venv/bin/activate

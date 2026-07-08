@@ -45,8 +45,16 @@ kathirmani/
 ├── benchmarks/             # perf + TCO harness; benchmarks/bakeoff/ (Phase 13)
 ├── scripts/                # db_migrate/seed/backfill, setup/<c>.sh, validate/<c>.py
 ├── design/                 # figures + AI image-gen (design-time only)
-├── spec/                   # this documentation set
+├── spec/                   # this documentation set (00 = the master plan)
 ├── agents-memory/          # AI-agent session notes + durable memory
+│
+├── store-videos/           # SOURCE FOOTAGE (.mkv, gitignored) — configs/cameras.yaml
+│                           #   source_file names must match these files exactly
+├── models/                 # model weights + PROVENANCE.json (fetched, not committed)
+├── data/                   # runtime output: clips/thumbnails/queue/metadata (gitignored)
+├── results/                # legacy-cascade JSON results (gitignored)
+├── grafana/                # LEGACY-cascade dashboards + setup_grafana.sh (live-mounted
+├── prometheus/             #   by compose/containers — do not move these two)
 │
 └── src/kathirmani/             # LEGACY research cascade (see below)
     ├── __init__.py         #   PROJECT_ROOT / MODELS_DIR / RESULTS_DIR anchors

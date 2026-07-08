@@ -1,7 +1,7 @@
 # 17 — POS Correlation, Time Alignment & the Full Hook Map
 
 > **Forward-looking.** Per the master prompt
-> [`oss_ingestion_nvidia_model_plugin_master_plan_v2.md`](../oss_ingestion_nvidia_model_plugin_master_plan_v2.md)
+> [`00-master-plan-v2.md`](00-master-plan-v2.md)
 > v3. No POS adapter exists yet — this is the **target contract**. Completes the
 > capability-hook picture: QUALITY ([15](15-quality-gate.md)) and the WHEN/WHERE/WHAT
 > hooks + router ([16](16-capability-hooks-profiles-router.md)) feed into POS + rules +

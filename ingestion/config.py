@@ -8,6 +8,7 @@ import yaml
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CONFIGS_DIR = PROJECT_ROOT / "configs"
+VIDEOS_DIR = PROJECT_ROOT / "store-videos"  # source footage (gitignored)
 DATA_DIR = PROJECT_ROOT / "data"            # runtime output (gitignored)
 CLIPS_DIR = DATA_DIR / "clips"
 THUMBS_DIR = DATA_DIR / "thumbnails"

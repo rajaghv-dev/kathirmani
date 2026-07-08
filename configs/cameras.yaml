@@ -1,5 +1,8 @@
 # Camera registry — the real Kathirmani 5-camera layout (same area, 5 angles).
 # Ingestion (Phase 1) reads `source_file` first; `rtsp_url_env` is for live RTSP later.
+# Source footage lives in store-videos/ at the repo root (gitignored; falls back to
+# the repo root for old checkouts). `source_file` values match the files EXACTLY —
+# including the "Kathirmni" typo baked into the entry-cam filename.
 store_id: kathirmani_01
 timezone: Asia/Kolkata
 
@@ -16,7 +19,7 @@ cameras:
   - id: bill_counter
     name: "Bill Counter"
     role: billing
-    source_file: "Kathirmani Bill Counter.mkv"
+    source_file: "Kathirmani Store Near Bill Counter.mkv"
     rtsp_url_env: RTSP_BILL_COUNTER
     fps_target: 10
     segment_sec: 10
@@ -25,7 +28,7 @@ cameras:
   - id: center
     name: "Center Camera"
     role: overview
-    source_file: "Kathirmani Center Camera.mkv"
+    source_file: "Kathirmani Center Camera.mkv"   # not yet in store-videos/ (4 of 5 files present)
     rtsp_url_env: RTSP_CENTER
     fps_target: 10
     segment_sec: 10
@@ -43,7 +46,7 @@ cameras:
   - id: entry_exit
     name: "Near Entry Door Camera"
     role: entry_exit
-    source_file: "Kathirmani Near Entry Door Camera.mkv"
+    source_file: "Kathirmni Entry Cam.mkv"
     rtsp_url_env: RTSP_ENTRY_EXIT
     fps_target: 10
     segment_sec: 10

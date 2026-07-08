@@ -1,7 +1,7 @@
 # 15 — Image/Video Quality Gate (the QUALITY hook)
 
 > **Forward-looking.** Per the master prompt
-> [`oss_ingestion_nvidia_model_plugin_master_plan_v2.md`](../oss_ingestion_nvidia_model_plugin_master_plan_v2.md)
+> [`00-master-plan-v2.md`](00-master-plan-v2.md)
 > v3 ("Plug-and-play models + image-quality gate + POS"). No `quality/` module exists
 > yet — this doc is the **target contract** for it. The capability-hook framing it
 > plugs into is [16-capability-hooks-profiles-router.md](16-capability-hooks-profiles-router.md);

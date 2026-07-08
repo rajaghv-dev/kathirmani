@@ -18,7 +18,7 @@ _SRC = Path(__file__).resolve().parents[2]
 if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
-from kathirmani import PROJECT_ROOT, MODELS_DIR, VIDEO_EXTS
+from kathirmani import PROJECT_ROOT, MODELS_DIR, VIDEO_EXTS, VIDEOS_DIR
 from kathirmani.ffmpeg_preload import preload_av_ffmpeg
 
 # Pre-load PyAV's bundled FFmpeg libs (Linux) before ANY torch/transformers
@@ -56,7 +56,7 @@ HERE = PROJECT_ROOT
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--video-dir", default=str(HERE), help="Directory with videos")
+    parser.add_argument("--video-dir", default=str(VIDEOS_DIR), help="Directory with videos (default: store-videos/)")
     parser.add_argument("--results-dir", default=str(HERE / "results"), help="Output directory")
     parser.add_argument("--metrics-port", type=int, default=8900, help="Prometheus metrics port")
     parser.add_argument("--no-compile", action="store_true", help="Skip torch.compile")

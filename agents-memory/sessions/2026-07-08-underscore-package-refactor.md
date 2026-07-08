@@ -70,3 +70,44 @@ Docs re-aligned: README, PLATFORM.md, spec/02/08/09 (rewritten import
 conventions + Tests), spec/10 (§B marked DONE), 11/13/14/16/17, master plan,
 observability/README, design/INFOGRAPHIC-BRIEF, memory.md. Dated session notes
 left verbatim (historical record).
+
+---
+
+# Same day, follow-up — store-videos/ wiring + root reorg
+
+## store-videos/ (source footage home)
+
+User dropped the camera footage into `store-videos/` at the repo root (4 of the
+5 files; Center Camera missing). Wired everywhere, gitignored:
+
+- `configs/cameras.yaml` `source_file` values updated to the ACTUAL filenames —
+  incl. `"Kathirmani Store Near Bill Counter.mkv"` and the typo'd
+  `"Kathirmni Entry Cam.mkv"` (match files exactly, don't "fix" the typo).
+- `ingestion.sources.source_for_camera` resolves `store-videos/<file>` first,
+  repo root as fallback. `ingestion.config.VIDEOS_DIR` added.
+- Legacy layer: `kathirmani.VIDEOS_DIR` anchor (falls back to PROJECT_ROOT);
+  `run_inference --video-dir` defaults to it; viz app scans it.
+- Verified end-to-end: `python -m ingestion --duration 10 --camera bill_counter`
+  → 1 clip + 4 windows from the real footage.
+
+## Root reorg (conservative — live infra pinned in place)
+
+- Master plan `oss_ingestion_nvidia_model_plugin_master_plan_v2.md` →
+  `spec/00-master-plan-v2.md`; all non-session references + spec/README index
+  updated.
+- A stray 26 GB Xilinx FPGA SDK installer tar (`test@zlabslen-d12-3`, unrelated
+  to this repo) moved out to `~/`.
+- `grafana/` and `prometheus/` deliberately NOT moved: bind-mounted by live
+  containers/compose (`./grafana:/etc/grafana/provisioning`, prometheus TSDB).
+- Makefile now pins `COMPOSE_PROJECT_NAME=kathirmani-platform` so `make platform`
+  from the renamed repo dir reuses the existing project + pgdata volume instead
+  of creating a parallel stack.
+
+## Live-stack staleness found (user action needed)
+
+ALL app-tier containers (api/review-ui/console, up 4 weeks) + the prometheus
+container bind-mount the pre-rename path `~/raja/kathir` (deleted) and run
+pre-refactor in-memory code. Fix = `make platform` (project name now pinned) and
+re-run `bash start_stack.sh` for prometheus/serve_metrics. serve_metrics was
+already recreated (2026-07-08) — it was serving `marlin_*` names while all
+dashboards query `kathirmani_*`.

@@ -8,12 +8,15 @@ Marlin-2B is a fine-tune of Qwen3.5-2B, trained on *atomic, temporally-grounded 
 
 ## The cameras
 
-| File | Location |
+Footage lives in **`store-videos/`** at the repo root (gitignored; the filenames
+below match `configs/cameras.yaml` → `source_file` exactly, typos included):
+
+| File (store-videos/) | Location |
 |---|---|
-| Kathirmani Bill Counter.mkv | Cash register area |
-| Kathirmani Center Camera.mkv | Center of store |
+| Kathirmani Store Near Bill Counter.mkv | Cash register area |
+| Kathirmani Center Camera.mkv | Center of store *(file not yet present — 4 of 5)* |
 | Kathirmani Left Side Camera.mkv | Left aisle |
-| Kathirmani Near Entry Door Camera.mkv | Entrance |
+| Kathirmni Entry Cam.mkv | Entrance |
 | Kathirmani Right Side Cam.mkv | Right aisle |
 
 The 5 cameras cover the same store area from different angles.

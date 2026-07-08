@@ -1,7 +1,7 @@
 # 11 — Model Plugin Policy (NVIDIA-only) + the plugin layer
 
 > Companion to [10-platform-roadmap.md](10-platform-roadmap.md). Source: master plan
-> [Addendum A](../oss_ingestion_nvidia_model_plugin_master_plan_v2.md) (A1–A13). This
+> [Addendum A](00-master-plan-v2.md) (A1–A13). This
 > is the *durable model map* for the target platform; the roadmap is the build order.
 
 > **⚠️ Superseded default (v3, 2026-06-16).** The master prompt v3 **relaxes the hard
