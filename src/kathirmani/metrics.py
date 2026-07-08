@@ -1,12 +1,11 @@
 """Prometheus metrics server for Marlin inference monitoring."""
 import os
 import shutil
-import socket
 import time
 import threading
 import subprocess
 from prometheus_client import (
-    start_http_server, Gauge, Counter, Histogram, Summary, Info
+    start_http_server, Gauge, Counter, Histogram, Info
 )
 
 # nvidia-smi / NVML / sysfs thermal zones only exist on Linux + NVIDIA boxes

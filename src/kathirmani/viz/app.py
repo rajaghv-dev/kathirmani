@@ -22,11 +22,10 @@ _SRC = Path(__file__).resolve().parents[2]
 if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
-from kathirmani import PROJECT_ROOT
+from kathirmani import PROJECT_ROOT, VIDEO_EXTS
 
 HERE = PROJECT_ROOT             # videos + results live at the repo root
 RESULTS = PROJECT_ROOT / "results"
-VIDEO_EXTS = ("*.mkv", "*.mp4", "*.avi", "*.mov", "*.webm")
 SKIP_JSON = {"summary.json", "fused.json", "economy.json"}
 
 

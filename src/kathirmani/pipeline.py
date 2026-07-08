@@ -10,7 +10,7 @@ from pathlib import Path
 import av
 import torch
 
-from . import MODELS_DIR
+from . import MODELS_DIR, VIDEO_EXTS
 from .device import detect_device
 from .metrics import (
     INFERENCE_DURATION, EVENTS_DETECTED, VIDEOS_PROCESSED,
@@ -529,7 +529,7 @@ def _infer_one_video(model, video: Path, infer_path: Path, results_dir: Path,
 def run_all(model, video_dir: Path, results_dir: Path, duration: float | None = None,
             max_workers: int | None = None) -> list[dict]:
     videos = [
-        v for ext in ("*.mkv", "*.mp4", "*.avi", "*.mov", "*.webm")
+        v for ext in VIDEO_EXTS
         for v in sorted(video_dir.glob(ext))
     ]
 

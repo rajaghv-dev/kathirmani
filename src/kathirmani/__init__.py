@@ -15,4 +15,8 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 MODELS_DIR = PROJECT_ROOT / "models"
 RESULTS_DIR = PROJECT_ROOT / "results"
 
-__all__ = ["PROJECT_ROOT", "MODELS_DIR", "RESULTS_DIR", "__version__"]
+# Video container globs the pipeline and viewer scan for. Single source of truth
+# so run_inference, pipeline, and the Streamlit viewer stay in agreement.
+VIDEO_EXTS = ("*.mkv", "*.mp4", "*.avi", "*.mov", "*.webm")
+
+__all__ = ["PROJECT_ROOT", "MODELS_DIR", "RESULTS_DIR", "VIDEO_EXTS", "__version__"]

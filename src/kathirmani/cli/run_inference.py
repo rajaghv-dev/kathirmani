@@ -18,7 +18,7 @@ _SRC = Path(__file__).resolve().parents[2]
 if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
-from kathirmani import PROJECT_ROOT, MODELS_DIR
+from kathirmani import PROJECT_ROOT, MODELS_DIR, VIDEO_EXTS
 from kathirmani.ffmpeg_preload import preload_av_ffmpeg
 
 # Pre-load PyAV's bundled FFmpeg libs (Linux) before ANY torch/transformers
@@ -93,7 +93,7 @@ def main():
     if args.video:
         video_dir = Path(args.video_dir)
         matches = [
-            v for ext in ("*.mkv", "*.mp4", "*.avi", "*.mov", "*.webm")
+            v for ext in VIDEO_EXTS
             for v in video_dir.glob(ext)
             if args.video.lower() in v.stem.lower()
         ]
@@ -104,7 +104,7 @@ def main():
         results = [process_video(model, matches[0], results_dir, duration=args.duration)]
     else:
         video_dir = Path(args.video_dir)
-        all_videos = [v for ext in ("*.mkv","*.mp4","*.avi","*.mov","*.webm") for v in sorted(video_dir.glob(ext))]
+        all_videos = [v for ext in VIDEO_EXTS for v in sorted(video_dir.glob(ext))]
         log_inference_start([v.stem for v in all_videos])
         results = run_all(model, video_dir=video_dir, results_dir=results_dir,
                           duration=args.duration, max_workers=args.max_workers)
@@ -136,7 +136,7 @@ def main():
             for result in results:
                 label = result["label"]
                 video_file = next(
-                    (v for ext in ("*.mkv", "*.mp4", "*.avi", "*.mov", "*.webm")
+                    (v for ext in VIDEO_EXTS
                      for v in Path(args.video_dir).glob(ext)
                      if v.stem == label), None
                 )
@@ -163,7 +163,7 @@ def main():
             label = result["label"]
             # Use the trimmed clip if duration was specified; otherwise locate original
             video_file = next(
-                (v for ext in ("*.mkv", "*.mp4", "*.avi", "*.mov", "*.webm")
+                (v for ext in VIDEO_EXTS
                  for v in Path(args.video_dir).glob(ext)
                  if v.stem == label), None
             )
