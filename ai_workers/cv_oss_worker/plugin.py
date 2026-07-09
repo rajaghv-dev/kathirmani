@@ -15,6 +15,7 @@ infer -> {detections: [Detection-dict, ...], events: [CommonEvent-dict, ...],
 """
 from __future__ import annotations
 
+import os
 import sys
 import time
 from dataclasses import asdict
@@ -34,6 +35,26 @@ DEFAULT_WEIGHTS = _REPO_ROOT / "models" / "yoloe" / "yoloe-11s-seg.pt"
 
 # Open-vocab prompt set for retail (YOLOE set_classes); also the fake_infer labels.
 DEFAULT_CLASSES = ["person", "handbag", "backpack", "bottle", "box", "item"]
+
+# ---- Tier-0/1 frame gating (spec/16 §Frame gating) --------------------------
+# Detect on ~1 frame/sec, and skip a sampled frame when the scene barely moved:
+# a frame whose motion delta vs the LAST DETECTED frame is under the threshold
+# never reaches YOLOE. Deltas are measured on 160×90 grayscale thumbnails, so
+# the gate itself costs microseconds of numpy per frame.
+DETECT_FPS = float(os.environ.get("KATHIRMANI_DETECT_FPS", "1.0"))
+MOTION_MIN_CHANGED = float(os.environ.get("KATHIRMANI_MOTION_MIN_CHANGED", "0.15"))
+MOTION_PIXEL_DELTA = int(os.environ.get("KATHIRMANI_MOTION_PIXEL_DELTA", "25"))
+
+
+def motion_changed_fraction(prev, cur, pixel_delta: int = MOTION_PIXEL_DELTA) -> float:
+    """Fraction of pixels whose absolute grayscale delta exceeds `pixel_delta`.
+
+    Pure numpy on small grayscale arrays; comparing against the last *detected*
+    frame (not the previous sample) lets slow drift accumulate until it trips
+    the threshold instead of being skipped forever."""
+    import numpy as np
+    d = np.abs(cur.astype(np.int16) - prev.astype(np.int16))
+    return float((d > pixel_delta).mean())
 
 
 def default_config(profile: str = "nvidia_gb10_retail_balanced") -> PluginConfig:
@@ -63,6 +84,7 @@ class CvOssDetector(ModelPlugin):
         # Persistent multi-object tracker — pure-python, no GPU/weights. Shared
         # across infer() calls so track_ids persist across windows per camera.
         self._tracker = Tracker()
+        self._last_gate: dict[str, Any] = {}   # frame-gate stats of the last clip
         # lightweight metric counters (also mirrored to prometheus in infer())
         self._n_requests = 0
         self._n_fake = 0
@@ -166,39 +188,61 @@ class CvOssDetector(ModelPlugin):
     def _run_yoloe(self, clip_path: str) -> list[list[Detection]]:
         """Real ultralytics path: per-FRAME detection lists over the clip.
 
-        ultralytics yields one result per decoded frame. Keeping the frame
-        structure (instead of flattening) is what lets the tracker associate
-        subjects across frames — flattened, every appearance looked like a
-        distinct concurrent person and spawned its own track."""
-        fps = 25.0
-        try:                                         # clip fps for frame times
-            import av
-            with av.open(clip_path) as _c:
-                fps = float(_c.streams.video[0].average_rate or 25.0)
-        except Exception:
-            pass
+        Frame gating (spec/16): decode with PyAV, sample ~DETECT_FPS frames per
+        second, and run YOLOE only on sampled frames whose motion delta vs the
+        last detected frame is ≥ MOTION_MIN_CHANGED (numpy on 160×90 gray
+        thumbnails). Keeping the per-frame structure is what lets the tracker
+        associate subjects across frames."""
+        import av
         frames: list[list[Detection]] = []
-        for fidx, r in enumerate(self._model.predict(clip_path, verbose=False,
-                                                     stream=True)):
+        sampled = detected = skipped = 0
+        prev_small = None
+        with av.open(clip_path) as container:
+            vs = container.streams.video[0]
+            fps = float(vs.average_rate or 25.0)
+            step = max(int(round(fps / DETECT_FPS)), 1)
+            for fidx, frame in enumerate(container.decode(vs)):
+                if fidx % step:
+                    continue
+                sampled += 1
+                small = frame.reformat(width=160, height=90,
+                                       format="gray8").to_ndarray()
+                if (prev_small is not None
+                        and motion_changed_fraction(prev_small, small)
+                        < MOTION_MIN_CHANGED):
+                    skipped += 1
+                    continue
+                prev_small = small
+                detected += 1
+                t = round(fidx / fps, 3)
+                frames.append(self._detect_frame(
+                    frame.to_ndarray(format="rgb24"), t))
+        self._last_gate = {"frames_sampled": sampled, "frames_detected": detected,
+                           "frames_skipped_static": skipped,
+                           "detect_fps": DETECT_FPS,
+                           "motion_min_changed": MOTION_MIN_CHANGED}
+        return frames
+
+    def _detect_frame(self, rgb, t: float) -> list[Detection]:
+        """Run YOLOE on one RGB ndarray frame; parse boxes to Detections."""
+        frame_dets: list[Detection] = []
+        for r in self._model.predict(rgb, verbose=False):
             names = getattr(r, "names", {}) or {}
             boxes = getattr(r, "boxes", None)
-            frame_dets: list[Detection] = []
-            if boxes is not None:
-                ow = float(getattr(r, "orig_shape", (1, 1))[1]) or 1.0
-                oh = float(getattr(r, "orig_shape", (1, 1))[0]) or 1.0
-                t = round(fidx / fps, 3)
-                for b in boxes:
-                    cls = int(b.cls.item()) if hasattr(b, "cls") else 0
-                    conf = float(b.conf.item()) if hasattr(b, "conf") else 0.0
-                    xyxy = b.xyxy[0].tolist()    # pixel coords [x1, y1, x2, y2]
-                    x1, y1, x2, y2 = xyxy
-                    bbox = [x1 / ow, y1 / oh, (x2 - x1) / ow, (y2 - y1) / oh]
-                    frame_dets.append(Detection(
-                        label=str(names.get(cls, cls)), confidence=conf,
-                        bbox=[round(v, 5) for v in bbox], frame_time_sec=t,
-                        model_name=self.config.model_id))
-            frames.append(frame_dets)
-        return frames
+            if boxes is None:
+                continue
+            ow = float(getattr(r, "orig_shape", rgb.shape)[1]) or 1.0
+            oh = float(getattr(r, "orig_shape", rgb.shape)[0]) or 1.0
+            for b in boxes:
+                cls = int(b.cls.item()) if hasattr(b, "cls") else 0
+                conf = float(b.conf.item()) if hasattr(b, "conf") else 0.0
+                x1, y1, x2, y2 = b.xyxy[0].tolist()  # pixel [x1, y1, x2, y2]
+                bbox = [x1 / ow, y1 / oh, (x2 - x1) / ow, (y2 - y1) / oh]
+                frame_dets.append(Detection(
+                    label=str(names.get(cls, cls)), confidence=conf,
+                    bbox=[round(v, 5) for v in bbox], frame_time_sec=t,
+                    model_name=self.config.model_id))
+        return frame_dets
 
     # ---- packaging: detections + the §8.3 event hypothesis -----------------
     def _package(self, dets: list[Detection] | list[list[Detection]],
@@ -233,6 +277,7 @@ class CvOssDetector(ModelPlugin):
                 "runtime": self.config.runtime,
                 "faked": faked,
                 "error": None,
+                "frame_gate": dict(self._last_gate),
             },
         }
 

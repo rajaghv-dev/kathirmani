@@ -198,6 +198,35 @@ The router is where QUALITY ([15](15-quality-gate.md)) and `route_to_vlm`
 "how hard to think" decision — preserving the cascade-gating saving (empty route ⇒ Qwen
 skipped) and adding a quality floor below which nothing infers strongly.
 
+## Frame gating — Tier 0/1 (IMPLEMENTED 2026-07-09)
+
+The first hook to land in code: the detection plugin
+(`ai_workers/cv_oss_worker/plugin.py::_run_yoloe`) no longer runs YOLOE on every
+decoded frame. Measured motivation (real footage, GB10): ungated detection cost
+~1.3× the footage's own runtime for 4 cameras — the compute exceeded the video.
+
+Two gates, both before any model call:
+
+1. **Sample ~1 frame/sec** (`KATHIRMANI_DETECT_FPS`, default `1.0`). The PyAV
+   decode loop keeps every `round(fps / DETECT_FPS)`-th frame. The IoU tracker
+   (`max_age_sec=5.0`) bridges 1-sec gaps, so track identity survives.
+2. **Motion gate (numpy):** each sampled frame is thumbnailed to 160×90
+   grayscale; `motion_changed_fraction()` = share of pixels whose absolute delta
+   vs the **last detected frame** exceeds `KATHIRMANI_MOTION_PIXEL_DELTA` (25).
+   If that share is **< 15%** (`KATHIRMANI_MOTION_MIN_CHANGED`, default `0.15`)
+   the frame is skipped — YOLOE never sees it. Comparing against the last
+   *detected* (not previous sampled) frame lets slow drift accumulate until it
+   trips the gate, so gradual scene changes still get detected.
+
+Gate stats travel with every run as `model_run.frame_gate`
+(`frames_sampled / frames_detected / frames_skipped_static`) for observability.
+
+Measured on a real right-aisle clip (10 s, 25 fps, 2688×1520): 250 frames →
+10 sampled → **1 detected** (9 static-skipped) → 3 detections in 1.13 s wall,
+vs 938 detections in 3.2 s ungated. This is the WHEN hook's cheapest tier; the
+policy (which frames matter) stays deterministic per the mechanism-vs-policy
+rule (spec/10 ingestion).
+
 ## How a low-cost model approaches frontier usefulness
 
 Don't expect a small model to beat a frontier model in general — make it win on *this

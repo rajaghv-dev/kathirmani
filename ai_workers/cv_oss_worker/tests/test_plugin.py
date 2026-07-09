@@ -142,3 +142,29 @@ def test_one_event_per_subject_track_not_per_frame_appearance():
     assert len({e.event_id for e in events}) == 2, "distinct ids per subject"
     for e in events:
         assert e.objects == ["item", "person"], "objects deduped + sorted"
+
+
+def test_motion_changed_fraction_gate_boundary():
+    """Frame gate math: identical frames -> 0 change (skip); a burst that moves
+    >15% of pixels by more than the delta threshold -> detect."""
+    import numpy as np
+    from ai_workers.cv_oss_worker.plugin import (MOTION_MIN_CHANGED,
+                                                 motion_changed_fraction)
+    base = np.full((90, 160), 100, dtype=np.uint8)
+    assert motion_changed_fraction(base, base.copy()) == 0.0
+
+    # 10% of pixels change hard -> below the 15% default -> would be skipped
+    minor = base.copy()
+    minor[:9, :] = 200                                 # 9/90 rows = 10%
+    frac = motion_changed_fraction(base, minor)
+    assert 0.09 < frac < 0.11 and frac < MOTION_MIN_CHANGED
+
+    # 20% of pixels change hard -> above threshold -> would be detected
+    major = base.copy()
+    major[:18, :] = 200                                # 18/90 rows = 20%
+    frac = motion_changed_fraction(base, major)
+    assert frac > MOTION_MIN_CHANGED
+
+    # sub-delta wiggle (noise) never counts, no matter how many pixels
+    noisy = base + np.uint8(5)                         # delta 5 < pixel_delta 25
+    assert motion_changed_fraction(base, noisy) == 0.0
