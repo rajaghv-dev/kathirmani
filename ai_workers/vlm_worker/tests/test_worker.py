@@ -67,7 +67,7 @@ def test_run_once_file_backend(tmp_path, monkeypatch):
     """run(once=True) drains event.created, verifies flagged ones, skips others,
     and publishes a vlm.verified event for the flagged one."""
     monkeypatch.setattr(worker, "EVENTS_DIR", tmp_path)
-    stream_file = tmp_path / "event_created.jsonl"
+    stream_file = tmp_path / f"{worker.STREAM.replace('.', '_')}.jsonl"
     flagged = _flagged_event()
     unflagged = dict(flagged, event_id="55555555-5555-5555-5555-555555555555",
                      needs_vlm_verification=False)

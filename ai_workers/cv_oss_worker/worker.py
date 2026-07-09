@@ -200,7 +200,8 @@ def process_window(window: dict, plugin: CvOssDetector, queue, conn) -> dict:
     _write_model_run(conn, out["model_run"], n_det)
     return {"window_id": window.get("window_id"), "detections": len(out["detections"]),
             "detections_written": n_det, "tracks_written": n_trk, "events": n_ev,
-            "faked": out["model_run"].get("faked", False)}
+            "faked": out["model_run"].get("faked", False),
+            "frame_gate": out["model_run"].get("frame_gate", {})}
 
 
 def make_detection_plugin() -> CvOssDetector:
@@ -279,4 +280,18 @@ if __name__ == "__main__":                           # python -m ai_workers... /
     ap.add_argument("--backend", default=None, help="pg|file|redis (default: env)")
     args = ap.parse_args()
     res = run(once=args.once, limit=args.limit, backend=args.backend)
-    print(f"[cv-worker] processed {len(res)} window(s): {res}")
+    # Aggregate line (the per-window list is huge on full runs): totals for
+    # frames sampled/detected/skipped + clip-cache hits = the measured savings.
+    tot = {"windows": len(res), "detections": 0, "events": 0, "cache_hits": 0,
+           "frames_sampled": 0, "frames_detected": 0, "frames_skipped": 0}
+    for s in res:
+        tot["detections"] += s.get("detections", 0)
+        tot["events"] += s.get("events", 0)
+        g = s.get("frame_gate") or {}
+        if g.get("clip_cache_hit"):
+            tot["cache_hits"] += 1
+        else:
+            tot["frames_sampled"] += g.get("frames_sampled", 0)
+            tot["frames_detected"] += g.get("frames_detected", 0)
+            tot["frames_skipped"] += g.get("frames_skipped_static", 0)
+    print(f"[cv-worker] AGGREGATE {tot}")

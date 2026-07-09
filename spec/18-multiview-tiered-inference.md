@@ -88,12 +88,13 @@ real time → hierarchy ≈ Tier 1 at 15–20% GPU + Tiers 3/4 under ~27 min/h c
 | Piece | State |
 |---|---|
 | Tier 0/1 frame gate (1 fps + <15% motion skip) | ✅ implemented + measured (spec/16) |
-| Per-segment (not per-window) detection | pending |
-| Queue stream split (`event.needs_vlm`) | pending |
-| Rules-gated VLM + fused-incident verification | pending |
+| Per-segment (not per-window) detection | ✅ 2026-07-09 — clip-level LRU result cache in the detection plugin; windows slice the cached per-frame results to their span; tracker runs once per clip; `model_run.frame_gate.clip_cache_hit` + worker AGGREGATE line report the savings |
+| Queue stream split (`event.needs_vlm`) | ✅ 2026-07-09 — rule engine forwards flagged hypotheses to `event.needs_vlm` (deduped per camera+subject+type+clip); VLM worker consumes that stream, ending the rules-vs-VLM race on `event.created` |
+| Verification result cache ("pipeline KV-cache") | ✅ 2026-07-09 — VLM worker reuses a clip+event-type verdict instead of re-watching (~44 s GPU per hit). True prompt-prefix KV reuse is blocked by Nemotron's `model.chat` API — the cache layer is the pipeline-level equivalent |
+| Strict rules-fired-only VLM gating | pending (currently: needs_vlm + subject dedup) |
 | View election / cross-view fusion (SQL overlap) | pending (indexes exist, unused) |
 | Tier-3 Cosmos triage plugin | pending |
-| Detection-row thinning | pending |
+| Detection-row thinning | partial (per-window slicing ended whole-clip row duplication; sampled-frame rows remain) |
 
 ## Related
 

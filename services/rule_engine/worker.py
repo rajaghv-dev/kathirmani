@@ -133,11 +133,38 @@ def _file_jobs(out_dir: Path, limit: int) -> list[dict]:
 # --------------------------------------------------------------------------
 # Core: feed one event to the engine + persist whatever fires.
 # --------------------------------------------------------------------------
+VLM_STREAM = "event.needs_vlm"
+# Verification dedup (spec/18 "verify once per subject"): one VLM forward per
+# (camera, lead subject track, event type, clip). ~13 windows of a 30-sec clip
+# raise the same hypothesis for the same person — the VLM needs to see it once.
+_vlm_forwarded: set[str] = set()
+
+
+def _forward_for_vlm(ev: dict, queue) -> int:
+    if not ev.get("needs_vlm_verification"):
+        return 0
+    subject = (ev.get("track_ids") or ["?"])[0]
+    key = (f"{ev.get('camera_id')}|{subject}|{ev.get('event_type')}"
+           f"|{ev.get('segment_id')}")
+    if key in _vlm_forwarded:
+        return 0
+    _vlm_forwarded.add(key)
+    try:
+        queue.publish({**ev, "type": VLM_STREAM})
+        return 1
+    except Exception:
+        return 0
+
+
 def process_event(ev: dict, engine: RuleEngine, queue, conn) -> dict:
     """Feed one low-level event; persist + republish any actions it triggers.
+    Hypotheses needing VLM verification are forwarded to `event.needs_vlm`
+    (deduped per subject/clip) — the VLM worker consumes THAT stream, not
+    `event.created`, so rules and VLM no longer race for the same messages.
     Returns a small summary dict for logging/tests."""
     actions = engine.feed(ev)
     n_event, n_incident = 0, 0
+    n_vlm = _forward_for_vlm(ev, queue)
     for a in actions:
         if a.kind == "create_incident":
             _write_incident(conn, a)             # no-op without DB
@@ -146,12 +173,14 @@ def process_event(ev: dict, engine: RuleEngine, queue, conn) -> dict:
             out = action_to_event_dict(a)
             _write_event(conn, out)              # no-op without DB
             try:
-                queue.publish(out)               # republish for the VLM worker
+                queue.publish(out)               # republish on event.created
             except Exception:
                 pass
+            n_vlm += _forward_for_vlm(out, queue)
             n_event += 1
     return {"in_event_type": ev.get("event_type"), "actions": len(actions),
             "events_created": n_event, "incidents_created": n_incident,
+            "vlm_forwarded": n_vlm,
             "rules_fired": [a.rule_id for a in actions]}
 
 

@@ -85,6 +85,12 @@ class CvOssDetector(ModelPlugin):
         # across infer() calls so track_ids persist across windows per camera.
         self._tracker = Tracker()
         self._last_gate: dict[str, Any] = {}   # frame-gate stats of the last clip
+        # Segment-level result cache: windows of one clip share a single
+        # decode+detect+track pass (spec/18 "detect once per segment").
+        from collections import OrderedDict
+        self._clip_cache: OrderedDict[str, tuple] = OrderedDict()
+        self._clip_cache_size = 4
+        self._n_cache_hits = 0
         # lightweight metric counters (also mirrored to prometheus in infer())
         self._n_requests = 0
         self._n_fake = 0
@@ -135,6 +141,7 @@ class CvOssDetector(ModelPlugin):
         return {
             "requests_total": float(self._n_requests),
             "fake_infer_total": float(self._n_fake),
+            "clip_cache_hits_total": float(self._n_cache_hits),
             "last_latency_ms": float(self._last_latency_ms),
             "model_loaded": 1.0 if self._loaded else 0.0,
         }
@@ -164,19 +171,46 @@ class CvOssDetector(ModelPlugin):
         return self._package(dets, request, faked=True)
 
     def infer(self, request: dict[str, Any]) -> dict[str, Any]:
-        """Run detection on `request['clip_path']`. Falls back to fake_infer
-        if the model isn't loaded or inference raises. Always returns
-        {detections, events, model_run}."""
+        """Run detection for one WINDOW of `request['clip_path']`.
+
+        Segment-level result cache (spec/18): all ~14 windows of a clip share
+        one decode + YOLOE + tracker pass — the first window computes it, the
+        rest slice the cached per-frame results down to their own
+        [window_start_sec, window_end_sec) span. Falls back to fake_infer if
+        the model isn't loaded or inference raises."""
         self._n_requests += 1
         start = time.perf_counter()
         if not self._loaded:
             self.load()                          # lazy, non-fatal
         clip_path = request.get("clip_path", "")
         try:
-            if self._model is None or not clip_path or not Path(clip_path).exists():
-                raise RuntimeError("model unavailable or clip missing")
-            dets = self._run_yoloe(clip_path)
-            out = self._package(dets, request, faked=False)
+            if not clip_path or not Path(clip_path).exists():
+                raise RuntimeError("clip missing")
+            cached = clip_path in self._clip_cache
+            if cached:
+                frames, gate = self._clip_cache[clip_path]
+                self._clip_cache.move_to_end(clip_path)
+                self._n_cache_hits += 1
+            else:
+                if self._model is None:
+                    raise RuntimeError("model unavailable")
+                frames = self._run_yoloe(clip_path)
+                camera_id = request.get("camera_id", "")
+                for fdets in frames:             # tracker: once per CLIP
+                    if fdets:
+                        self._tracker.update(fdets, camera_id,
+                                             fdets[0].frame_time_sec)
+                gate = dict(self._last_gate)
+                self._clip_cache[clip_path] = (frames, gate)
+                while len(self._clip_cache) > self._clip_cache_size:
+                    self._clip_cache.popitem(last=False)
+            ws = float(request.get("window_start_sec", 0.0))
+            we = float(request.get("window_end_sec", 1e9))
+            dets = [d for fr in frames for d in fr
+                    if ws <= d.frame_time_sec < we]
+            self._last_gate = {**gate, "clip_cache_hit": cached}
+            out = self._package(dets, request, faked=False,
+                                update_tracker=False)
         except Exception as e:
             out = self.fake_infer(request)
             out["model_run"]["error"] = f"fallback: {type(e).__name__}: {e}"
@@ -246,22 +280,25 @@ class CvOssDetector(ModelPlugin):
 
     # ---- packaging: detections + the §8.3 event hypothesis -----------------
     def _package(self, dets: list[Detection] | list[list[Detection]],
-                 request: dict[str, Any], faked: bool) -> dict[str, Any]:
+                 request: dict[str, Any], faked: bool,
+                 update_tracker: bool = True) -> dict[str, Any]:
         # Assign persistent track_ids (in place) before building events/rows, so
         # detections, the §8.3 event, and the tracks table all share one identity.
-        # The real path hands us per-frame lists — feed the tracker one frame at
-        # a time (that's what lets it associate the same subject across frames).
+        # The real path tracks once per CLIP in infer() (update_tracker=False
+        # here); per-frame lists are fed one frame at a time (that's what lets
+        # the tracker associate the same subject across frames).
         camera_id = request.get("camera_id", "")
         if dets and isinstance(dets[0], list):
             flat: list[Detection] = []
             for frame_dets in dets:
                 if not frame_dets:
                     continue
-                self._tracker.update(frame_dets, camera_id,
-                                     frame_dets[0].frame_time_sec)
+                if update_tracker:
+                    self._tracker.update(frame_dets, camera_id,
+                                         frame_dets[0].frame_time_sec)
                 flat.extend(frame_dets)
             dets = flat
-        else:
+        elif update_tracker:
             frame_time = float(request.get("window_start_sec", 0.0))
             if dets:
                 frame_time = dets[0].frame_time_sec or frame_time

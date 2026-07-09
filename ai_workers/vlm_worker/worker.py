@@ -33,7 +33,7 @@ from ingestion.bus import make_queue                          # noqa: E402
 
 from .host import load_plugin
 
-STREAM = "event.created"                                      # the rule_engine output stream
+STREAM = "event.needs_vlm"                                    # rules-gated, subject-deduped feed
 EVENTS_DIR = _REPO_ROOT / "data" / "queue"                    # FileQueue out_dir (hermetic)
 
 
@@ -152,8 +152,16 @@ def needs_verification(ev: dict) -> bool:
 # --------------------------------------------------------------------------
 # Core: verify one flagged event with the plugin + persist its outputs.
 # --------------------------------------------------------------------------
+# Verification result cache ("KV-cache" at the pipeline level): a clip already
+# watched for an event type is not re-watched for a duplicate hypothesis — the
+# cached verdict is reused for the new event row, saving ~44s GPU per hit. The
+# rule engine dedupes per subject upstream; this catches cross-subject dupes on
+# the same clip + requeues within a worker run.
+_verdict_cache: dict[tuple, dict] = {}
+
+
 def process_event(ev: dict, plugin, queue, conn) -> dict:
-    """Run the VLM plugin on one flagged `event.created` and persist outputs.
+    """Run the VLM plugin on one flagged `event.needs_vlm` and persist outputs.
     Non-flagged events are skipped cheaply. Returns a summary dict for tests."""
     if not needs_verification(ev):
         return {"event_id": ev.get("event_id"), "skipped": True}
@@ -163,13 +171,18 @@ def process_event(ev: dict, plugin, queue, conn) -> dict:
         "event": ev,
         "event_id": ev.get("event_id"),
     }
+    cache_key = (request["clip_path"], ev.get("event_type"))
+    from_cache = cache_key in _verdict_cache
     _t0 = time.time()
-    out = plugin.infer(request)
-    try:  # telemetry hook: per-model runtime resources + run annotation (never fatal)
-        from model_plugins.base.run_hooks import record_model_run
-        record_model_run(getattr(plugin, "config", None), _t0, time.time(), out.get("model_run"))
-    except Exception:
-        pass
+    out = _verdict_cache[cache_key] if from_cache else plugin.infer(request)
+    if not from_cache:
+        _verdict_cache[cache_key] = out
+        try:  # telemetry hook: per-model runtime resources (never fatal)
+            from model_plugins.base.run_hooks import record_model_run
+            record_model_run(getattr(plugin, "config", None), _t0, time.time(),
+                             out.get("model_run"))
+        except Exception:
+            pass
     event_id = ev.get("event_id")
     obs_id = _write_vlm_observation(conn, out, event_id)
     confidence = float(out["verification"].get("confidence", 0.0))
@@ -189,7 +202,7 @@ def process_event(ev: dict, plugin, queue, conn) -> dict:
     except Exception:
         pass
 
-    return {"event_id": event_id, "skipped": False,
+    return {"event_id": event_id, "skipped": False, "cached": from_cache,
             "verdict": out["verification"]["verdict"], "confidence": confidence,
             "parse_success": out["parse_success"],
             "faked": out["model_run"].get("faked", False),
