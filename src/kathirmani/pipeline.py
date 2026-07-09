@@ -107,11 +107,18 @@ def trim_video(src: Path, duration_sec: float) -> Path:
             out_vs.height = in_vs.height
             out_vs.pix_fmt = "yuv420p"
             out_vs.options = {"crf": "23", "preset": "ultrafast"}
+            nframes = 0
             for frame in inp.decode(in_vs):
                 t = float(frame.pts * in_vs.time_base) if frame.pts is not None else 0.0
                 if t > duration_sec:
                     break
+                # Rebase PTS to a local frame counter: encoder output must not
+                # inherit source timestamps (invalid DTS on real footage; same
+                # fix as ingestion/segmenter.py).
                 frame = frame.reformat(format="yuv420p")
+                frame.pts = nframes
+                frame.time_base = Fraction(1, int(round(fps))) if fps else None
+                nframes += 1
                 for pkt in out_vs.encode(frame):
                     out.mux(pkt)
             for pkt in out_vs.encode():

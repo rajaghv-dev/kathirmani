@@ -42,7 +42,10 @@ os.environ.setdefault("TORCHINDUCTOR_FX_GRAPH_CACHE", "1")
 (_CACHE / "inductor").mkdir(parents=True, exist_ok=True)
 
 # These env vars must be set before importing transformers / qwen-vl-utils.
-os.environ.setdefault("FORCE_QWENVL_VIDEO_READER", "torchcodec")
+# The video reader is chosen at runtime: torchcodec when its native decoder
+# loads, else the registered PyAV backend (kathirmani.video_reader).
+from kathirmani.video_reader import ensure_reader  # noqa: E402
+ensure_reader()
 os.environ.setdefault("VIDEO_MAX_PIXELS", "200704")
 os.environ.setdefault("FPS", "2.0")
 os.environ.setdefault("FPS_MAX_FRAMES", "240")
