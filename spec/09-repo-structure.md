@@ -52,7 +52,7 @@ kathirmani/
 │                           #   source_file names must match these files exactly
 ├── models/                 # model weights + PROVENANCE.json (fetched, not committed)
 ├── data/                   # runtime output: clips/thumbnails/queue/metadata (gitignored)
-├── results/                # legacy-cascade JSON results (gitignored)
+├── results/                # legacy-cascade JSON results (committed as data)
 ├── grafana/                # LEGACY-cascade dashboards + setup_grafana.sh (live-mounted
 ├── prometheus/             #   by compose/containers — do not move these two)
 │
