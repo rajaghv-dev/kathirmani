@@ -96,7 +96,15 @@ def segment_source(
                 samples.append(small)
             fcount += 1
 
-            for pkt in out_vs.encode(frame.reformat(format="yuv420p")):
+            # Re-encoded frames must NOT inherit the source PTS: each segment has
+            # a fresh encoder, and source timestamps (huge, in the source
+            # time_base) produce a non-monotonic/invalid DTS at a segment
+            # boundary on real footage. Rebase to a per-segment frame counter
+            # in 1/fps time_base (PyAV 17 requires explicit pts).
+            nf = frame.reformat(format="yuv420p")
+            nf.pts = fcount - 1                      # frames since segment start
+            nf.time_base = Fraction(1, int(round(fps))) if fps else None
+            for pkt in out_vs.encode(nf):
                 out.mux(pkt)
 
         if out is not None:

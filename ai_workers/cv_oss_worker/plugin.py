@@ -163,39 +163,65 @@ class CvOssDetector(ModelPlugin):
         self._emit_prometheus(out, faked=out["model_run"].get("faked", False))
         return out
 
-    def _run_yoloe(self, clip_path: str) -> list[Detection]:
-        """Real ultralytics path: predict on the clip's first frame(s)."""
-        results = self._model.predict(clip_path, verbose=False)
-        dets: list[Detection] = []
-        for r in results:
+    def _run_yoloe(self, clip_path: str) -> list[list[Detection]]:
+        """Real ultralytics path: per-FRAME detection lists over the clip.
+
+        ultralytics yields one result per decoded frame. Keeping the frame
+        structure (instead of flattening) is what lets the tracker associate
+        subjects across frames — flattened, every appearance looked like a
+        distinct concurrent person and spawned its own track."""
+        fps = 25.0
+        try:                                         # clip fps for frame times
+            import av
+            with av.open(clip_path) as _c:
+                fps = float(_c.streams.video[0].average_rate or 25.0)
+        except Exception:
+            pass
+        frames: list[list[Detection]] = []
+        for fidx, r in enumerate(self._model.predict(clip_path, verbose=False,
+                                                     stream=True)):
             names = getattr(r, "names", {}) or {}
             boxes = getattr(r, "boxes", None)
-            if boxes is None:
-                continue
-            ow = float(getattr(r, "orig_shape", (1, 1))[1]) or 1.0
-            oh = float(getattr(r, "orig_shape", (1, 1))[0]) or 1.0
-            for b in boxes:
-                cls = int(b.cls.item()) if hasattr(b, "cls") else 0
-                conf = float(b.conf.item()) if hasattr(b, "conf") else 0.0
-                xyxy = b.xyxy[0].tolist()        # pixel coords [x1, y1, x2, y2]
-                x1, y1, x2, y2 = xyxy
-                bbox = [x1 / ow, y1 / oh, (x2 - x1) / ow, (y2 - y1) / oh]  # ->[x,y,w,h] norm
-                dets.append(Detection(
-                    label=str(names.get(cls, cls)), confidence=conf,
-                    bbox=[round(v, 5) for v in bbox], frame_time_sec=0.0,
-                    model_name=self.config.model_id))
-        return dets
+            frame_dets: list[Detection] = []
+            if boxes is not None:
+                ow = float(getattr(r, "orig_shape", (1, 1))[1]) or 1.0
+                oh = float(getattr(r, "orig_shape", (1, 1))[0]) or 1.0
+                t = round(fidx / fps, 3)
+                for b in boxes:
+                    cls = int(b.cls.item()) if hasattr(b, "cls") else 0
+                    conf = float(b.conf.item()) if hasattr(b, "conf") else 0.0
+                    xyxy = b.xyxy[0].tolist()    # pixel coords [x1, y1, x2, y2]
+                    x1, y1, x2, y2 = xyxy
+                    bbox = [x1 / ow, y1 / oh, (x2 - x1) / ow, (y2 - y1) / oh]
+                    frame_dets.append(Detection(
+                        label=str(names.get(cls, cls)), confidence=conf,
+                        bbox=[round(v, 5) for v in bbox], frame_time_sec=t,
+                        model_name=self.config.model_id))
+            frames.append(frame_dets)
+        return frames
 
     # ---- packaging: detections + the §8.3 event hypothesis -----------------
-    def _package(self, dets: list[Detection], request: dict[str, Any],
-                 faked: bool) -> dict[str, Any]:
+    def _package(self, dets: list[Detection] | list[list[Detection]],
+                 request: dict[str, Any], faked: bool) -> dict[str, Any]:
         # Assign persistent track_ids (in place) before building events/rows, so
         # detections, the §8.3 event, and the tracks table all share one identity.
+        # The real path hands us per-frame lists — feed the tracker one frame at
+        # a time (that's what lets it associate the same subject across frames).
         camera_id = request.get("camera_id", "")
-        frame_time = float(request.get("window_start_sec", 0.0))
-        if dets:
-            frame_time = dets[0].frame_time_sec or frame_time
-        self._tracker.update(dets, camera_id, frame_time)
+        if dets and isinstance(dets[0], list):
+            flat: list[Detection] = []
+            for frame_dets in dets:
+                if not frame_dets:
+                    continue
+                self._tracker.update(frame_dets, camera_id,
+                                     frame_dets[0].frame_time_sec)
+                flat.extend(frame_dets)
+            dets = flat
+        else:
+            frame_time = float(request.get("window_start_sec", 0.0))
+            if dets:
+                frame_time = dets[0].frame_time_sec or frame_time
+            self._tracker.update(dets, camera_id, frame_time)
         events = self.detections_to_events(dets, request)
         return {
             "detections": [asdict(d) for d in dets],
@@ -224,16 +250,26 @@ class CvOssDetector(ModelPlugin):
         persons = [d for d in dets if d.label == "person"]
         items = [d for d in dets if d.label != "person"]
         events: list[CommonEvent] = []
+        # `dets` spans EVERY frame of the window, so the same subject appears
+        # once per frame (~125×). Emit ONE event per subject (track_id) per
+        # window, not one per frame appearance — real footage otherwise floods
+        # ~600 duplicate events per busy window.
+        seen_subjects: set[str] = set()
         for p in persons:
+            subject = p.track_id or "untracked"
+            if subject in seen_subjects:
+                continue
             zone_ids = map_detection_to_zones(tuple(p.bbox), camera_id, zm)
             zone_types = zm.zone_types(zone_ids)
             if "shelf" in zone_types and items:
+                seen_subjects.add(subject)
                 # Carry real persistent track_ids for the subjects in this event;
                 # the person's id leads so the rule engine buckets by that subject.
-                track_ids = [t for t in ([p.track_id] + [i.track_id for i in items])
-                             if t is not None]
+                track_ids = [p.track_id] if p.track_id is not None else []
+                track_ids += sorted({i.track_id for i in items if i.track_id is not None})
                 ev = CommonEvent(
-                    event_id=self._event_id(request, "suspicious_item_interaction"),
+                    event_id=self._event_id(request, "suspicious_item_interaction",
+                                            subject),
                     store_id=store_id,
                     camera_id=camera_id,
                     event_type="suspicious_item_interaction",
@@ -242,7 +278,7 @@ class CvOssDetector(ModelPlugin):
                     source_engine="cv_oss_detector",
                     ai_window_id=request.get("window_id"),
                     segment_id=request.get("segment_id"),
-                    objects=[d.label for d in dets],
+                    objects=sorted({d.label for d in dets}),
                     track_ids=track_ids,
                     zones=zone_ids,
                     needs_vlm_verification=True,
@@ -252,9 +288,10 @@ class CvOssDetector(ModelPlugin):
         return events
 
     @staticmethod
-    def _event_id(request: dict[str, Any], kind: str) -> str:
+    def _event_id(request: dict[str, Any], kind: str, subject: str = "") -> str:
         import uuid
-        seed = f"{request.get('window_id','')}|{request.get('camera_id','')}|{kind}"
+        seed = (f"{request.get('window_id','')}|{request.get('camera_id','')}"
+                f"|{kind}|{subject}")
         return str(uuid.uuid5(uuid.NAMESPACE_URL, seed))
 
     # ---- prometheus mirror (best-effort) -----------------------------------

@@ -115,3 +115,30 @@ def test_default_config_matches_detection_task():
     assert cfg.plugin == "cv_oss_detector"
     assert cfg.runtime == "ultralytics"
     assert cfg.model_id == "jameslahm/yoloe-11s-seg"
+
+
+def test_one_event_per_subject_track_not_per_frame_appearance():
+    """Real windows carry the SAME person once per decoded frame (~125×). The
+    hypothesis must be per subject (track_id) per window, not per appearance —
+    the pre-fix behaviour flooded ~600 duplicate events per busy window."""
+    p = CvOssDetector()
+    mn = p.config.model_id
+    dets = []
+    for frame in range(50):                            # same two subjects, 50 frames
+        t = frame / 10.0
+        dets.append(Detection(label="person", confidence=0.9,
+                              bbox=[0.40, 0.45, 0.18, 0.40],
+                              frame_time_sec=t, model_name=mn, track_id="p1"))
+        dets.append(Detection(label="person", confidence=0.9,
+                              bbox=[0.42, 0.45, 0.18, 0.40],
+                              frame_time_sec=t, model_name=mn, track_id="p2"))
+        dets.append(Detection(label="item", confidence=0.8,
+                              bbox=[0.46, 0.55, 0.06, 0.06],
+                              frame_time_sec=t, model_name=mn, track_id="i1"))
+    req = {"window_id": "w-1", "segment_id": "s-1", "camera_id": "left_aisle",
+           "store_id": "kathirmani_01", "clip_path": "/nonexistent/clip.mp4"}
+    events = p.detections_to_events(dets, req)
+    assert len(events) == 2, "one event per subject track, not per frame"
+    assert len({e.event_id for e in events}) == 2, "distinct ids per subject"
+    for e in events:
+        assert e.objects == ["item", "person"], "objects deduped + sorted"
