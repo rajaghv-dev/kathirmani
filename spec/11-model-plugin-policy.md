@@ -169,6 +169,43 @@ into the plugin layer. VSS-style capabilities are implemented in OSS + NVIDIA mo
 **VSS is a reference, never a runtime dependency** (`allow_vss_runtime_dependency:
 false`).
 
+## Licensing status (verified 2026-07-09, from the local model cards)
+
+| Model | License | Commercial use? |
+|---|---|---|
+| Nemotron-Nano-VL-8B-V1 | NVIDIA Open Model License + Llama 3.1 Community ("Built with Llama") | **Yes** (royalty-free; Llama attribution + >700M-MAU clause) |
+| Cosmos-Reason2-2B | NVIDIA Open Model License (2025-09 text) | **Yes** ("commercially… royalty-free"; keep guardrails + attribution) |
+| C-RADIOv4-H | NVIDIA Open Model License (2024-06) | **Yes** — card: "ready for commercial/non-commercial use" (earlier RADIO versions were research-only; v4 is the commercial one) |
+| YOLOE (`jameslahm/yoloe-11s-seg`) + ultralytics runtime | **AGPL-3.0** (both) | **No for closed commercial deployment** — AGPL copyleft incl. the network-service clause; needs a paid Ultralytics Enterprise License, or swap (below). Its MobileCLIP text encoder (`models/yoloe/mobileclip_blt.ts`) carries Apple's own model license — check it too |
+| Qwen2.5-VL-7B (research arm) | Apache-2.0 | Yes (but comparison-only per this doc's policy anyway) |
+
+Not legal advice; counsel pass required before any paid deployment.
+
+## YOLOE replacement path (people + objects, NVIDIA-only)
+
+**Tier A — TAO models (needs the free NGC API key; all commercially licensed,
+TensorRT-native, plug behind the same `DetectionPlugin` contract):**
+- **PeopleNet** (person/bag/face — CCTV-angle trained; already in the catalog),
+- **Retail Object Detection** (retail items at shelf/checkout — literally this task),
+- **Grounding-DINO (TAO)** — open-vocabulary; the true YOLOE replacement for the
+  prompt-set workflow (`person, handbag, backpack, …`),
+- **ReIdentificationNet** — person re-ID; upgrades the deterministic cross-camera
+  handoff of [18](18-multiview-tiered-inference.md).
+
+**Tier B — no NGC key, commercially clean today:** `PekingU/rtdetr_v2_r50vd`
+(Apache-2.0, HF-hosted): closed-set COCO classes cover person/handbag/backpack/
+bottle — the rule engine consumes only those labels anyway. Optional poor-man's
+open-vocab: class-agnostic boxes + C-RADIO crop embeddings matched against prompts.
+
+**Tier C — end-state:** DeepStream + `nvinfer` running the TAO engines
+(hardware-decoded, batched multi-stream) — NGC-gated like Tier A.
+
+**Recommendation:** get the NGC key (already the top "blocked on user" item in
+spec/10) → PeopleNet + Retail OD as the default `detection` profile (Grounding-DINO
+if prompt-driven classes must stay) → ReIdentificationNet for cross-view identity.
+Until then RT-DETRv2 is the same-day AGPL-free swap; YOLOE remains research-only.
+The spec/16 frame gate is model-agnostic and carries over unchanged.
+
 ## Related
 
-[10-platform-roadmap.md](10-platform-roadmap.md) · [03-models-and-query-modes.md](03-models-and-query-modes.md) · [04-observability-stack.md](04-observability-stack.md)
+[10-platform-roadmap.md](10-platform-roadmap.md) · [03-models-and-query-modes.md](03-models-and-query-modes.md) · [04-observability-stack.md](04-observability-stack.md) · [18-multiview-tiered-inference.md](18-multiview-tiered-inference.md)

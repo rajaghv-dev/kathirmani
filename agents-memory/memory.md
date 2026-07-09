@@ -215,7 +215,11 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
 `05` performance · `06` hardware-portability · `07` runbook · `08` dashboards ·
 `09` repo-structure · `10` platform-roadmap (+ What's-to-be-done) · `11` model-plugin-policy ·
 `12` frameworks (requirements/ split + setup/validate) · `13` models (catalog/provenance) ·
-`14` console + one-command deployment (the front door).
+`14` console + one-command deployment (the front door) ·
+`18` multi-view tiered inference (same room/5 angles/1 GPU; measured 2026-07-09;
+frame gate IMPLEMENTED in cv worker — 1 fps + <15%-motion skip, spec/16). Licensing:
+YOLOE/ultralytics = AGPL (no commercial) → TAO swap path in spec/11; Nemotron/Cosmos/
+C-RADIOv4 = NVIDIA Open Model License (commercial OK).
 
 ## Setup + validation framework (per component)
 - Frameworks per component: `requirements/{base,inference,ingestion,db,api,models,
