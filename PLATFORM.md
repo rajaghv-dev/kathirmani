@@ -33,7 +33,7 @@ pipeline from it with `make ingest-sample` → `make backfill` → `make run-wor
 | **Incidents** | Loss hypotheses queue → click to review → **Approve / Reject** (audited) | review service `/incidents/{id}` + `/incidents/{id}/review` |
 | **Events** | Perception + rule_engine signal stream | `GET /events` |
 | **Search** | Natural-language search over events/observations/embeddings | `GET /search?q=…` (Phase 8 pipeline) |
-| **Segments** | Ingested 10-second clips (path + checksum) | `GET /segments` |
+| **Segments** | Ingested 30-second clips, 5-sec overlap (path + checksum) | `GET /segments` |
 | **Cameras** | Store camera fleet | `GET /cameras` |
 | **Models** | Active profile, model registry, recent runs | `GET /api/model-registry*`, `/api/model-runs` |
 | **Observability** | Embedded Grafana dashboards | Grafana `:3000` |

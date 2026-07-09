@@ -99,7 +99,7 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
 
 ## Ingestion media stack — PyAV now, GStreamer for live/HW (decision)
 - **Files (Phase 1): PyAV** (libav) — vetted repo dep, bundled-FFmpeg preload, no
-  system ffmpeg, in-process + testable. `ingestion/` segments .mkv → 10-sec clips.
+  system ffmpeg, in-process + testable. `ingestion/` segments .mkv → 30-sec clips, 5-sec overlap (since 2026-07-09; was 10s).
 - **Live RTSP: GStreamer** (`gst 1.24` on box; Python `gi` NOT installed → drive via
   gst-launch/subprocess). `rtspsrc ! rtph264depay ! h264parse ! splitmuxsink
   max-size-time=10s` = stream-copy 10-sec clips, no re-encode. The live clip writer.

@@ -1,233 +1,598 @@
 {
   "video": "Kathirmani Left Side Camera.mkv",
   "label": "Kathirmani Left Side Camera",
-  "duration_tested_sec": 10.0,
-  "processed_at": "2026-05-22T13:05:21",
-  "caption": "Scene: A high-angle, wide-shot view of a brightly lit retail store, likely a specialized food or grocery shop. The primary focus is a large, black shelving unit on the left, stocked with various packaged goods, including bags of rice and other dry ingredients. A sign above the shelf reads 'KANDITaman Essential Store RICE & TRADITIONAL RICE'. The floor features a large, circular pattern with alternating light and dark beige or tan tones. In the foreground, a black pedestal fan sits on the floor. To the right, another shelving unit holds blue plastic bins and various packaged items. The background shows a doorway leading to another area and a white wall with a fire extinguisher. The camera remains static throughout the duration, providing a consistent perspective of the empty or lightly stocked shelves.\n\nEvents:\n<0.0 - 10.0> The camera remains static over the empty store shelves.",
+  "duration_tested_sec": 120.0,
+  "processed_at": "2026-07-09T11:30:09",
+  "caption": "Scene: The video captures a high-angle, wide-shot view of a modern, well-lit retail environment, likely a food or grocery store. The setting is characterized by a large, polished floor featuring a prominent circular pattern with alternating white and gold-toned sections. On the left side of the frame, a long, black shelving unit is stocked with numerous items, including stacks of white-wrapped packaged goods and various boxes of snacks. A framed picture hangs on the wall above the shelves. In the background, a doorway leads to another area, and a person in a yellow shirt is visible near a counter. The camera remains fixed, providing a consistent perspective of the store's interior. Throughout the clip, several individuals are seen moving through the space, some walking across the floor and others standing near the shelves. The atmosphere is that of a typical, active commercial space during business hours.\n\nEvents:\n<0.0 - 11.5> A person in a yellow shirt walks across the background.\n<11.5 - 13.5> A person in a blue shirt walks across the floor.\n<13.5 - 15.5> A person in a blue shirt walks toward the background.\n<15.5 - 18.5> A person in a blue shirt walks toward the foreground.\n<18.5 - 21.5> A person in a blue shirt walks toward the background.\n<21.5 - 24.5> A person in a blue shirt walks toward the foreground.\n<24.5 - 28.5> A person in a blue shirt walks toward the background.\n<28.5 - 32.5> A person in a blue shirt walks toward the foreground.\n<32.5 - 36.5> A person in a blue shirt walks toward the background.\n<36.5 - 40.5> A person in a blue shirt walks toward the foreground.\n<40.5 - 44.5> A person in a blue shirt walks toward the background.\n<44.5 - 48.5> A person in a blue shirt walks toward the foreground.\n<48.5 - 53.5> A person in a blue shirt walks toward the background.\n<53.5 - 57.5> A person in a blue shirt walks toward the foreground.\n<57.5 - 61.5> A person in a blue shirt walks toward the background.\n<61.5 - 65.5> A person in a blue shirt walks toward the foreground.\n<65.5 - 69.5> A person in a blue shirt walks toward the background.\n<69.5 - 73.5> A person in a blue shirt walks toward the foreground.\n<73.5 - 77.5> A person in a blue shirt walks toward the background.\n<77.5 - 81.5> A person in a blue shirt walks toward the foreground.\n<81.5 - 85.5> A person in a blue shirt walks toward the background.\n<85.5 - 89.5> A person in a blue shirt walks toward the foreground.\n<89.5 - 93.5> A person in a blue shirt walks toward the background.\n<93.5 - 97.5> A person in a blue shirt walks toward the foreground.\n<97.5 - 101.5> A person in a blue shirt walks toward the background.\n<101.5 - 105.5> A person in a blue shirt walks toward the foreground.\n<105.5 - 111.5> A person in a blue shirt walks toward the background.\n<111.5 - 116.5> A person in a blue shirt walks toward the foreground.\n<116.5 - 121.5> A person in a blue shirt walks toward the background.\n<121.5 - 126.5> A person in a blue shirt walks toward the foreground.\n<126.5 - 131.5> A person in a blue shirt walks toward the background.\n<131.5 - 136.5> A person in a blue shirt walks toward the foreground.\n<136.5 - 141.5> A person in a blue shirt walks toward the background.\n<141.5 - 146.5> A person in a blue shirt walks toward the foreground.\n<146.5 - 151.5> A person in a blue shirt walks toward the background.\n<151.5 - 156.5> A person in a blue shirt walks toward the foreground.\n<156.5 - 161.5> A person in a blue shirt walks toward the background.\n<161.5 - 166.5> A person in a blue shirt walks toward the foreground.\n<166.5 - 171.5> A person in a blue shirt walks toward the background.\n<171.5 - 176.5> A person in a blue shirt walks toward the foreground.\n<176.5 - 181.5> A person in a blue shirt walks toward the background.\n<181.5 - 186.5> A person in a blue shirt walks toward the foreground.\n<186.5 - 191.5> A person in a blue shirt walks toward the background.\n<191.5 - 196.5> A person in a blue shirt walks toward the foreground.\n<196.5 - 20.5> A person in a blue shirt walks toward the background.\n<20.5 - 24.5> A person in a blue shirt walks toward the foreground.\n<24.5 - 28.5> A person in a blue shirt walks toward the background.\n<28.5 - 32.5> A person in a blue shirt walks toward the foreground.\n<32.5 - 36.5> A person in a blue shirt walks toward the background.\n<36.5 - 40.5> A person in a blue shirt walks toward the foreground.\n<40.5 - 44.5> A person in a blue shirt walks toward the background.\n<44.5 - 48.5> A person in a blue shirt walks toward the foreground.\n<48.5 - 53.5> A person in a blue shirt walks toward the background.\n<53.5 - 57.5> A person in a blue shirt walks toward the foreground.\n<57.5 - 61.5> A person in a blue shirt walks toward the background.\n<61.5 - 65.5> A person in a blue shirt walks toward the foreground.\n<65.5 - 69.5> A person in a blue shirt walks toward the background.\n<69.5 - 73.5> A person in a blue shirt walks toward the foreground.\n<73.5 - 77.5> A person in a blue shirt walks toward the background.\n<77.5 - 81.5> A person in a blue shirt walks toward the foreground.\n<81.5 - 85.5> A person in a blue shirt walks toward the background.\n<85.5 - 89.5> A person in a blue shirt walks toward the foreground.\n<89.5 - 93.5> A person in a blue shirt walks toward the background.\n<93.5 - 97.5> A person in a blue shirt walks toward the foreground.\n<97.5 - 101.5> A person in a blue shirt walks toward the background.\n<101.5 - 105.5> A person in a blue shirt walks toward the foreground.\n<105.5 - 110.5> A person in a blue shirt walks toward the background.\n<110.5 - 115.5> A person in a blue shirt walks toward the foreground.\n<115.5 - 120.5> A person in a blue shirt walks toward the background.\n<120.5 - 125.5> A person in a blue shirt walks toward the foreground.\n<125.5 - 130.5> A person in a blue shirt walks toward the background.\n<130.5 - 135.5> A person in a blue shirt walks toward the foreground.\n<135.5 - 140.5> A person in a blue shirt walks toward the background.\n<140.5 - 145.5> A person in a blue shirt walks toward the foreground.\n<145.5 - 150.5> A person in a blue shirt walks toward the background.\n<150.5",
   "events": [
     {
       "start": 0.0,
-      "end": 10.0,
-      "description": "The camera remains static over the empty store shelves."
+      "end": 11.5,
+      "description": "A person in a yellow shirt walks across the background."
+    },
+    {
+      "start": 11.5,
+      "end": 13.5,
+      "description": "A person in a blue shirt walks across the floor."
+    },
+    {
+      "start": 13.5,
+      "end": 15.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 15.5,
+      "end": 18.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 18.5,
+      "end": 21.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 21.5,
+      "end": 24.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 24.5,
+      "end": 28.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 28.5,
+      "end": 32.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 32.5,
+      "end": 36.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 36.5,
+      "end": 40.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 40.5,
+      "end": 44.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 44.5,
+      "end": 48.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 48.5,
+      "end": 53.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 53.5,
+      "end": 57.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 57.5,
+      "end": 61.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 61.5,
+      "end": 65.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 65.5,
+      "end": 69.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 69.5,
+      "end": 73.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 73.5,
+      "end": 77.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 77.5,
+      "end": 81.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 81.5,
+      "end": 85.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 85.5,
+      "end": 89.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 89.5,
+      "end": 93.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 93.5,
+      "end": 97.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 97.5,
+      "end": 101.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 101.5,
+      "end": 105.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 105.5,
+      "end": 111.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 111.5,
+      "end": 116.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 116.5,
+      "end": 121.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 121.5,
+      "end": 126.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 126.5,
+      "end": 131.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 131.5,
+      "end": 136.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 136.5,
+      "end": 141.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 141.5,
+      "end": 146.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 146.5,
+      "end": 151.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 151.5,
+      "end": 156.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 156.5,
+      "end": 161.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 161.5,
+      "end": 166.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 166.5,
+      "end": 171.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 171.5,
+      "end": 176.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 176.5,
+      "end": 181.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 181.5,
+      "end": 186.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 186.5,
+      "end": 191.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 191.5,
+      "end": 196.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 20.5,
+      "end": 24.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 24.5,
+      "end": 28.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 28.5,
+      "end": 32.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 32.5,
+      "end": 36.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 36.5,
+      "end": 40.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 40.5,
+      "end": 44.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 44.5,
+      "end": 48.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 48.5,
+      "end": 53.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 53.5,
+      "end": 57.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 57.5,
+      "end": 61.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 61.5,
+      "end": 65.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 65.5,
+      "end": 69.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 69.5,
+      "end": 73.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 73.5,
+      "end": 77.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 77.5,
+      "end": 81.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 81.5,
+      "end": 85.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 85.5,
+      "end": 89.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 89.5,
+      "end": 93.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 93.5,
+      "end": 97.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 97.5,
+      "end": 101.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 101.5,
+      "end": 105.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 105.5,
+      "end": 110.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 110.5,
+      "end": 115.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 115.5,
+      "end": 120.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 120.5,
+      "end": 125.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 125.5,
+      "end": 130.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 130.5,
+      "end": 135.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 135.5,
+      "end": 140.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 140.5,
+      "end": 145.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 145.5,
+      "end": 150.5,
+      "description": "A person in a blue shirt walks toward the background."
     }
   ],
   "find_results": {
-    "customer enters Kathirmani store": {
-      "raw": "From 0.0 to 10.0.",
+    "a person walks in through the entrance door": {
+      "raw": "From 11.5 to 13.5.",
       "span": [
-        0.0,
-        10.0
+        11.5,
+        13.5
       ],
       "format_ok": true
     },
-    "customer exits Kathirmani store": {
-      "raw": "From 0.0 to 10.0.",
+    "a person walks out through the exit door": {
+      "raw": "From 11.5 to 13.5.",
       "span": [
-        0.0,
-        10.0
+        11.5,
+        13.5
       ],
       "format_ok": true
     },
-    "cash payment at bill counter": {
-      "raw": "From 0.0 to 10.0.",
+    "a customer places items on the billing counter": {
+      "raw": "From 11.5 to 13.5.",
       "span": [
-        0.0,
-        10.0
+        11.5,
+        13.5
       ],
       "format_ok": true
     },
-    "billing staff at counter": {
-      "raw": "From 0.0 to 10.0.",
+    "a staff member scans or bills an item at the counter": {
+      "raw": "From 106.5 to 111.5.",
       "span": [
-        0.0,
-        10.0
+        106.5,
+        111.5
       ],
       "format_ok": true
     },
-    "customer queue at billing": {
-      "raw": "From 0.0 to 10.0.",
+    "a customer hands cash or a card to the billing staff": {
+      "raw": "From 106.5 to 111.5.",
       "span": [
-        0.0,
-        10.0
+        106.5,
+        111.5
       ],
       "format_ok": true
     },
-    "customer browsing shelves": {
-      "raw": "From 0.0 to 10.0.",
+    "several customers wait in line at the billing counter": {
+      "raw": "From 106.5 to 120.0.",
       "span": [
-        0.0,
-        10.0
+        106.5,
+        120.0
       ],
       "format_ok": true
     },
-    "person picking item from rack": {
-      "raw": "From 0.0 to 10.0.",
+    "a customer browses products on a shelf": {
+      "raw": "From 11.5 to 13.5.",
       "span": [
-        0.0,
-        10.0
+        11.5,
+        13.5
       ],
       "format_ok": true
     },
-    "customer carrying shopping basket": {
-      "raw": "From 0.0 to 10.0.",
+    "a person takes an item off a shelf": {
+      "raw": "From 11.5 to 13.5.",
       "span": [
-        0.0,
-        10.0
+        11.5,
+        13.5
       ],
       "format_ok": true
     },
-    "unattended bag or package": {
-      "raw": "From 0.0 to 10.0.",
+    "a person puts an item back on a shelf": {
+      "raw": "From 11.5 to 13.5.",
       "span": [
-        0.0,
-        10.0
+        11.5,
+        13.5
       ],
       "format_ok": true
     },
-    "person loitering near exit": {
-      "raw": "From 0.0 to 10.0.",
+    "a customer carries a shopping basket": {
+      "raw": "From 11.5 to 13.5.",
       "span": [
-        0.0,
-        10.0
+        11.5,
+        13.5
       ],
       "format_ok": true
     },
-    "suspicious or unusual behavior": {
-      "raw": "From 0.0 to 10.0.",
+    "a customer pushes a shopping cart": {
+      "raw": "From 11.5 to 13.5.",
       "span": [
-        0.0,
-        10.0
+        11.5,
+        13.5
       ],
       "format_ok": true
     },
-    "crowded aisle or bottleneck": {
-      "raw": "From 0.0 to 10.0.",
+    "a person puts a product into a personal bag or backpack": {
+      "raw": "From 106.1 to 111.1.",
       "span": [
-        0.0,
-        10.0
+        106.1,
+        111.1
       ],
       "format_ok": true
     },
-    "customer leaving store without approaching billing counter": {
-      "raw": "From 0.0 to 10.0.",
+    "a person puts a product into their pocket or clothing": {
+      "raw": "From 106.5 to 111.0.",
       "span": [
-        0.0,
-        10.0
+        106.5,
+        111.0
       ],
       "format_ok": true
     },
-    "person handling merchandise near store exit or boundary": {
-      "raw": "From 0.0 to 10.0.",
+    "a person conceals an item with their hand or body": {
+      "raw": "From 106.5 to 111.5.",
       "span": [
-        0.0,
-        10.0
+        106.5,
+        111.5
       ],
       "format_ok": true
     },
-    "group of customers gathered around a product display blocking view": {
-      "raw": "From 0.0 to 10.0.",
+    "a person carries a large bag or backpack near the shelves": {
+      "raw": "From 11.5 to 13.5.",
       "span": [
-        0.0,
-        10.0
+        11.5,
+        13.5
       ],
       "format_ok": true
     },
-    "person placing merchandise into personal bag or clothing at shelf": {
-      "raw": "From 0.0 to 10.0.",
+    "a person walks toward the exit holding an item": {
+      "raw": "From 10.0 to 13.0.",
       "span": [
-        0.0,
-        10.0
+        10.0,
+        13.0
       ],
       "format_ok": true
     },
-    "customer returning to the same shelf section multiple times": {
-      "raw": "From 0.0 to 10.0.",
+    "a person lingers near the exit": {
+      "raw": "From 114.0 to 120.0.",
       "span": [
-        0.0,
-        10.0
+        114.0,
+        120.0
       ],
       "format_ok": true
     },
-    "billing staff engaged by customer while another person handles merchandise": {
-      "raw": "From 0.0 to 10.0.",
+    "a person opens or tears product packaging at a shelf": {
+      "raw": "From 10.0 to 13.0.",
       "span": [
-        0.0,
-        10.0
+        10.0,
+        13.0
       ],
       "format_ok": true
     },
-    "person carrying large bag or backpack near merchandise shelves": {
-      "raw": "From 0.0 to 10.0.",
+    "a group of people crowds together in an aisle": {
+      "raw": "From 112.0 to 120.0.",
       "span": [
-        0.0,
-        10.0
+        112.0,
+        120.0
       ],
       "format_ok": true
     },
-    "customer switching or swapping product packaging at shelf": {
-      "raw": "From 0.0 to 10.0.",
+    "a bag or object is left unattended on the floor": {
+      "raw": "From 102.1 to 120.0.",
       "span": [
-        0.0,
-        10.0
+        102.1,
+        120.0
       ],
       "format_ok": true
     }
   },
-  "scene": "A high-angle, wide-shot view of a brightly lit retail store, likely a specialized food or grocery shop. The primary focus is a large, black shelving unit on the left, stocked with various packaged goods, including bags of rice and other dry ingredients. A sign above the shelf reads 'KANDITaman Essential Store RICE & TRADITIONAL RICE'. The floor features a large, circular pattern with alternating light and dark beige or tan tones. In the foreground, a black pedestal fan sits on the floor. To the right, another shelving unit holds blue plastic bins and various packaged items. The background shows a doorway leading to another area and a white wall with a fire extinguisher. The camera remains static throughout the duration, providing a consistent perspective of the empty or lightly stocked shelves.",
+  "scene": "The video captures a high-angle, wide-shot view of a modern, well-lit retail environment, likely a food or grocery store. The setting is characterized by a large, polished floor featuring a prominent circular pattern with alternating white and gold-toned sections. On the left side of the frame, a long, black shelving unit is stocked with numerous items, including stacks of white-wrapped packaged goods and various boxes of snacks. A framed picture hangs on the wall above the shelves. In the background, a doorway leads to another area, and a person in a yellow shirt is visible near a counter. The camera remains fixed, providing a consistent perspective of the store's interior. Throughout the clip, several individuals are seen moving through the space, some walking across the floor and others standing near the shelves. The atmosphere is that of a typical, active commercial space during business hours.",
   "qwen_analysis": {
     "label": "Kathirmani Left Side Camera",
     "model": "Qwen2.5-VL-7B-Instruct",
     "queries": {
       "Count the customers visible and describe what each person is doing with their hands and any bags they carry.": {
-        "answer": "In the image, there are two customers visible:\n\n1. **Customer 1 (Closer to the Camera):**\n   - **Appearance:** Wearing a red top.\n   - **Hand Position:** Both hands appear to be holding a bag or some items, possibly shopping.\n   - **Activity:** Walking towards the shelves, likely browsing or selecting items.\n\n2. **Customer 2 (Further Away):**\n   - **Appearance:** Wearing a dark outfit.\n   - **Hand Position:** One hand appears to be holding a bag or item, while the other hand is not clearly visible.\n   - **Activity:** Walking away from the camera, possibly heading towards another section of the store.\n\nBoth individuals seem to be engaged in typical shopping activities, such as browsing and carrying items.",
+        "answer": "In the image, there are two customers visible:\n\n1. **Customer 1 (Closer to the Camera):**\n   - **Position:** Standing near the center of the image, slightly to the left.\n   - **Activity:** The customer appears to be reaching out or adjusting something on one of the shelves, possibly interacting with the products.\n   - **Bag:** No bag is visible in this customer's possession.\n\n2. **Customer 2 (Further Away):**\n   - **Position:** Standing further back, closer to the right side of the image.\n   - **Activity:** This customer seems to be walking away from the camera, possibly heading towards another section of the store.\n   - **Bag:** No bag is visible in this customer's possession.\n\nThe overall scene shows a well-lit bakery or grocery store with neatly arranged shelves and a clean, polished floor.",
         "ok": true
       },
       "Is any customer placing merchandise into a personal bag, pocket, or clothing while at the shelf \u2014 not into a store basket?": {
-        "answer": "No, there is no visible evidence in the image that any customer is placing merchandise into a personal bag, pocket, or clothing while at the shelf. The customers appear to be browsing and selecting items from the shelves, but none of them are seen putting anything into their bags or pockets.",
+        "answer": "No, there is no visible evidence in the image that any customer is placing merchandise into a personal bag, pocket, or clothing while at the shelf. The shelves appear to be empty of customers at the moment the photo was taken.",
         "ok": true
       },
       "Are any customers moving toward the store exit while carrying unpaid merchandise without a billing bag or receipt?": {
-        "answer": "Based on the image provided, it is not possible to definitively determine if there are any customers moving toward the store exit while carrying unpaid merchandise without a billing bag or receipt. The image shows a store interior with shelves stocked with various items and a few people walking around, but it does not provide enough detail to confirm the actions of specific individuals or their possession of merchandise. To make such a determination, one would need more information or a clearer view of the individuals in question.",
+        "answer": "Based on the image provided, it is not possible to definitively determine if there are any customers moving toward the store exit with unpaid merchandise without a billing bag or receipt. The image shows a view of the bakery section with shelves stocked with various bread and baked goods. There are no visible customers in the image, and the perspective does not allow for a clear view of the store's exit area. Additionally, the image appears to be from a security camera, which captures a wide-angle view but may not provide detailed information about individual actions or items being carried by customers. For a more accurate assessment, one would need to observe the exit area directly or have additional context about the store's layout and customer behavior.",
         "ok": true
       },
       "Is there a group of customers clustered together near merchandise in a way that could obstruct the camera view of the shelf?": {
-        "answer": "No, there is no group of customers clustered together near the merchandise in a way that could obstruct the camera view of the shelf. The image shows two individuals walking past the shelves, but they do not appear to be obstructing the view of the merchandise. The camera angle provides a clear view of the shelves and the products displayed on them.",
+        "answer": "No, there is no group of customers clustered together near the merchandise in a way that could obstruct the camera view of the shelf. The image shows a clear view of the shelves with various products, and there are no people obstructing the camera's perspective. The floor appears to be mostly empty except for a few individuals who are not close enough to the shelves to affect the camera's view.",
         "ok": true
       },
       "Describe any customer spending an unusually long time handling a single product without placing it in a basket.": {
-        "answer": "In the image, there is a customer near the center of the frame who appears to be spending an unusually long time handling a single product from the display case. The individual is standing close to the shelves, which contain various packaged items such as bread and other food products. The person seems to be examining or possibly weighing the item they are holding, as they are not yet placing it into a shopping basket. This behavior could indicate that they are carefully considering their purchase or perhaps checking the weight of the item before deciding to add it to their basket.",
+        "answer": "In the image, there is a person standing near the bread section of what appears to be a bakery or grocery store. The individual seems to be handling a single product from the shelf, possibly inspecting it closely or reading the label. This behavior could indicate that they are considering purchasing the item but have not yet placed it in a basket. The person's focus on the product suggests they might be making a decision about whether to add it to their shopping list or cart.",
         "ok": true
       },
       "Is there any commotion, argument, or distraction happening near the billing counter or merchandise display?": {
-        "answer": "From the image provided, it appears to be a relatively calm scene in what looks like a bakery or deli. There are no visible signs of commotion, argument, or distraction near the billing counter or merchandise display. The shelves are neatly organized with various baked goods and packaged items, and there are a few people walking around, but they seem to be engaged in normal shopping activities without any apparent disturbance. The timestamp suggests that this is a surveillance video from a security camera, capturing a moment during the day.",
+        "answer": "From the image provided, it appears to be a well-organized store with a clear view of the merchandise display and the floor area. There is no visible commotion, argument, or distraction near the billing counter or merchandise display. The shelves are neatly arranged, and the floor looks clean and uncluttered. However, it's important to note that this is a still image, and without additional context or video footage, it's not possible to determine if there was any activity or disturbance at a different time.",
         "ok": true
       },
       "Are any customers engaging billing staff in extended conversation while another person is near the merchandise?": {
-        "answer": "The image shows a store with shelves stocked with various items, likely food products, and a few people walking around. There doesn't appear to be any customer engaging in an extended conversation with a billing staff member or anyone near the merchandise. The individuals seem to be browsing or moving through the store without interacting closely with the staff or the products.",
+        "answer": "The image shows a bakery or deli section with shelves stocked with various breads and baked goods. There are no visible customers engaging in billing conversations with staff, nor is there anyone near the merchandise. The area appears to be relatively empty at the moment captured in the image.",
         "ok": true
       },
       "Are there any empty shelf gaps or sections that appear to need restocking?": {
-        "answer": "From the image, it appears that the shelves in the bakery section are mostly full of various baked goods and packaged items. There do not seem to be any obvious empty shelf gaps or sections that require restocking. The shelves are well-stocked with a variety of products, including what looks like bread, pastries, and other baked items. However, without a closer inspection or more detailed view, it's difficult to determine if there are any specific areas that might need attention.",
+        "answer": "From the image, it appears that the shelves in the bakery section are mostly full of various bread and baked goods. There do not seem to be any obvious empty shelf gaps or sections that require restocking at this moment. The shelves are well-stocked with a variety of items, including loaves of bread, packaged goods, and other bakery products. However, it's important to note that the image is a still from a security camera, so it may not capture the entire stock situation, especially if items are being added or removed quickly. For an accurate assessment, it would be best to check the shelves manually.",
         "ok": true
       },
       "Is there any merchandise on the floor, misplaced, or fallen from shelves?": {
-        "answer": "From the image provided, it does not appear that there is any merchandise on the floor that has been misplaced or fallen from the shelves. The shelves seem to be organized and there are no visible items on the floor that could indicate such an occurrence. However, it's important to note that the image is taken from a security camera and may not capture all details of the scene.",
+        "answer": "From the image provided, it does not appear that there is any merchandise on the floor that has been misplaced or fallen from the shelves. The shelves seem to be organized and there are no visible items lying on the floor. However, it's important to note that the image is taken at two different times (02:58:57 PM and 02:51:23 PM), so if something did fall between these times, it might not be captured in this specific frame. If you need more recent information, it would be best to check the latest security footage available.",
         "ok": true
       },
       "How many customers are at or waiting at the billing counter? Estimate queue length.": {
-        "answer": "In the image, there appear to be two customers at the billing counter. The queue length seems to be minimal, as only these two individuals are visible in the area where customers typically wait for their orders to be processed.",
+        "answer": "The image provided is a security camera view of a bakery section, and it does not show the billing counter or any customers waiting there. Therefore, it is not possible to estimate the queue length for the billing counter based on this image alone. The image only shows the bakery section with shelves of bread and other baked goods.",
         "ok": true
       },
       "Is any child present in the store without an accompanying adult nearby?": {
-        "answer": "Based on the image provided, there is no visible child in the store without an accompanying adult nearby. The individuals present appear to be adults and are engaged in typical shopping activities.",
+        "answer": "Based on the image provided, there is no visible child in the store. The image shows shelves stocked with various items and a few people walking around, but no children are apparent. It's important to note that the image is taken from a security camera perspective, which may not capture all details of the scene, so it's possible that a child could be present outside the frame or in another part of the store.",
         "ok": true
       },
       "Is any customer appearing distressed, confused, or in need of staff assistance?": {
-        "answer": "From the image provided, it is not possible to determine if any customer appears distressed, confused, or in need of staff assistance. The image shows a store with shelves stocked with various items and two individuals walking through the aisle. There are no clear indicators of distress, confusion, or need for assistance based on their body language or actions. To accurately assess such situations, more context or a closer view would be necessary.",
+        "answer": "From the image provided, it is not possible to determine if any customer appears distressed, confused, or in need of staff assistance. The image shows a store with shelves stocked with various items and a few people walking around, but there is no clear indication of distress, confusion, or need for assistance from the customers visible in the image. To accurately assess such situations, more context or a closer view would be necessary.",
         "ok": true
       },
       "Describe the overall store activity level: how many staff and customers visible, and what is the general level of activity?": {
-        "answer": "The image shows a store with a moderate level of activity. There are two staff members visible in the background, one near the counter and another further back. There are also a few customers walking around the store, but no specific interactions or transactions appear to be taking place at this moment.\n\nThe general level of activity seems low, as there are not many people present and no one appears to be actively shopping or engaging with the products on display. The store looks clean and organized, with neatly arranged shelves and a well-maintained floor.",
+        "answer": "The image appears to be taken from a security camera in a bakery or deli section of a store. Here's a description of the activity level:\n\n1. **Staff**: There is one person visible in the image, who seems to be a staff member. This individual is walking through the aisle, possibly restocking shelves or checking inventory.\n\n2. **Customers**: There are no visible customers in the image. The area appears to be relatively empty, with no one shopping at the moment the photo was taken.\n\n3. **General Level of Activity**: The store looks calm and quiet. The single staff member suggests that it might not be peak hours for customer traffic. The shelves are well-stocked, indicating that the store is prepared for business, but there is currently low activity.",
         "ok": true
       }
     }

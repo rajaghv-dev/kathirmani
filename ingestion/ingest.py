@@ -1,4 +1,4 @@
-"""Ingestion orchestrator: Source → 10-sec clips → windows → store + metadata + queue.
+"""Ingestion orchestrator: Source → 30-sec clips (5-sec overlap) → windows → store + metadata + queue.
 
 Per camera: segment the source, and for each clip store it (checksummed for evidence
 integrity), thumbnail it, score camera health, write a metadata row, publish
@@ -59,14 +59,17 @@ def ingest_camera(cam, cfg, opts, storage, sink, queue, base_time, seen: set) ->
         print(f"[{cam.id}] source error: {e}")
         return {"camera": cam.id, "segments": 0, "windows": 0, "error": str(e)}
 
-    for seg in segment_source(src, staging, seg_cfg.storage_clip_duration_sec, opts.duration_limit):
+    for seg in segment_source(src, staging, seg_cfg.storage_clip_duration_sec,
+                              opts.duration_limit,
+                              overlap_sec=seg_cfg.clip_overlap_sec):
         t0 = time.time()
         dedup_key = f"{cam.id}:{seg.index}"
         if dedup_key in seen:                                  # duplicate-segment protection
             continue
         seen.add(dedup_key)
 
-        start = base_time + timedelta(seconds=seg.index * seg_cfg.storage_clip_duration_sec)
+        # Clips overlap: clip k starts every stride (= duration − overlap) secs.
+        start = base_time + timedelta(seconds=seg.index * seg_cfg.clip_stride_sec)
         end = start + timedelta(seconds=seg.duration_sec)
         rec = SegmentRecord(
             camera_id=cam.id, store_id=cfg.store_id, index=seg.index,
@@ -87,7 +90,12 @@ def ingest_camera(cam, cfg, opts, storage, sink, queue, base_time, seen: set) ->
         sink.write_segment(rec.to_row())
         queue.publish(rec.to_message())
 
-        wins = windows_for_segment(rec, seg_cfg.ai_window_duration_sec, seg_cfg.ai_window_stride_sec)
+        wins = windows_for_segment(
+            rec, seg_cfg.ai_window_duration_sec, seg_cfg.ai_window_stride_sec,
+            # Overlapping clips: drop windows fully inside the shared prefix —
+            # the previous clip's tail windows already cover those spans.
+            skip_before_sec=(seg_cfg.clip_overlap_sec if seg.index > 0 else 0),
+        )
         for w in wins:
             sink.write_window(w.to_row())
             queue.publish(w.to_message())

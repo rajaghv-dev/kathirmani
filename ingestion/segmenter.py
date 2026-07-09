@@ -34,10 +34,36 @@ class SegmentData:
     samples: list[np.ndarray] = field(default_factory=list)  # small RGB frames, for health
 
 
+class _OpenSegment:
+    """One in-flight clip encoder (clips can overlap, so ≥1 may be open)."""
+
+    def __init__(self, idx: int, start_t: float, out_dir: Path, in_vs, fps: float):
+        self.idx = idx
+        self.start_t = start_t
+        self.path = out_dir / f"seg_{idx:05d}.mp4"
+        self.out = av.open(str(self.path), "w", format="mp4")
+        vs = self.out.add_stream("libx264", rate=Fraction(fps).limit_denominator(1001))
+        vs.width, vs.height, vs.pix_fmt = in_vs.width, in_vs.height, "yuv420p"
+        vs.options = {"crf": "23", "preset": "ultrafast"}
+        self.vs = vs
+        self.first: np.ndarray | None = None
+        self.samples: list[np.ndarray] = []
+        self.fcount = 0
+
+
 def segment_source(
     source, out_dir: Path, clip_sec: float,
     duration_limit: float | None = None, health_samples: int = 5,
+    overlap_sec: float = 0.0,
 ) -> Iterator[SegmentData]:
+    """Cut `source` into `clip_sec` clips; consecutive clips overlap by
+    `overlap_sec` (stride = clip_sec - overlap_sec), so events crossing a clip
+    boundary are fully contained in the next clip. overlap_sec=0 keeps the old
+    back-to-back behaviour. During an overlap a frame is encoded into every
+    clip that spans it (multiple encoders open at once)."""
+    if not (0 <= overlap_sec < clip_sec):
+        raise ValueError("overlap_sec must satisfy 0 <= overlap_sec < clip_sec")
+    stride = clip_sec - overlap_sec
     preload_av_ffmpeg()
     out_dir.mkdir(parents=True, exist_ok=True)
     target = source.open_target()
@@ -47,32 +73,18 @@ def segment_source(
         fps = float(in_vs.average_rate or 25)
         tb = in_vs.time_base
         sample_every = max(1, int(fps * clip_sec / max(1, health_samples)))
-
-        cur_idx: int | None = None
-        out = out_vs = None
-        path: Path | None = None
-        first = None
-        samples: list[np.ndarray] = []
-        seg_start = 0.0
+        open_segs: dict[int, _OpenSegment] = {}
         last_t = 0.0
-        fcount = 0
 
-        def _open(idx: int):
-            p = out_dir / f"seg_{idx:05d}.mp4"
-            o = av.open(str(p), "w", format="mp4")
-            vs = o.add_stream("libx264", rate=Fraction(fps).limit_denominator(1001))
-            vs.width, vs.height, vs.pix_fmt = in_vs.width, in_vs.height, "yuv420p"
-            vs.options = {"crf": "23", "preset": "ultrafast"}
-            return p, o, vs
-
-        def _close_emit(end_t: float) -> SegmentData:
-            for pkt in out_vs.encode():
-                out.mux(pkt)
-            out.close()
+        def _close_emit(seg: _OpenSegment, end_t: float) -> SegmentData:
+            for pkt in seg.vs.encode():
+                seg.out.mux(pkt)
+            seg.out.close()
             return SegmentData(
-                index=cur_idx, path=path, duration_sec=round(end_t - seg_start, 3),
+                index=seg.idx, path=seg.path,
+                duration_sec=round(end_t - seg.start_t, 3),
                 fps=fps, codec="h264", width=in_vs.width, height=in_vs.height,
-                first_frame=first, samples=samples,
+                first_frame=seg.first, samples=seg.samples,
             )
 
         for frame in inp.decode(in_vs):
@@ -80,32 +92,32 @@ def segment_source(
             last_t = t
             if duration_limit is not None and t > duration_limit:
                 break
-            idx = int(t // clip_sec)
-            if idx != cur_idx:
-                if out is not None:
-                    yield _close_emit(seg_start + clip_sec)
-                cur_idx = idx
-                seg_start = idx * clip_sec
-                path, out, out_vs = _open(idx)
-                first, samples, fcount = None, [], 0
 
-            if first is None:
-                first = frame.to_ndarray(format="rgb24")
-            if fcount % sample_every == 0 and len(samples) < health_samples:
-                small = frame.reformat(width=160, height=90, format="rgb24").to_ndarray()
-                samples.append(small)
-            fcount += 1
+            # close clips this frame has passed
+            for k in sorted(open_segs):
+                if t >= k * stride + clip_sec:
+                    yield _close_emit(open_segs.pop(k), k * stride + clip_sec)
 
-            # Re-encoded frames must NOT inherit the source PTS: each segment has
-            # a fresh encoder, and source timestamps (huge, in the source
-            # time_base) produce a non-monotonic/invalid DTS at a segment
-            # boundary on real footage. Rebase to a per-segment frame counter
-            # in 1/fps time_base (PyAV 17 requires explicit pts).
-            nf = frame.reformat(format="yuv420p")
-            nf.pts = fcount - 1                      # frames since segment start
-            nf.time_base = Fraction(1, int(round(fps))) if fps else None
-            for pkt in out_vs.encode(nf):
-                out.mux(pkt)
+            # every clip index whose span [k*stride, k*stride+clip_sec) holds t
+            k_lo = max(0, int((t - clip_sec) // stride) + 1)
+            k_hi = int(t // stride)
+            for k in range(k_lo, k_hi + 1):
+                if k not in open_segs:
+                    open_segs[k] = _OpenSegment(k, k * stride, out_dir, in_vs, fps)
+                seg = open_segs[k]
+                if seg.first is None:
+                    seg.first = frame.to_ndarray(format="rgb24")
+                if seg.fcount % sample_every == 0 and len(seg.samples) < health_samples:
+                    seg.samples.append(frame.reformat(
+                        width=160, height=90, format="rgb24").to_ndarray())
+                # Re-encoded frames must NOT inherit the source PTS (invalid DTS
+                # on real footage) — rebase to a per-clip frame counter.
+                nf = frame.reformat(format="yuv420p")
+                nf.pts = seg.fcount
+                nf.time_base = Fraction(1, int(round(fps))) if fps else None
+                seg.fcount += 1
+                for pkt in seg.vs.encode(nf):
+                    seg.out.mux(pkt)
 
-        if out is not None:
-            yield _close_emit(last_t + (1.0 / fps if fps else 0))
+        for k in sorted(open_segs):
+            yield _close_emit(open_segs.pop(k), last_t + (1.0 / fps if fps else 0))

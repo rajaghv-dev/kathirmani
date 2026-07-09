@@ -203,6 +203,25 @@ def process_window(window: dict, plugin: CvOssDetector, queue, conn) -> dict:
             "faked": out["model_run"].get("faked", False)}
 
 
+def make_detection_plugin() -> CvOssDetector:
+    """Detection plugin from the active profile in configs/models.yaml
+    (`tasks.detection.plugin`; MODEL_PROFILE env overrides the profile).
+    Unknown/missing config → the default CvOssDetector, same as before."""
+    import os
+    name = "cv_oss_detector"
+    try:
+        import yaml
+        doc = yaml.safe_load((_REPO_ROOT / "configs" / "models.yaml").read_text())
+        prof = os.environ.get("MODEL_PROFILE") or doc.get("active_profile", "")
+        name = doc["profiles"][prof]["tasks"]["detection"].get("plugin", name)
+    except Exception:
+        pass
+    if name == "nvidia_locate_anything":
+        from .locate_plugin import NvidiaLocateAnythingDetector
+        return NvidiaLocateAnythingDetector()
+    return CvOssDetector()
+
+
 def run(once: bool = False, limit: int = 8, backend: str | None = None,
         sleep_sec: float = 2.0) -> list[dict]:
     """Worker entrypoint.
@@ -213,7 +232,7 @@ def run(once: bool = False, limit: int = 8, backend: str | None = None,
     """
     queue = make_queue(backend, EVENTS_DIR)
     conn = _db_conn()
-    plugin = CvOssDetector()
+    plugin = make_detection_plugin()
     plugin.load()                                    # lazy/non-fatal
     is_pg = getattr(queue, "name", "") == "pg"
     summaries: list[dict] = []

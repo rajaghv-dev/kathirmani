@@ -168,3 +168,35 @@ def test_motion_changed_fraction_gate_boundary():
     # sub-delta wiggle (noise) never counts, no matter how many pixels
     noisy = base + np.uint8(5)                         # delta 5 < pixel_delta 25
     assert motion_changed_fraction(base, noisy) == 0.0
+
+
+def test_locate_anything_parser_and_fake_fallback():
+    """LocateAnything plugin: box-text parsing + inherited fake fallback +
+    config-driven worker selection."""
+    from ai_workers.cv_oss_worker.locate_plugin import (
+        NvidiaLocateAnythingDetector, parse_locate_boxes)
+
+    text = ("person<box> 100, 200, 300, 600 </box> "
+            "handbag<box>400,500,450,560</box> junk<box>700,300,600,200</box>")
+    dets = parse_locate_boxes(text, "nvidia/LocateAnything-3B", 1.5)
+    assert [d.label for d in dets] == ["person", "handbag"]   # inverted box dropped
+    assert dets[0].bbox == [0.1, 0.2, 0.2, 0.4]               # /1000 -> [x,y,w,h]
+    assert dets[0].frame_time_sec == 1.5
+
+    # without weights/remote-code the plugin still answers (fake mode)
+    p = NvidiaLocateAnythingDetector()
+    out = p.infer({"window_id": "w", "segment_id": "s", "camera_id": "left_aisle",
+                   "store_id": "kathirmani_01", "clip_path": "/nonexistent.mp4",
+                   "window_start_sec": 0.0})
+    assert out["model_run"]["faked"] is True
+    assert out["detections"], "fake fallback inherited from CvOssDetector"
+
+
+def test_worker_selects_plugin_from_profile(monkeypatch):
+    from ai_workers.cv_oss_worker import worker
+    from ai_workers.cv_oss_worker.locate_plugin import NvidiaLocateAnythingDetector
+    monkeypatch.setenv("MODEL_PROFILE", "research_locate_anything")
+    assert isinstance(worker.make_detection_plugin(), NvidiaLocateAnythingDetector)
+    monkeypatch.setenv("MODEL_PROFILE", "nvidia_gb10_retail_balanced")
+    p = worker.make_detection_plugin()
+    assert type(p).__name__ == "CvOssDetector"

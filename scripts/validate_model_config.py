@@ -28,6 +28,7 @@ KNOWN_PLUGINS = {
     "cv_oss_detector", "deepstream_detector", "deepstream_tracker",
     "nvidia_openai_compatible_vlm", "vlm_qwen_baseline", "nvidia_embedding",
     "nvidia_summary", "nvidia_search_critic", "nvidia_cosmos",
+    "nvidia_locate_anything",
 }
 
 

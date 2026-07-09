@@ -11,7 +11,7 @@
 
 From an **offline research cascade** (one process reads 5 `.mkv` → `results/*.json`)
 to an **OSS-ingestion-first, NVIDIA-model-first, plugin-driven video intelligence
-platform**: durable 10-sec clips → 5-sec AI windows → queue → plugin-host AI workers
+platform**: durable 30-sec clips (5-sec overlap) → 5-sec AI windows → queue → plugin-host AI workers
 → deterministic rule engine → VLM verification → evidence package → human review →
 search → digital twin → Grafana. The current `src/kathirmani` pipeline becomes the
 **AI-worker seed**; nothing is thrown away.

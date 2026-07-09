@@ -91,6 +91,26 @@ profiles:
         endpoint: local
         metrics: { enabled: true }
 
+  # ---- Research arm: NVIDIA LocateAnything-3B (Eagle-Embodied) open-vocab detector.
+  # ⚠ NON-COMMERCIAL license (NVIDIA license: "Commercial use is not permitted";
+  # built on Qwen2.5-3B, Qwen Research License) → non_default, never a production
+  # profile. spec/11 §Licensing.
+  research_locate_anything:
+    description: >-
+      LocateAnything-3B (nvidia/, Eagle-Embodied) grounding model as the detection
+      arm — open-vocab boxes from text categories. Research-only license;
+      comparison against cv_oss_detector / future TAO detectors.
+    non_default: true
+    tasks:
+      detection:
+        enabled: true
+        plugin: nvidia_locate_anything
+        runtime: transformers
+        model_id: nvidia/LocateAnything-3B        # local: models/LocateAnything-3B
+        endpoint: local
+        precision: bf16
+        metrics: { enabled: true }
+
   # ---- Comparison-only baseline: the current Qwen/Marlin/YOLOE cascade.
   # NEVER the production default (master plan A1.2). Runnable today for the bake-off.
   research_qwen_baseline:

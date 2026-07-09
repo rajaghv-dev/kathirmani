@@ -76,3 +76,42 @@ def test_file_backends_roundtrip(tmp_path):
     q.close()
     assert (tmp_path / "q" / "video_segment_ready.jsonl").exists()
     assert (tmp_path / "q" / "ai_window_ready.jsonl").exists()
+
+
+def test_segment_source_overlap(tmp_path):
+    """30s/5s-overlap geometry, scaled down: clip_sec=3, overlap=1 on a 7s
+    source -> clips start every 2s: [0,3) [2,5) [4,7) [6,7]. Frames in the
+    shared second land in BOTH adjacent clips."""
+    from ingestion.segmenter import segment_source
+    from ingestion.sources import FileSource
+
+    src_file = tmp_path / "src.mp4"
+    _make_clip(src_file, seconds=7, fps=10)
+    segs = list(segment_source(FileSource(src_file), tmp_path / "out",
+                               clip_sec=3, overlap_sec=1))
+    assert [s.index for s in segs] == [0, 1, 2, 3]
+    # full clips are clip_sec long; starts advance by stride=2
+    assert segs[0].duration_sec == 3.0 and segs[1].duration_sec == 3.0
+    assert segs[-1].duration_sec <= 3.0                 # tail clip is shorter
+    # overlap means the total encoded duration EXCEEDS the source duration
+    assert sum(s.duration_sec for s in segs) > 7.0
+    for s in segs:
+        assert s.path.exists() and s.path.stat().st_size > 0
+
+
+def test_windows_skip_overlap_prefix():
+    """Windows fully inside the overlap prefix are dropped (covered by the
+    previous clip's tail); boundary-crossing windows survive."""
+    from ingestion.windows import windows_for_segment
+
+    class Seg:
+        segment_id = "s1"; camera_id = "cam"; storage_path = "p.mp4"
+        duration_sec = 30.0
+
+    all_w = windows_for_segment(Seg(), 5, 2)
+    kept = windows_for_segment(Seg(), 5, 2, skip_before_sec=5)
+    dropped = [w for w in all_w if w.window_start_sec not in
+               {k.window_start_sec for k in kept}]
+    assert all(w.window_end_sec <= 5 for w in dropped), "only fully-inside-overlap dropped"
+    assert any(w.window_start_sec < 5 < w.window_end_sec for w in kept), \
+        "boundary-crossing windows kept"

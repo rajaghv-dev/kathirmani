@@ -178,6 +178,7 @@ false`).
 | C-RADIOv4-H | NVIDIA Open Model License (2024-06) | **Yes** — card: "ready for commercial/non-commercial use" (earlier RADIO versions were research-only; v4 is the commercial one) |
 | YOLOE (`jameslahm/yoloe-11s-seg`) + ultralytics runtime | **AGPL-3.0** (both) | **No for closed commercial deployment** — AGPL copyleft incl. the network-service clause; needs a paid Ultralytics Enterprise License, or swap (below). Its MobileCLIP text encoder (`models/yoloe/mobileclip_blt.ts`) carries Apple's own model license — check it too |
 | Qwen2.5-VL-7B (research arm) | Apache-2.0 | Yes (but comparison-only per this doc's policy anyway) |
+| LocateAnything-3B (Eagle-Embodied, `nvidia/`) | NVIDIA license, **non-commercial** ("Commercial use is not permitted, except by NVIDIA and its affiliates") + Qwen2.5-3B (Qwen *Research* License) | **No** — research/comparison arm only (`research_locate_anything` profile, `non_default: true`; plugin `nvidia_locate_anything` in the cv worker) |
 
 Not legal advice; counsel pass required before any paid deployment.
 

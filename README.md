@@ -1,7 +1,7 @@
 # Kathirmani — Video-Intelligence Platform
 
 An NVIDIA-model, OSS-ingestion video-intelligence **platform** over the 5 Kathirmani
-store cameras. Footage is segmented into durable 10-sec clips → 5-sec AI windows →
+store cameras. Footage is segmented into durable 30-sec clips (5-sec overlap) → 5-sec AI windows →
 a Postgres-backed queue → plugin-host AI workers (detection → deterministic rule
 engine → VLM verification) → evidence package → human approve/reject → natural-language
 search — all observable in Grafana. Models are config-driven and NVIDIA-only by default

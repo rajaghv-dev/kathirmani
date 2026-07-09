@@ -1,217 +1,631 @@
 {
   "source": "fused_5_cameras",
   "cameras": [
-    "Kathirmani Bill Counter",
-    "Kathirmani Center Camera",
     "Kathirmani Left Side Camera",
-    "Kathirmani Near Entry Door Camera",
-    "Kathirmani Right Side Cam"
+    "Kathirmani Right Side Cam",
+    "Kathirmani Store Near Bill Counter",
+    "Kathirmni Entry Cam"
   ],
   "find_results": {
-    "customer enters Kathirmani store": {
+    "a person walks in through the entrance door": {
       "span": [
-        0.0,
-        10.0
+        68.1,
+        71.1
       ],
-      "camera": "Kathirmani Bill Counter",
+      "camera": "Kathirmani Right Side Cam",
       "format_ok": true
     },
-    "customer exits Kathirmani store": {
+    "a person walks out through the exit door": {
       "span": [
-        0.0,
-        10.0
+        112.0,
+        120.0
       ],
-      "camera": "Kathirmani Bill Counter",
+      "camera": "Kathirmni Entry Cam",
       "format_ok": true
     },
-    "cash payment at bill counter": {
+    "a customer places items on the billing counter": {
       "span": [
-        0.0,
-        10.0
+        102.1,
+        113.1
       ],
-      "camera": "Kathirmani Bill Counter",
+      "camera": "Kathirmani Right Side Cam",
       "format_ok": true
     },
-    "billing staff at counter": {
+    "a staff member scans or bills an item at the counter": {
       "span": [
-        0.0,
-        10.0
+        106.5,
+        111.5
       ],
-      "camera": "Kathirmani Bill Counter",
+      "camera": "Kathirmani Left Side Camera",
       "format_ok": true
     },
-    "customer queue at billing": {
+    "a customer hands cash or a card to the billing staff": {
       "span": [
-        0.0,
-        10.0
+        106.5,
+        111.5
       ],
-      "camera": "Kathirmani Bill Counter",
+      "camera": "Kathirmani Left Side Camera",
       "format_ok": true
     },
-    "customer browsing shelves": {
+    "several customers wait in line at the billing counter": {
       "span": [
-        0.0,
-        10.0
+        106.5,
+        120.0
       ],
-      "camera": "Kathirmani Bill Counter",
+      "camera": "Kathirmani Left Side Camera",
       "format_ok": true
     },
-    "person picking item from rack": {
+    "a customer browses products on a shelf": {
       "span": [
         0.0,
-        10.0
+        122.5
       ],
-      "camera": "Kathirmani Bill Counter",
+      "camera": "Kathirmani Right Side Cam",
       "format_ok": true
     },
-    "customer carrying shopping basket": {
+    "a person takes an item off a shelf": {
       "span": [
-        0.0,
-        10.0
+        106.5,
+        111.5
       ],
-      "camera": "Kathirmani Bill Counter",
+      "camera": "Kathirmani Right Side Cam",
       "format_ok": true
     },
-    "unattended bag or package": {
+    "a person puts an item back on a shelf": {
       "span": [
-        0.0,
-        10.0
+        106.5,
+        111.5
       ],
-      "camera": "Kathirmani Bill Counter",
+      "camera": "Kathirmani Right Side Cam",
       "format_ok": true
     },
-    "person loitering near exit": {
+    "a customer carries a shopping basket": {
       "span": [
-        0.0,
-        10.0
+        112.0,
+        120.0
       ],
-      "camera": "Kathirmani Bill Counter",
+      "camera": "Kathirmni Entry Cam",
       "format_ok": true
     },
-    "suspicious or unusual behavior": {
+    "a customer pushes a shopping cart": {
       "span": [
-        0.0,
-        10.0
+        10.0,
+        12.5
       ],
-      "camera": "Kathirmani Bill Counter",
+      "camera": "Kathirmani Right Side Cam",
       "format_ok": true
     },
-    "crowded aisle or bottleneck": {
+    "a person puts a product into a personal bag or backpack": {
       "span": [
-        0.0,
-        10.0
+        102.1,
+        113.1
       ],
-      "camera": "Kathirmani Bill Counter",
+      "camera": "Kathirmani Right Side Cam",
       "format_ok": true
     },
-    "customer leaving store without approaching billing counter": {
+    "a person puts a product into their pocket or clothing": {
       "span": [
-        0.0,
-        10.0
+        106.5,
+        111.5
       ],
-      "camera": "Kathirmani Bill Counter",
+      "camera": "Kathirmani Store Near Bill Counter",
       "format_ok": true
     },
-    "person handling merchandise near store exit or boundary": {
+    "a person conceals an item with their hand or body": {
       "span": [
-        0.0,
-        10.0
+        102.1,
+        113.1
       ],
-      "camera": "Kathirmani Bill Counter",
+      "camera": "Kathirmani Right Side Cam",
       "format_ok": true
     },
-    "group of customers gathered around a product display blocking view": {
+    "a person carries a large bag or backpack near the shelves": {
       "span": [
-        0.0,
-        10.0
+        108.1,
+        111.1
       ],
-      "camera": "Kathirmani Bill Counter",
+      "camera": "Kathirmani Right Side Cam",
       "format_ok": true
     },
-    "person placing merchandise into personal bag or clothing at shelf": {
+    "a person walks toward the exit holding an item": {
       "span": [
-        0.0,
-        10.0
+        10.0,
+        13.0
       ],
-      "camera": "Kathirmani Bill Counter",
+      "camera": "Kathirmani Left Side Camera",
       "format_ok": true
     },
-    "customer returning to the same shelf section multiple times": {
+    "a person lingers near the exit": {
       "span": [
-        0.0,
-        10.0
+        108.0,
+        120.0
       ],
-      "camera": "Kathirmani Bill Counter",
+      "camera": "Kathirmani Right Side Cam",
       "format_ok": true
     },
-    "billing staff engaged by customer while another person handles merchandise": {
+    "a person opens or tears product packaging at a shelf": {
       "span": [
-        0.0,
-        10.0
+        102.0,
+        113.0
       ],
-      "camera": "Kathirmani Bill Counter",
+      "camera": "Kathirmani Right Side Cam",
       "format_ok": true
     },
-    "person carrying large bag or backpack near merchandise shelves": {
+    "a group of people crowds together in an aisle": {
       "span": [
         0.0,
-        10.0
+        12.5
       ],
-      "camera": "Kathirmani Bill Counter",
+      "camera": "Kathirmani Right Side Cam",
       "format_ok": true
     },
-    "customer switching or swapping product packaging at shelf": {
+    "a bag or object is left unattended on the floor": {
       "span": [
         0.0,
-        10.0
+        120.0
       ],
-      "camera": "Kathirmani Bill Counter",
+      "camera": "Kathirmani Right Side Cam",
       "format_ok": true
     }
   },
   "events": [
     {
       "start": 0.0,
-      "end": 5.5,
-      "description": "The person uses a computer mouse on the desk."
+      "end": 11.5,
+      "description": "A person in a yellow shirt walks across the background."
     },
     {
-      "start": 5.5,
-      "end": 10.0,
-      "description": "The person rests their arms on the counter."
+      "start": 11.5,
+      "end": 13.5,
+      "description": "A person in a blue shirt walks across the floor."
+    },
+    {
+      "start": 13.5,
+      "end": 15.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 15.5,
+      "end": 18.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 18.5,
+      "end": 21.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 21.5,
+      "end": 26.5,
+      "description": "The man in the green shirt walks back toward the center."
+    },
+    {
+      "start": 24.5,
+      "end": 28.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 26.5,
+      "end": 31.5,
+      "description": "The man in the green shirt walks toward the left again."
+    },
+    {
+      "start": 32.5,
+      "end": 36.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 36.5,
+      "end": 42.5,
+      "description": "The man in the green shirt walks toward the left once more."
+    },
+    {
+      "start": 40.5,
+      "end": 44.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 44.5,
+      "end": 48.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 48.5,
+      "end": 54.5,
+      "description": "The man in the green shirt walks toward the left again."
+    },
+    {
+      "start": 53.5,
+      "end": 57.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 57.5,
+      "end": 61.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 61.5,
+      "end": 65.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 65.5,
+      "end": 69.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 69.5,
+      "end": 73.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 73.5,
+      "end": 77.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 77.5,
+      "end": 81.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 81.5,
+      "end": 85.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 85.5,
+      "end": 89.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 89.5,
+      "end": 93.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 93.5,
+      "end": 97.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 97.5,
+      "end": 101.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 101.5,
+      "end": 105.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 105.5,
+      "end": 111.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 111.5,
+      "end": 116.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 116.5,
+      "end": 121.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 121.5,
+      "end": 126.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 126.5,
+      "end": 131.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 131.5,
+      "end": 136.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 136.5,
+      "end": 141.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 141.5,
+      "end": 146.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 146.5,
+      "end": 151.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 151.5,
+      "end": 156.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 156.5,
+      "end": 161.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 161.5,
+      "end": 166.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 166.5,
+      "end": 171.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 171.5,
+      "end": 176.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 176.5,
+      "end": 181.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 181.5,
+      "end": 186.5,
+      "description": "A person in a blue shirt walks toward the foreground."
+    },
+    {
+      "start": 186.5,
+      "end": 191.5,
+      "description": "A person in a blue shirt walks toward the background."
+    },
+    {
+      "start": 191.5,
+      "end": 196.5,
+      "description": "A person in a blue shirt walks toward the foreground."
     },
     {
       "start": 0.0,
-      "end": 4.5,
-      "description": "The man talks on a phone while holding a mouse."
+      "end": 16.5,
+      "description": "A man in a green shirt stands near the shelves."
     },
     {
-      "start": 4.5,
-      "end": 5.5,
-      "description": "The man lowers the phone from his ear."
+      "start": 31.5,
+      "end": 36.5,
+      "description": "The man in the green shirt walks back to the center."
     },
     {
-      "start": 5.5,
-      "end": 10.0,
-      "description": "The man looks down at a small object in his hands."
+      "start": 42.5,
+      "end": 48.5,
+      "description": "The man in the green shirt walks back to the center."
+    },
+    {
+      "start": 54.5,
+      "end": 61.5,
+      "description": "The man in the green shirt walks back to the center."
+    },
+    {
+      "start": 81.5,
+      "end": 84.5,
+      "description": "The man in the brown shirt signs a paper."
+    },
+    {
+      "start": 93.5,
+      "end": 101.5,
+      "description": "The man in the brown shirt walks back to the center."
+    },
+    {
+      "start": 115.5,
+      "end": 122.0,
+      "description": "The man in the brown shirt walks back to the center."
     },
     {
       "start": 0.0,
-      "end": 10.0,
-      "description": "The camera remains static over the empty store shelves."
+      "end": 11.5,
+      "description": "The woman in the patterned blouse signs a paper."
+    },
+    {
+      "start": 11.5,
+      "end": 13.5,
+      "description": "The woman in the patterned blouse places the paper down."
+    },
+    {
+      "start": 13.5,
+      "end": 18.5,
+      "description": "The woman in the patterned blouse signs another paper."
+    },
+    {
+      "start": 18.5,
+      "end": 20.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 20.5,
+      "end": 23.5,
+      "description": "The woman in the patterned blouse signs a third paper."
+    },
+    {
+      "start": 23.5,
+      "end": 25.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 25.5,
+      "end": 28.5,
+      "description": "The woman in the patterned blouse signs a fourth paper."
+    },
+    {
+      "start": 28.5,
+      "end": 30.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 30.5,
+      "end": 34.5,
+      "description": "The woman in the patterned blouse signs a fifth paper."
+    },
+    {
+      "start": 34.5,
+      "end": 36.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 36.5,
+      "end": 41.5,
+      "description": "The woman in the patterned blouse signs a sixth paper."
+    },
+    {
+      "start": 41.5,
+      "end": 43.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 43.5,
+      "end": 46.5,
+      "description": "The woman in the patterned blouse signs a seventh paper."
+    },
+    {
+      "start": 46.5,
+      "end": 48.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 48.5,
+      "end": 51.5,
+      "description": "The woman in the patterned blouse signs an eighth paper."
+    },
+    {
+      "start": 51.5,
+      "end": 53.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 53.5,
+      "end": 56.5,
+      "description": "The woman in the patterned blouse signs a ninth paper."
+    },
+    {
+      "start": 56.5,
+      "end": 58.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 58.5,
+      "end": 61.5,
+      "description": "The woman in the patterned blouse signs a tenth paper."
+    },
+    {
+      "start": 61.5,
+      "end": 63.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 63.5,
+      "end": 66.5,
+      "description": "The woman in the patterned blouse signs an eleventh paper."
+    },
+    {
+      "start": 66.5,
+      "end": 68.5,
+      "description": "A man in a yellow shirt enters the frame."
+    },
+    {
+      "start": 71.5,
+      "end": 74.5,
+      "description": "The man in the yellow shirt signs a paper."
+    },
+    {
+      "start": 72.5,
+      "end": 81.5,
+      "description": "A man in a yellow shirt leans over the freezer."
+    },
+    {
+      "start": 77.5,
+      "end": 81.5,
+      "description": "A man in a brown shirt enters the frame."
+    },
+    {
+      "start": 84.5,
+      "end": 87.5,
+      "description": "The man in the brown shirt walks away."
+    },
+    {
+      "start": 87.5,
+      "end": 91.5,
+      "description": "The woman in the patterned blouse signs a twelfth paper."
+    },
+    {
+      "start": 91.5,
+      "end": 93.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 93.5,
+      "end": 96.5,
+      "description": "The woman in the patterned blouse signs a thirteenth paper."
+    },
+    {
+      "start": 96.5,
+      "end": 99.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 99.5,
+      "end": 103.5,
+      "description": "The woman in the patterned blouse signs a fourteenth paper."
+    },
+    {
+      "start": 103.5,
+      "end": 106.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 106.5,
+      "end": 111.5,
+      "description": "The woman in the patterned blouse signs a fifteenth paper."
+    },
+    {
+      "start": 111.5,
+      "end": 123.1,
+      "description": "The woman in the patterned blouse puts the paper down."
     },
     {
       "start": 0.0,
-      "end": 5.5,
-      "description": "The man stands at the counter looking at the computer."
+      "end": 11.5,
+      "description": "A man in a yellow shirt talks to a group."
     },
     {
-      "start": 0.0,
-      "end": 10.0,
-      "description": "The empty storage room remains static with no subject motion."
+      "start": 27.5,
+      "end": 34.5,
+      "description": "A man in a yellow shirt gestures while talking."
+    },
+    {
+      "start": 34.5,
+      "end": 41.5,
+      "description": "A man in a yellow shirt leans over the freezer."
+    },
+    {
+      "start": 48.5,
+      "end": 56.5,
+      "description": "A man in a yellow shirt holds a red can."
+    },
+    {
+      "start": 81.5,
+      "end": 91.5,
+      "description": "A man in a yellow shirt stands up and gestures."
+    },
+    {
+      "start": 91.5,
+      "end": 108.5,
+      "description": "A man in a yellow shirt leans over the freezer."
     }
   ],
-  "unique_event_count": 8,
-  "total_raw_events": 9,
-  "dedup_ratio": 1.125
+  "unique_event_count": 91,
+  "total_raw_events": 141,
+  "dedup_ratio": 1.5494505494505495
 }

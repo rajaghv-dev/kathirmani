@@ -28,11 +28,17 @@ def window_bounds(duration_sec: float, win_sec: float, stride_sec: float) -> lis
     return out
 
 
-def windows_for_segment(seg, win_sec: float, stride_sec: float) -> list[WindowRecord]:
+def windows_for_segment(seg, win_sec: float, stride_sec: float,
+                        skip_before_sec: float = 0.0) -> list[WindowRecord]:
+    """Windows for one clip. `skip_before_sec` drops windows lying ENTIRELY
+    inside the clip's overlap prefix (already covered by the previous clip's
+    tail windows); boundary-crossing windows are kept — containing them is
+    the point of the overlap."""
     return [
         WindowRecord(
             segment_id=seg.segment_id, camera_id=seg.camera_id,
             window_start_sec=s, window_end_sec=e, clip_path=seg.storage_path,
         )
         for (s, e) in window_bounds(seg.duration_sec, win_sec, stride_sec)
+        if e > skip_before_sec
     ]

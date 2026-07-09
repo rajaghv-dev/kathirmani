@@ -20,12 +20,18 @@ METRICS_PORT = 8901                          # ingestion /metrics (Prometheus sc
 
 @dataclass
 class SegmentSettings:
-    storage_clip_duration_sec: int = 10
+    storage_clip_duration_sec: int = 30
+    clip_overlap_sec: int = 5               # consecutive clips share this much
     ai_window_duration_sec: int = 5
     ai_window_stride_sec: int = 2
     pre_event_context_sec: int = 5
     post_event_context_sec: int = 10
     evidence_clip_duration_sec: int = 20
+
+    @property
+    def clip_stride_sec(self) -> int:
+        """Wall-clock spacing between clip starts (duration − overlap)."""
+        return self.storage_clip_duration_sec - self.clip_overlap_sec
 
 
 @dataclass

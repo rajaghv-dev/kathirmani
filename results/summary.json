@@ -1,12 +1,11 @@
 {
-  "total_videos": 5,
-  "processed": 5,
+  "total_videos": 4,
+  "processed": 4,
   "videos": [
-    "Kathirmani Bill Counter",
-    "Kathirmani Center Camera",
     "Kathirmani Left Side Camera",
-    "Kathirmani Near Entry Door Camera",
-    "Kathirmani Right Side Cam"
+    "Kathirmani Right Side Cam",
+    "Kathirmani Store Near Bill Counter",
+    "Kathirmni Entry Cam"
   ],
-  "total_events": 9
+  "total_events": 141
 }

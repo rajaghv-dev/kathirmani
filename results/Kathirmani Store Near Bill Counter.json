@@ -1,0 +1,410 @@
+{
+  "video": "Kathirmani Store Near Bill Counter.mkv",
+  "label": "Kathirmani Store Near Bill Counter",
+  "duration_tested_sec": 120.0,
+  "processed_at": "2026-07-09T11:30:09",
+  "caption": "Scene: The scene is set in a spacious, well-lit indoor environment, likely a retail store or a large office, characterized by a distinctive floor pattern of large, interlocking yellow and white circles. A long, white service counter dominates the upper half of the frame, equipped with a computer monitor, a keyboard, and a black cash register. A man in a red shirt is seated at the far end of the counter, focused on paperwork. Standing at the counter is a woman with long dark hair, wearing a black and white patterned blouse and blue jeans. She is actively engaged in a transaction, handling a small white slip of paper and interacting with the counter's interface. Throughout the video, various individuals, including a woman in a black shirt and a man in a yellow shirt, enter the frame from the bottom, moving across the patterned floor. The camera maintains a high-angle, static perspective, capturing the entire scene from above.\n\nEvents:\n<0.0 - 11.5> The woman in the patterned blouse signs a paper.\n<11.5 - 13.5> The woman in the patterned blouse places the paper down.\n<13.5 - 18.5> The woman in the patterned blouse signs another paper.\n<18.5 - 20.5> The woman in the patterned blouse puts the paper down.\n<20.5 - 23.5> The woman in the patterned blouse signs a third paper.\n<23.5 - 25.5> The woman in the patterned blouse puts the paper down.\n<25.5 - 28.5> The woman in the patterned blouse signs a fourth paper.\n<28.5 - 30.5> The woman in the patterned blouse puts the paper down.\n<30.5 - 34.5> The woman in the patterned blouse signs a fifth paper.\n<34.5 - 36.5> The woman in the patterned blouse puts the paper down.\n<36.5 - 41.5> The woman in the patterned blouse signs a sixth paper.\n<41.5 - 43.5> The woman in the patterned blouse puts the paper down.\n<43.5 - 46.5> The woman in the patterned blouse signs a seventh paper.\n<46.5 - 48.5> The woman in the patterned blouse puts the paper down.\n<48.5 - 51.5> The woman in the patterned blouse signs an eighth paper.\n<51.5 - 53.5> The woman in the patterned blouse puts the paper down.\n<53.5 - 56.5> The woman in the patterned blouse signs a ninth paper.\n<56.5 - 58.5> The woman in the patterned blouse puts the paper down.\n<58.5 - 61.5> The woman in the patterned blouse signs a tenth paper.\n<61.5 - 63.5> The woman in the patterned blouse puts the paper down.\n<63.5 - 66.5> The woman in the patterned blouse signs an eleventh paper.\n<66.5 - 68.5> A man in a yellow shirt enters the frame.\n<68.5 - 71.5> The man in the yellow shirt walks toward the counter.\n<71.5 - 74.5> The man in the yellow shirt signs a paper.\n<74.5 - 77.5> The man in the yellow shirt walks away.\n<77.5 - 81.5> A man in a brown shirt enters the frame.\n<81.5 - 84.5> The man in the brown shirt signs a paper.\n<84.5 - 87.5> The man in the brown shirt walks away.\n<87.5 - 91.5> The woman in the patterned blouse signs a twelfth paper.\n<91.5 - 93.5> The woman in the patterned blouse puts the paper down.\n<93.5 - 96.5> The woman in the patterned blouse signs a thirteenth paper.\n<96.5 - 99.5> The woman in the patterned blouse puts the paper down.\n<99.5 - 103.5> The woman in the patterned blouse signs a fourteenth paper.\n<103.5 - 106.5> The woman in the patterned blouse puts the paper down.\n<106.5 - 111.5> The woman in the patterned blouse signs a fifteenth paper.\n<111.5 - 123.1> The woman in the patterned blouse puts the paper down.",
+  "events": [
+    {
+      "start": 0.0,
+      "end": 11.5,
+      "description": "The woman in the patterned blouse signs a paper."
+    },
+    {
+      "start": 11.5,
+      "end": 13.5,
+      "description": "The woman in the patterned blouse places the paper down."
+    },
+    {
+      "start": 13.5,
+      "end": 18.5,
+      "description": "The woman in the patterned blouse signs another paper."
+    },
+    {
+      "start": 18.5,
+      "end": 20.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 20.5,
+      "end": 23.5,
+      "description": "The woman in the patterned blouse signs a third paper."
+    },
+    {
+      "start": 23.5,
+      "end": 25.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 25.5,
+      "end": 28.5,
+      "description": "The woman in the patterned blouse signs a fourth paper."
+    },
+    {
+      "start": 28.5,
+      "end": 30.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 30.5,
+      "end": 34.5,
+      "description": "The woman in the patterned blouse signs a fifth paper."
+    },
+    {
+      "start": 34.5,
+      "end": 36.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 36.5,
+      "end": 41.5,
+      "description": "The woman in the patterned blouse signs a sixth paper."
+    },
+    {
+      "start": 41.5,
+      "end": 43.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 43.5,
+      "end": 46.5,
+      "description": "The woman in the patterned blouse signs a seventh paper."
+    },
+    {
+      "start": 46.5,
+      "end": 48.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 48.5,
+      "end": 51.5,
+      "description": "The woman in the patterned blouse signs an eighth paper."
+    },
+    {
+      "start": 51.5,
+      "end": 53.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 53.5,
+      "end": 56.5,
+      "description": "The woman in the patterned blouse signs a ninth paper."
+    },
+    {
+      "start": 56.5,
+      "end": 58.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 58.5,
+      "end": 61.5,
+      "description": "The woman in the patterned blouse signs a tenth paper."
+    },
+    {
+      "start": 61.5,
+      "end": 63.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 63.5,
+      "end": 66.5,
+      "description": "The woman in the patterned blouse signs an eleventh paper."
+    },
+    {
+      "start": 66.5,
+      "end": 68.5,
+      "description": "A man in a yellow shirt enters the frame."
+    },
+    {
+      "start": 68.5,
+      "end": 71.5,
+      "description": "The man in the yellow shirt walks toward the counter."
+    },
+    {
+      "start": 71.5,
+      "end": 74.5,
+      "description": "The man in the yellow shirt signs a paper."
+    },
+    {
+      "start": 74.5,
+      "end": 77.5,
+      "description": "The man in the yellow shirt walks away."
+    },
+    {
+      "start": 77.5,
+      "end": 81.5,
+      "description": "A man in a brown shirt enters the frame."
+    },
+    {
+      "start": 81.5,
+      "end": 84.5,
+      "description": "The man in the brown shirt signs a paper."
+    },
+    {
+      "start": 84.5,
+      "end": 87.5,
+      "description": "The man in the brown shirt walks away."
+    },
+    {
+      "start": 87.5,
+      "end": 91.5,
+      "description": "The woman in the patterned blouse signs a twelfth paper."
+    },
+    {
+      "start": 91.5,
+      "end": 93.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 93.5,
+      "end": 96.5,
+      "description": "The woman in the patterned blouse signs a thirteenth paper."
+    },
+    {
+      "start": 96.5,
+      "end": 99.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 99.5,
+      "end": 103.5,
+      "description": "The woman in the patterned blouse signs a fourteenth paper."
+    },
+    {
+      "start": 103.5,
+      "end": 106.5,
+      "description": "The woman in the patterned blouse puts the paper down."
+    },
+    {
+      "start": 106.5,
+      "end": 111.5,
+      "description": "The woman in the patterned blouse signs a fifteenth paper."
+    },
+    {
+      "start": 111.5,
+      "end": 123.1,
+      "description": "The woman in the patterned blouse puts the paper down."
+    }
+  ],
+  "find_results": {
+    "a person walks in through the entrance door": {
+      "raw": "From 67.5 to 69.5.",
+      "span": [
+        67.5,
+        69.5
+      ],
+      "format_ok": true
+    },
+    "a person walks out through the exit door": {
+      "raw": "From 86.1 to 88.6.",
+      "span": [
+        86.1,
+        88.6
+      ],
+      "format_ok": true
+    },
+    "a customer places items on the billing counter": {
+      "raw": "From 12.5 to 15.5.",
+      "span": [
+        12.5,
+        15.5
+      ],
+      "format_ok": true
+    },
+    "a staff member scans or bills an item at the counter": {
+      "raw": "From 13.5 to 15.5.",
+      "span": [
+        13.5,
+        15.5
+      ],
+      "format_ok": true
+    },
+    "a customer hands cash or a card to the billing staff": {
+      "raw": "From 106.5 to 111.5.",
+      "span": [
+        106.5,
+        111.5
+      ],
+      "format_ok": true
+    },
+    "several customers wait in line at the billing counter": {
+      "raw": "From 78.1 to 83.1.",
+      "span": [
+        78.1,
+        83.1
+      ],
+      "format_ok": true
+    },
+    "a customer browses products on a shelf": {
+      "raw": "From 78.1 to 83.1.",
+      "span": [
+        78.1,
+        83.1
+      ],
+      "format_ok": true
+    },
+    "a person takes an item off a shelf": {
+      "raw": "From 80.1 to 83.1.",
+      "span": [
+        80.1,
+        83.1
+      ],
+      "format_ok": true
+    },
+    "a person puts an item back on a shelf": {
+      "raw": "From 80.1 to 83.1.",
+      "span": [
+        80.1,
+        83.1
+      ],
+      "format_ok": true
+    },
+    "a customer carries a shopping basket": {
+      "raw": "From 68.1 to 71.1.",
+      "span": [
+        68.1,
+        71.1
+      ],
+      "format_ok": true
+    },
+    "a customer pushes a shopping cart": {
+      "raw": "From 68.1 to 70.1.",
+      "span": [
+        68.1,
+        70.1
+      ],
+      "format_ok": true
+    },
+    "a person puts a product into a personal bag or backpack": {
+      "raw": "From 10.0 to 11.5.",
+      "span": [
+        10.0,
+        11.5
+      ],
+      "format_ok": true
+    },
+    "a person puts a product into their pocket or clothing": {
+      "raw": "From 106.5 to 111.5.",
+      "span": [
+        106.5,
+        111.5
+      ],
+      "format_ok": true
+    },
+    "a person conceals an item with their hand or body": {
+      "raw": "From 104.5 to 111.5.",
+      "span": [
+        104.5,
+        111.5
+      ],
+      "format_ok": true
+    },
+    "a person carries a large bag or backpack near the shelves": {
+      "raw": "From 84.1 to 87.1.",
+      "span": [
+        84.1,
+        87.1
+      ],
+      "format_ok": true
+    },
+    "a person walks toward the exit holding an item": {
+      "raw": "From 84.1 to 87.1.",
+      "span": [
+        84.1,
+        87.1
+      ],
+      "format_ok": true
+    },
+    "a person lingers near the exit": {
+      "raw": "From 86.1 to 89.1.",
+      "span": [
+        86.1,
+        89.1
+      ],
+      "format_ok": true
+    },
+    "a person opens or tears product packaging at a shelf": {
+      "raw": "From 80.1 to 83.1.",
+      "span": [
+        80.1,
+        83.1
+      ],
+      "format_ok": true
+    },
+    "a group of people crowds together in an aisle": {
+      "raw": "From 78.1 to 83.1.",
+      "span": [
+        78.1,
+        83.1
+      ],
+      "format_ok": true
+    },
+    "a bag or object is left unattended on the floor": {
+      "raw": "From 106.1 to 119.1.",
+      "span": [
+        106.1,
+        119.1
+      ],
+      "format_ok": true
+    }
+  },
+  "scene": "The scene is set in a spacious, well-lit indoor environment, likely a retail store or a large office, characterized by a distinctive floor pattern of large, interlocking yellow and white circles. A long, white service counter dominates the upper half of the frame, equipped with a computer monitor, a keyboard, and a black cash register. A man in a red shirt is seated at the far end of the counter, focused on paperwork. Standing at the counter is a woman with long dark hair, wearing a black and white patterned blouse and blue jeans. She is actively engaged in a transaction, handling a small white slip of paper and interacting with the counter's interface. Throughout the video, various individuals, including a woman in a black shirt and a man in a yellow shirt, enter the frame from the bottom, moving across the patterned floor. The camera maintains a high-angle, static perspective, capturing the entire scene from above.",
+  "qwen_analysis": {
+    "label": "Kathirmani Store Near Bill Counter",
+    "model": "Qwen2.5-VL-7B-Instruct",
+    "queries": {
+      "Count the customers visible and describe what each person is doing with their hands and any bags they carry.": {
+        "answer": "In the image, there are two customers visible:\n\n1. **Customer 1 (on the left):**\n   - This customer appears to be standing near a desk or counter.\n   - They have one hand resting on the desk, possibly interacting with something on it, such as a computer or a device.\n   - The other hand is not clearly visible in this frame.\n\n2. **Customer 2 (on the right):**\n   - This customer is walking away from the desk area.\n   - They appear to be carrying a bag over their shoulder, which suggests they might be shopping or carrying items purchased.\n   - Their hands are not clearly visible in this frame, but given the context of carrying a bag, it's likely that one or both hands are occupied with the bag.\n\nThe overall scene suggests a retail environment, possibly a store or a checkout area, where customers are either interacting with staff or preparing to leave with their purchases.",
+        "ok": true
+      },
+      "Is any customer placing merchandise into a personal bag, pocket, or clothing while at the shelf \u2014 not into a store basket?": {
+        "answer": "No, there is no visible evidence in the image that any customer is placing merchandise into a personal bag, pocket, or clothing while at the shelf. The image shows a person walking past a desk with a computer and some office supplies, but there is no indication of merchandise being placed into a personal bag or clothing. The focus appears to be on the person moving around the area, possibly organizing or cleaning up.",
+        "ok": true
+      },
+      "Are any customers moving toward the store exit while carrying unpaid merchandise without a billing bag or receipt?": {
+        "answer": "Based on the image provided, it is not possible to definitively determine if there are any customers moving toward the store exit while carrying unpaid merchandise without a billing bag or receipt. The image shows an indoor setting with a desk, computer, and some office supplies, but no visible customers or individuals carrying items that could be interpreted as unpaid merchandise. To make such a determination, one would need to observe the behavior of individuals in the store and their interactions with the merchandise and staff.",
+        "ok": true
+      },
+      "Is there a group of customers clustered together near merchandise in a way that could obstruct the camera view of the shelf?": {
+        "answer": "No, there is no group of customers clustered together near merchandise in this image. The image shows an office or workspace with desks, computers, and some office supplies. There are no visible shelves or merchandise, and the area appears to be relatively clear of people.",
+        "ok": true
+      },
+      "Describe any customer spending an unusually long time handling a single product without placing it in a basket.": {
+        "answer": "In the image, there is a customer standing near a desk with a computer and some office supplies. The customer appears to be handling a single product, possibly a bag or a box, for an extended period. This behavior might suggest they are carefully inspecting the item, comparing it to other products, or perhaps considering multiple options before making a decision. The customer's actions seem deliberate and focused on the product rather than immediately placing it into a shopping basket. The surrounding area includes a shopping cart, indicating that this is likely a retail environment where customers typically place items in baskets as they proceed through the store.",
+        "ok": true
+      },
+      "Is there any commotion, argument, or distraction happening near the billing counter or merchandise display?": {
+        "answer": "From the image provided, it appears to be a relatively calm scene at what looks like a store or office with a billing counter. There is no visible commotion, argument, or distraction occurring near the billing counter or merchandise display. The individuals in the image seem to be engaged in their respective tasks without any signs of disturbance. The environment looks orderly, and there are no indications of chaos or conflict.",
+        "ok": true
+      },
+      "Are any customers engaging billing staff in extended conversation while another person is near the merchandise?": {
+        "answer": "From the image provided, it appears that there are no visible customers engaging in an extended conversation with the billing staff. The focus seems to be on the person in the foreground who is walking towards the desk area. There are no other individuals clearly visible in the image who might be near the merchandise or engaging in conversations. The scene suggests a relatively quiet moment at the checkout area.",
+        "ok": true
+      },
+      "Are there any empty shelf gaps or sections that appear to need restocking?": {
+        "answer": "The image shows a workspace with desks, computers, and some office supplies. There are no visible shelves in the image, so it's not possible to determine if there are any empty shelf gaps or sections that need restocking based on this image alone. The focus of the image is on the work area and the people working at the desks. If you have more images or information about the surrounding areas, please provide them for a more accurate assessment.",
+        "ok": true
+      },
+      "Is there any merchandise on the floor, misplaced, or fallen from shelves?": {
+        "answer": "From the image provided, it appears that there is no visible merchandise on the floor that has been misplaced or fallen from shelves. The floor looks clean and free of any items that would suggest such an occurrence. The area around the desk and the person seems organized, with no signs of disarray or items out of place.",
+        "ok": true
+      },
+      "How many customers are at or waiting at the billing counter? Estimate queue length.": {
+        "answer": "In the image, there appears to be one customer standing at the billing counter. There are no other visible customers in line or waiting. The queue length can be estimated as 0.",
+        "ok": true
+      },
+      "Is any child present in the store without an accompanying adult nearby?": {
+        "answer": "No, there is no child visible in the image. The scene appears to be an office or a workspace with desks, computers, and some office supplies. There are adults present, but they do not seem to be children.",
+        "ok": true
+      },
+      "Is any customer appearing distressed, confused, or in need of staff assistance?": {
+        "answer": "From the image provided, it is not possible to determine if any customer is appearing distressed, confused, or in need of staff assistance. The image shows an office environment with desks, computers, and some office supplies, but no customers are visible in the frame. If you have more images or additional context, please share them so I can assist further.",
+        "ok": true
+      },
+      "Describe the overall store activity level: how many staff and customers visible, and what is the general level of activity?": {
+        "answer": "The image shows a store with a relatively low level of activity. There are two individuals visible in the scene:\n\n1. A person standing near the desk, possibly a staff member, as they appear to be interacting with the computer or printer.\n2. Another person walking across the floor, who could be a customer or another staff member.\n\nThe store appears to have some boxes and a shopping cart, suggesting that it might be a retail environment where items are being organized or prepared for sale. The presence of the shopping cart indicates that there may be ongoing activities related to inventory management or restocking. Overall, the store seems to be moderately active, with a few people present but not overly busy.",
+        "ok": true
+      }
+    }
+  }
+}

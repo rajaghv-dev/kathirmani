@@ -1,9 +1,9 @@
 {
-  "avg_power_w": 54.82,
-  "energy_wh": 8.1905,
-  "cost_inr": 0.081905,
-  "events_per_wh": 1.1,
-  "cost_per_event_inr": 0.009101,
-  "wall_time_sec": 537.9,
-  "total_events": 9
+  "avg_power_w": 46.27,
+  "energy_wh": 7.1525,
+  "cost_inr": 0.071525,
+  "events_per_wh": 19.71,
+  "cost_per_event_inr": 0.000507,
+  "wall_time_sec": 556.5,
+  "total_events": 141
 }

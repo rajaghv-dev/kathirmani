@@ -6,9 +6,12 @@
 store_id: kathirmani_01
 timezone: Asia/Kolkata
 
-# Clip/window geometry (master plan §3.2 defaults).
+# Clip/window geometry. 30-sec storage clips with a 5-sec overlap (a new clip
+# starts every 25 s), so actions crossing a clip boundary are fully contained
+# in the next clip. AI windows stay 5 s / 2 s stride within each clip.
 segmenting:
-  storage_clip_duration_sec: 10
+  storage_clip_duration_sec: 30
+  clip_overlap_sec: 5
   ai_window_duration_sec: 5
   ai_window_stride_sec: 2
   pre_event_context_sec: 5

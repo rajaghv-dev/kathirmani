@@ -1,0 +1,242 @@
+{
+  "video": "Kathirmni Entry Cam.mkv",
+  "label": "Kathirmni Entry Cam",
+  "duration_tested_sec": 120.0,
+  "processed_at": "2026-07-09T11:30:09",
+  "caption": "Scene: The scene is set in a spacious, modern retail store, likely a home appliance or electronics shop, characterized by polished marble flooring with large yellow and white circular patterns. In the foreground, a group of men is gathered around a white and red ice cream freezer branded with the name 'Arun'. One man wears a bright yellow polo shirt, another a brown shirt, and a third a striped white and grey shirt. They appear to be discussing the freezer's features or its contents. In the background, a woman in a black top and blue jeans walks across the store floor, while another woman in a patterned dress stands near a black counter area. The background is filled with retail displays, including black shelving units holding various boxed products and a wall of small, square display tiles. The lighting is bright and even, typical of a commercial interior. The camera maintains a high-angle, wide-shot perspective, capturing the interactions and movements of the people within the store.\n\nEvents:\n<0.0 - 11.5> A man in a yellow shirt talks to a group.\n<11.5 - 15.5> A woman in a black shirt walks across the floor.\n<15.5 - 21.5> A man in a striped shirt walks toward the freezer.\n<21.5 - 27.5> A man in a yellow shirt walks toward the freezer.\n<27.5 - 34.5> A man in a yellow shirt gestures while talking.\n<34.5 - 41.5> A man in a yellow shirt leans over the freezer.\n<41.5 - 48.5> A man in a brown shirt walks toward the freezer.\n<48.5 - 56.5> A man in a yellow shirt holds a red can.\n<56.5 - 64.5> A man in a striped shirt walks toward the freezer.\n<64.5 - 72.5> A man in a yellow shirt walks toward the freezer.\n<72.5 - 81.5> A man in a yellow shirt leans over the freezer.\n<81.5 - 91.5> A man in a yellow shirt stands up and gestures.\n<91.5 - 108.5> A man in a yellow shirt leans over the freezer.\n<108.5 - 122.0> A man in a striped shirt walks toward the freezer.",
+  "events": [
+    {
+      "start": 0.0,
+      "end": 11.5,
+      "description": "A man in a yellow shirt talks to a group."
+    },
+    {
+      "start": 11.5,
+      "end": 15.5,
+      "description": "A woman in a black shirt walks across the floor."
+    },
+    {
+      "start": 15.5,
+      "end": 21.5,
+      "description": "A man in a striped shirt walks toward the freezer."
+    },
+    {
+      "start": 21.5,
+      "end": 27.5,
+      "description": "A man in a yellow shirt walks toward the freezer."
+    },
+    {
+      "start": 27.5,
+      "end": 34.5,
+      "description": "A man in a yellow shirt gestures while talking."
+    },
+    {
+      "start": 34.5,
+      "end": 41.5,
+      "description": "A man in a yellow shirt leans over the freezer."
+    },
+    {
+      "start": 41.5,
+      "end": 48.5,
+      "description": "A man in a brown shirt walks toward the freezer."
+    },
+    {
+      "start": 48.5,
+      "end": 56.5,
+      "description": "A man in a yellow shirt holds a red can."
+    },
+    {
+      "start": 56.5,
+      "end": 64.5,
+      "description": "A man in a striped shirt walks toward the freezer."
+    },
+    {
+      "start": 64.5,
+      "end": 72.5,
+      "description": "A man in a yellow shirt walks toward the freezer."
+    },
+    {
+      "start": 72.5,
+      "end": 81.5,
+      "description": "A man in a yellow shirt leans over the freezer."
+    },
+    {
+      "start": 81.5,
+      "end": 91.5,
+      "description": "A man in a yellow shirt stands up and gestures."
+    },
+    {
+      "start": 91.5,
+      "end": 108.5,
+      "description": "A man in a yellow shirt leans over the freezer."
+    },
+    {
+      "start": 108.5,
+      "end": 122.0,
+      "description": "A man in a striped shirt walks toward the freezer."
+    }
+  ],
+  "find_results": {
+    "a person walks in through the entrance door": {
+      "raw": "From 11.0 to 13.5.",
+      "span": [
+        11.0,
+        13.5
+      ],
+      "format_ok": true
+    },
+    "a person walks out through the exit door": {
+      "raw": "From 112.0 to 120.0.",
+      "span": [
+        112.0,
+        120.0
+      ],
+      "format_ok": true
+    },
+    "a customer places items on the billing counter": {
+      "raw": "From 16.0 to 21.0.",
+      "span": [
+        16.0,
+        21.0
+      ],
+      "format_ok": true
+    },
+    "a staff member scans or bills an item at the counter": {
+      "raw": "From 10.0 to 13.0.",
+      "span": [
+        10.0,
+        13.0
+      ],
+      "format_ok": true
+    },
+    "a customer hands cash or a card to the billing staff": {
+      "raw": "From 58.0 to 61.0.",
+      "span": [
+        58.0,
+        61.0
+      ],
+      "format_ok": true
+    },
+    "several customers wait in line at the billing counter": {
+      "raw": "From 0.0 to 12.5.",
+      "span": [
+        0.0,
+        12.5
+      ],
+      "format_ok": true
+    },
+    "a customer browses products on a shelf": {
+      "raw": "From 106.1 to 120.0.",
+      "span": [
+        106.1,
+        120.0
+      ],
+      "format_ok": true
+    },
+    "a person takes an item off a shelf": {
+      "raw": "From 104.5 to 107.5.",
+      "span": [
+        104.5,
+        107.5
+      ],
+      "format_ok": true
+    },
+    "a person puts an item back on a shelf": {
+      "raw": "From 106.1 to 109.1.",
+      "span": [
+        106.1,
+        109.1
+      ],
+      "format_ok": true
+    },
+    "a customer carries a shopping basket": {
+      "raw": "From 112.0 to 120.0.",
+      "span": [
+        112.0,
+        120.0
+      ],
+      "format_ok": true
+    },
+    "a customer pushes a shopping cart": {
+      "raw": "From 10.0 to 12.0.",
+      "span": [
+        10.0,
+        12.0
+      ],
+      "format_ok": true
+    },
+    "a person puts a product into a personal bag or backpack": {
+      "raw": "From 106.5 to 111.5.",
+      "span": [
+        106.5,
+        111.5
+      ],
+      "format_ok": true
+    },
+    "a person puts a product into their pocket or clothing": {
+      "raw": "From 100.0 to 103.0.",
+      "span": [
+        100.0,
+        103.0
+      ],
+      "format_ok": true
+    },
+    "a person conceals an item with their hand or body": {
+      "raw": "From 104.5 to 111.0.",
+      "span": [
+        104.5,
+        111.0
+      ],
+      "format_ok": true
+    },
+    "a person carries a large bag or backpack near the shelves": {
+      "raw": "From 108.1 to 111.1.",
+      "span": [
+        108.1,
+        111.1
+      ],
+      "format_ok": true
+    },
+    "a person walks toward the exit holding an item": {
+      "raw": "From 108.1 to 111.1.",
+      "span": [
+        108.1,
+        111.1
+      ],
+      "format_ok": true
+    },
+    "a person lingers near the exit": {
+      "raw": "From 116.0 to 120.0.",
+      "span": [
+        116.0,
+        120.0
+      ],
+      "format_ok": true
+    },
+    "a person opens or tears product packaging at a shelf": {
+      "raw": "From 104.5 to 111.0.",
+      "span": [
+        104.5,
+        111.0
+      ],
+      "format_ok": true
+    },
+    "a group of people crowds together in an aisle": {
+      "raw": "From 114.0 to 120.0.",
+      "span": [
+        114.0,
+        120.0
+      ],
+      "format_ok": true
+    },
+    "a bag or object is left unattended on the floor": {
+      "raw": "From 106.1 to 111.1.",
+      "span": [
+        106.1,
+        111.1
+      ],
+      "format_ok": true
+    }
+  },
+  "scene": "The scene is set in a spacious, modern retail store, likely a home appliance or electronics shop, characterized by polished marble flooring with large yellow and white circular patterns. In the foreground, a group of men is gathered around a white and red ice cream freezer branded with the name 'Arun'. One man wears a bright yellow polo shirt, another a brown shirt, and a third a striped white and grey shirt. They appear to be discussing the freezer's features or its contents. In the background, a woman in a black top and blue jeans walks across the store floor, while another woman in a patterned dress stands near a black counter area. The background is filled with retail displays, including black shelving units holding various boxed products and a wall of small, square display tiles. The lighting is bright and even, typical of a commercial interior. The camera maintains a high-angle, wide-shot perspective, capturing the interactions and movements of the people within the store."
+}
