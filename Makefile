@@ -91,7 +91,7 @@ migrate-status: ## Show applied migrations
 	python3 scripts/db_migrate.py status
 seed: ## Seed kathirmani store/cameras/zones + model profiles/registry
 	python3 scripts/db_seed.py
-ingest-sample: ## Segment store-videos/*.mkv into 10-sec clips + 5-sec windows (DURATION=secs)
+ingest-sample: ## Segment store-videos/*.mkv into 30-sec clips (5s overlap) + 5-sec windows (DURATION=secs)
 	python3 -m ingestion $(if $(DURATION),--duration $(DURATION),--duration 30) $(if $(CAMERA),--camera $(CAMERA),)
 backfill: ## Load ingestion JSONL (data/metadata) into Postgres
 	python3 scripts/backfill_ingest.py
@@ -99,9 +99,9 @@ api: ## Run the platform API (FastAPI/uvicorn on :8000)
 	.venv/bin/uvicorn services.api.app:app --host 0.0.0.0 --port 8000
 run-cv-worker: ## Phase 4: OSS CV worker — consume ai_window.ready, emit detections/events
 	INGEST_QUEUE=pg .venv/bin/python -m ai_workers.cv_oss_worker.worker $(if $(ONCE),--once,) --limit $(or $(LIMIT),8)
-run-rule-engine: ## Phase 5: rule engine — consume event.created, raise hypotheses + incidents
+run-rule-engine: ## Phase 5: rule engine — consume event.created; forward deduped hypotheses to event.needs_vlm
 	INGEST_QUEUE=pg .venv/bin/python -m services.rule_engine.worker $(if $(ONCE),--once,) --limit $(or $(LIMIT),8)
-run-vlm-worker: ## Phase 6: VLM worker — verify needs_vlm events → vlm_observations
+run-vlm-worker: ## Phase 6: VLM worker — consume event.needs_vlm (rules-gated, deduped) → vlm_observations
 	INGEST_QUEUE=pg .venv/bin/python -m ai_workers.vlm_worker.worker $(if $(ONCE),--once,) --limit $(or $(LIMIT),8)
 run-workers: run-cv-worker run-rule-engine run-vlm-worker ## Start the AI workers (cv + rules + vlm)
 index: ## Phase 8: embed + index events/observations into pgvector

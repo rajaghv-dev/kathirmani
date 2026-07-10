@@ -2,9 +2,11 @@
 
 An NVIDIA-model, OSS-ingestion video-intelligence **platform** over the 5 Kathirmani
 store cameras. Footage is segmented into durable 30-sec clips (5-sec overlap) → 5-sec AI windows →
-a Postgres-backed queue → plugin-host AI workers (detection → deterministic rule
-engine → VLM verification) → evidence package → human approve/reject → natural-language
-search — all observable in Grafana. Models are config-driven and NVIDIA-only by default
+a Postgres-backed queue → plugin-host AI workers (frame-gated detection with a
+per-clip result cache → deterministic rule engine → subject-deduped VLM verification
+on `event.needs_vlm`) → evidence package → human approve/reject → natural-language
+search — all observable in Grafana. Measured on the full 4×60-min footage: every
+stage runs well faster than real time on one GB10 (spec/18 §Measured). Models are config-driven and NVIDIA-only by default
 (spec/11); the original Marlin/Qwen cascade is kept as a comparison baseline.
 
 ## Start here — one command, one URL

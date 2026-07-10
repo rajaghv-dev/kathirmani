@@ -111,3 +111,27 @@ pre-refactor in-memory code. Fix = `make platform` (project name now pinned) and
 re-run `bash start_stack.sh` for prometheus/serve_metrics. serve_metrics was
 already recreated (2026-07-08) — it was serving `marlin_*` names while all
 dashboards query `kathirmani_*`.
+
+---
+
+# 2026-07-09/10 follow-up — tiered pipeline build + FULL-footage run
+
+Code (commits 74acb00 → baa4313 + doc commits):
+- Frame gate (spec/16): 1 fps sampling + numpy motion gate (<15% changed → skip).
+- Segment-level detection cache: ~14 windows/clip share one decode+YOLOE+track
+  pass; windows slice cached per-frame results to their span.
+- Stream split: rules forward needs_vlm hypotheses (deduped per camera+subject+
+  type+clip) to `event.needs_vlm`; VLM consumes that stream. VLM verdict cache
+  (clip+type) = pipeline-level "KV cache" (~44 s GPU/hit; true prefix-KV blocked
+  by model.chat API).
+- Ingestion: 30-sec clips with 5-sec overlap (concurrent encoders; stride 25 s;
+  overlap-prefix windows deduped).
+- LocateAnything-3B research plugin + profile (non-commercial license; runs but
+  degenerate output on transformers 5.7 — checkpoint pins 4.57.1).
+
+Full run (4 cams × 60 min = 4 h footage, GB10): ingest 16.2 min (580 clips /
+7,484 windows) · CV 13.3 min — 92% window cache hits, 1,389 of ~360k frames to
+YOLOE (0.39%), 12,125 detections, 18 events · rules <1 s → 8 deduped VLM
+forwards · Nemotron 4.6 min for 8 (≥1 verdict-cache hit; all `unclear`,
+parse_success false — bracket-typo JSON, parser-repair TODO) · index 6 s.
+vs pre-fix baselines: 17,632 events/60 s → 18/hour; detection ≈20–90× less GPU.

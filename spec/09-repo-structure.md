@@ -29,7 +29,9 @@ kathirmani/
 │   └── security/           #  auth + RBAC + audit + redaction + retention + backup
 │
 ├── ai_workers/             # plugin-host inference workers (consume the queue)
-│   ├── cv_oss_worker/      #  YOLOE detection + Tracker (real track_ids) → events
+│   ├── cv_oss_worker/      #  gated detection (1 fps + motion skip, spec/16) + segment
+│   │                       #    result cache (spec/18) + Tracker → per-subject events;
+│   │                       #    plugins: YOLOE (default) / LocateAnything (research)
 │   ├── vlm_worker/         #  Nemotron-VL (default) / Qwen baseline / fake_infer
 │   ├── embedding_worker/   #  C-RADIO embeddings (+ random-projection head) + search
 │   └── vss_eval_worker/    #  hierarchical summary + VSS-parity report

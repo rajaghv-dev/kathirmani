@@ -182,6 +182,16 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   W4 7 evidence/9 vss/11 bench/12 hardening → W5 13 bake-off.
 - All worker/service dirs are real underscore packages (2026-07-08 refactor) —
   package-qualified imports, no per-dir conftest/pytest.ini, one flat `pytest` run.
+- **Tiered pipeline LIVE (2026-07-09, spec/18):** cv worker = 1 fps + <15%-motion
+  frame gate (spec/16) + segment-level result cache (windows slice one clip pass);
+  rule engine forwards deduped hypotheses to `event.needs_vlm` (VLM consumes THAT,
+  not event.created); vlm worker has a clip+type verdict cache. Full 4×60-min run:
+  ingest 16 min (14.8×RT) · CV 13 min (18×RT, 0.39% of frames hit YOLOE, 92%
+  window cache hits) · 18 events → 8 VLM verifications. Nemotron JSON often has
+  bracket typos → parse_success false → verdict `unclear` (parser-repair TODO).
+- LocateAnything-3B research plugin (`research_locate_anything` profile): loads on
+  transformers 5.7 via compat shims but generates degenerate output (checkpoint
+  pins 4.57.1) — needs a pinned-deps env for real output; NON-COMMERCIAL license.
 
 ## Design assets + AI image-gen (2026-06-05) → sessions/2026-06-05
 - Figures live in `design/figures/` via `design/make_figures.py` (`make figures`); NV green

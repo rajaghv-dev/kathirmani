@@ -72,6 +72,34 @@ real time → hierarchy ≈ Tier 1 at 15–20% GPU + Tiers 3/4 under ~27 min/h c
     `event.needs_vlm` → VLM. Measured failure: rules and the VLM worker both
     consume `event.created`; rules drained all 176 messages and the VLM got 0.
 
+## Measured: the full-footage run (2026-07-09, GB10)
+
+The first end-to-end run over ALL footage — 4 cameras × 60 min = **4 hours of
+2688×1520@25fps video** — with the implemented tiers (frame gate, segment
+cache, stream split, verdict cache):
+
+| Stage | Wall | vs footage runtime | Detail |
+|---|---|---|---|
+| Ingest (4 cams parallel) | 16.2 min | **14.8× faster** | 580 clips (30 s/5 s overlap) → 7,484 windows |
+| Backfill → Postgres | 3 s | — | 580 segments + 7,484 windows |
+| CV detection | 13.3 min | **18× faster** | 92% of windows (6,908/7,484) served from the segment cache; 17,305 frames sampled @1 fps; 15,916 motion-skipped; **1,389 of ~360,000 frames reached YOLOE (0.39%)**; 12,125 detections |
+| Rule engine | <1 s | — | 18 hypotheses in → **8 unique verifications** forwarded on `event.needs_vlm` (subject/clip dedup) |
+| VLM (Nemotron-8B) | 4.6 min | — | 8 verifications (incl. ≥1 verdict-cache hit on a same-clip duplicate); all verdicts `unclear` — the model's JSON has bracket typos the parser doesn't yet repair (known follow-up) |
+| Embedding index (C-RADIO) | 6 s | — | 48 events + 18 observations indexed |
+
+**Against the measured naive baselines:**
+- Events: **18 from the full hour** vs 17,632 duplicates from 60 *seconds* of
+  the same footage pre-fix (~10⁵× noise reduction at equal footage).
+- Detection GPU: pre-gate detection measured 1.27× real time (≈5 GPU-hours for
+  this footage; ~14× worse again if each 30-s clip were re-detected per
+  window) → actual 13.3 min = **~20–90× less GPU**.
+- VLM: raw per-window hypothesizing would have queued hundreds of ~44-s
+  verifications; dedup + gating reduced it to **8**.
+
+Net: the full pipeline processes an hour of 5-camera-class footage in well
+under real time on the single GB10 — the spec's "< 1 GPU-hour per hour"
+budget is met with a wide margin.
+
 ## Operating modes → profiles (spec/16)
 
 - **Hot path (live)** = Tiers 0–4 with budget caps: bounded latency, real-time

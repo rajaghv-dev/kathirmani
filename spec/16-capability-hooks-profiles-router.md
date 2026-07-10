@@ -223,9 +223,11 @@ Gate stats travel with every run as `model_run.frame_gate`
 
 Measured on a real right-aisle clip (10 s, 25 fps, 2688×1520): 250 frames →
 10 sampled → **1 detected** (9 static-skipped) → 3 detections in 1.13 s wall,
-vs 938 detections in 3.2 s ungated. This is the WHEN hook's cheapest tier; the
-policy (which frames matter) stays deterministic per the mechanism-vs-policy
-rule (spec/10 ingestion).
+vs 938 detections in 3.2 s ungated. At full scale (4 cams × 60 min,
+2026-07-09): 17,305 sampled / 15,916 motion-skipped / **1,389 of ~360,000
+frames reached YOLOE (0.39%)** — spec/18 §Measured. This is the WHEN hook's
+cheapest tier; the policy (which frames matter) stays deterministic per the
+mechanism-vs-policy rule (spec/10 ingestion).
 
 ## How a low-cost model approaches frontier usefulness
 
