@@ -84,7 +84,7 @@ cache, stream split, verdict cache):
 | Backfill → Postgres | 3 s | — | 580 segments + 7,484 windows |
 | CV detection | 13.3 min | **18× faster** | 92% of windows (6,908/7,484) served from the segment cache; 17,305 frames sampled @1 fps; 15,916 motion-skipped; **1,389 of ~360,000 frames reached YOLOE (0.39%)**; 12,125 detections |
 | Rule engine | <1 s | — | 18 hypotheses in → **8 unique verifications** forwarded on `event.needs_vlm` (subject/clip dedup) |
-| VLM (Nemotron-8B) | 4.6 min | — | 8 verifications (incl. ≥1 verdict-cache hit on a same-clip duplicate); all verdicts `unclear` — the model's JSON has bracket typos the parser doesn't yet repair (known follow-up) |
+| VLM (Nemotron-8B) | 4.6 min | — | 8 verifications (incl. ≥1 verdict-cache hit on a same-clip duplicate). Verdicts: 8× `unclear` @ avg 0.40 confidence — the model's honest read of ambiguous footage. (Its JSON systematically closes arrays with `)` instead of `]`; the parser's mismatched-closer repair — added 2026-07-10 — now recovers 8/8, where all 8 previously failed parsing.) |
 | Embedding index (C-RADIO) | 6 s | — | 48 events + 18 observations indexed |
 
 **Against the measured naive baselines:**

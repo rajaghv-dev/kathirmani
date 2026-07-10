@@ -80,3 +80,34 @@ def test_unknown_verdict_collapses_to_unclear():
 def test_string_lists_coerced():
     v = coerce({"verdict": "benign", "observed_actions": "walked in; looked around"})
     assert v.observed_actions == ["walked in", "looked around"]
+
+
+def test_repairs_paren_closed_array():
+    """Nemotron's signature bracket typo: an array closed with `)` instead of
+    `]` — every parse failure of the 2026-07-09 full-footage run had exactly
+    this shape. The repair must recover verdict/confidence/lists intact."""
+    raw = ('{"verdict": "unclear", "confidence": 0.5, '
+           '"observed_actions": ["Person standing near the shelves.", '
+           '"Another person partially visible."], '
+           '"missing_evidence": ["Clearer view to confirm intentions."), '
+           '"recommended_next_step": "Review other footage.", '
+           '"structured_event_type": "suspicious_item_interaction", '
+           '"explanation": "Not enough clarity."}')
+    v, _, ok = parse_verification(raw)
+    assert ok is True
+    assert v["verdict"] == "unclear" and v["confidence"] == 0.5
+    assert v["observed_actions"] == ["Person standing near the shelves.",
+                                     "Another person partially visible."]
+    assert v["missing_evidence"] == ["Clearer view to confirm intentions."]
+
+
+def test_repairs_paren_typo_plus_truncation():
+    """Both defects at once: paren-closed array AND output truncated at the
+    token cap — the combined repair path must still recover the object."""
+    raw = ('{"verdict": "suspicious", "confidence": 0.8, '
+           '"observed_actions": ["Item concealed in bag."), '
+           '"missing_evidence": ["POS re')
+    v, _, ok = parse_verification(raw)
+    assert ok is True
+    assert v["verdict"] == "suspicious" and v["confidence"] == 0.8
+    assert v["observed_actions"] == ["Item concealed in bag."]

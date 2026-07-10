@@ -66,6 +66,47 @@ def _first_json_object(text: str) -> str | None:
     return None
 
 
+def _repair_mismatched_closers(text: str) -> str | None:
+    """Fix bracket-typo JSON: Nemotron systematically closes arrays with ``)``
+    instead of ``]`` (every parse failure of the 2026-07-09 full run was
+    ``"…"), "next_key"``). Walk the text outside string literals with a stack
+    of expected closers; a ``)`` or a mismatched ``]``/``}`` is replaced by
+    the closer the stack expects, stray closers are dropped, and a lone ``(``
+    outside a string (invalid JSON either way) is dropped. Returns the
+    repaired ``{...}`` string or None if there's no object start."""
+    start = text.find("{")
+    if start < 0:
+        return None
+    out: list[str] = []
+    stack: list[str] = []
+    in_str = esc = False
+    for c in text[start:]:
+        if in_str:
+            out.append(c)
+            if esc:
+                esc = False
+            elif c == "\\":
+                esc = True
+            elif c == '"':
+                in_str = False
+            continue
+        if c == '"':
+            in_str = True
+            out.append(c)
+        elif c in "{[":
+            stack.append("}" if c == "{" else "]")
+            out.append(c)
+        elif c in ")]}":
+            if not stack:
+                continue                      # stray closer: drop
+            out.append(stack.pop())           # emit what the structure expects
+        elif c == "(":
+            continue                          # stray opener: drop
+        else:
+            out.append(c)
+    return "".join(out)
+
+
 def _repair_truncated(text: str) -> str | None:
     """Salvage a JSON object truncated mid-output (small VLMs hit the token cap):
     close a dangling string, drop trailing commas, and append the missing closing
@@ -183,10 +224,18 @@ def parse_verification(raw_text: str) -> tuple[dict[str, Any], str, bool]:
         span = _first_json_object(_strip_fences(raw_text))
         if span is not None:
             obj = _try_load(span)
-    if obj is None:                                   # 4) repair a truncated object
+    if obj is None:                                   # 4) repair bracket typos ()->]
+        repaired = _repair_mismatched_closers(_strip_fences(raw_text))
+        if repaired is not None:
+            obj = _try_load(repaired)
+    if obj is None:                                   # 5) repair a truncated object
         repaired = _repair_truncated(_strip_fences(raw_text))
         if repaired is not None:
             obj = _try_load(repaired)
+        if obj is None and repaired is not None:      # 6) both defects at once
+            repaired2 = _repair_mismatched_closers(repaired)
+            if repaired2 is not None:
+                obj = _try_load(repaired2)
 
     if obj is None:
         return asdict(_unparsed(raw_text)), raw_text, False

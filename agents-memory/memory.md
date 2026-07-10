@@ -187,8 +187,9 @@ Prometheus/Grafana/Loki + Streamlit viewer. → `spec/01`, `spec/02`.
   rule engine forwards deduped hypotheses to `event.needs_vlm` (VLM consumes THAT,
   not event.created); vlm worker has a clip+type verdict cache. Full 4×60-min run:
   ingest 16 min (14.8×RT) · CV 13 min (18×RT, 0.39% of frames hit YOLOE, 92%
-  window cache hits) · 18 events → 8 VLM verifications. Nemotron JSON often has
-  bracket typos → parse_success false → verdict `unclear` (parser-repair TODO).
+  window cache hits) · 18 events → 8 VLM verifications. Nemotron JSON closes
+  arrays with `)` not `]` — parser's mismatched-closer repair (2026-07-10)
+  recovers it; 8/8 parse (verdicts honest `unclear` @ ~0.4 conf on this footage).
 - LocateAnything-3B research plugin (`research_locate_anything` profile): loads on
   transformers 5.7 via compat shims but generates degenerate output (checkpoint
   pins 4.57.1) — needs a pinned-deps env for real output; NON-COMMERCIAL license.
